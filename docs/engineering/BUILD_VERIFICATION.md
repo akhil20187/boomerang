@@ -34,6 +34,7 @@ Screenshots live in [verification](../verification/). Earlier captures may prece
 - Wider extraction reliability and unsupported/unreadable-link recovery. Typed and one Amazon-link search are verified.
 - Public MCP/OAuth endpoint and persistent refresh/revocation.
   Publication is awaiting specific user permission after automatic approval review rejected the new public login/security routes. Local security tests pass; those routes are not deployed yet.
+  Latest read-only deployment check: `/.well-known/oauth-authorization-server` returns HTTP 200 with `text/html`, the website fallback rather than OAuth JSON. This confirms account linking is unavailable on the live deployment.
 - Full controlled task with fake bridge through completion, recording ingestion, signed playback and exactly one started/completed email.
   Guarded synthetic task tests already cover no dialing, exactly two mocked notification sends despite retries, private playback and token revocation. Final deployed AgentMail delivery has not run.
 - Always-on audio-server deployment and final live Vobiz/OpenAI/recording test with the user.
