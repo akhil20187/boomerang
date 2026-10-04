@@ -1,0 +1,13 @@
+
+.env.local
+.env
+.env.*
+node_modules/
+.DS_Store
+voice-test/phone-results/
+.superpowers/
+mcp/.state/
+call-bridge/.state/
+call-bridge/data/
+web/dist/
+docs/verification/*.webm

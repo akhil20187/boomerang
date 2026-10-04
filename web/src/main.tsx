@@ -1,0 +1,11 @@
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {ConvexReactClient} from 'convex/react';
+import {ConvexAuthProvider} from '@convex-dev/auth/react';
+import {App} from './App';
+import {ErrorBoundary} from './ErrorBoundary';
+import './style.css';
+import './account.css';
+const url=import.meta.env.VITE_CONVEX_URL;
+const app=<ErrorBoundary><App connected={!!url}/></ErrorBoundary>;
+createRoot(document.getElementById('root')!).render(<React.StrictMode>{url?<ConvexAuthProvider client={new ConvexReactClient(url)}>{app}</ConvexAuthProvider>:app}</React.StrictMode>);
