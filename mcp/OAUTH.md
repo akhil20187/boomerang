@@ -1,5 +1,9 @@
 # Account linking
 
+Default redirects exactly match ChatGPT's `https://chatgpt.com/connector_platform_oauth_redirect` and Claude's `https://claude.ai/api/mcp/auth_callback`. No wildcard host/path is accepted. Both addresses appear in [Google Cloud's application setup guide](https://docs.cloud.google.com/mcp/configure-mcp-ai-application), checked 5 October 2026. This establishes callback configuration, not a successful host connection.
+
+In Claude's OAuth client settings, use **Register automatically** for this implementation. It supports dynamic client registration, not Claude's published client-metadata identity. The setting is described in [Claude's current custom-connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp), checked 5 October 2026. Host connection is still unverified.
+
 `oauth.mjs` supplies OAuth metadata, exact-allowlist client registration, authorization requests, website consent, one-use authorization codes with S256 proof, scoped access tokens and revocation. Convex verifies the signed-in customer and stores the underlying account token. No shared server customer identity exists.
 
 Root server integration configures issuer from `MCP_PUBLIC_URL`, website approval page from `SITE_URL + '/connect'`, and exact host callback URLs from `MCP_OAUTH_REDIRECT_URIS`. The official ChatGPT stable callback is `https://chatgpt.com/connector_platform_oauth_redirect` when issuer identification is supported. Copy any connection-specific callback from the host management page into the explicit allowlist. Unknown redirect URLs are rejected, including lookalike host domains.

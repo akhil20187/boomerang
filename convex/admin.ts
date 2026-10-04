@@ -1,5 +1,6 @@
 import { internalMutation } from "./_generated/server";
 import { v } from "convex/values";
+import { addGrantToAccount } from "./credits";
 export const approve = internalMutation({
   args: { email: v.string(), grantWelcomeCredit: v.boolean() },
   returns: v.any(),
@@ -17,7 +18,7 @@ export const approve = internalMutation({
         .query("creditEntries")
         .withIndex("by_operation", (q) => q.eq("operationId", operationId))
         .unique();
-      if (!old)
+      if (!old) {
         await ctx.db.insert("creditEntries", {
           userId: user._id,
           amount: 5,
@@ -26,6 +27,8 @@ export const approve = internalMutation({
           reason: "Approved $5 welcome credit",
           operationId,
         });
+        await addGrantToAccount(ctx, user._id, 500);
+      }
     }
     return { userId: user._id };
   },

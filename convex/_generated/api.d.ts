@@ -12,6 +12,7 @@ import type * as access from "../access.js";
 import type * as admin from "../admin.js";
 import type * as auth from "../auth.js";
 import type * as calls from "../calls.js";
+import type * as credits from "../credits.js";
 import type * as crons from "../crons.js";
 import type * as discovery from "../discovery.js";
 import type * as domain from "../domain.js";
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   auth: typeof auth;
   calls: typeof calls;
+  credits: typeof credits;
   crons: typeof crons;
   discovery: typeof discovery;
   domain: typeof domain;

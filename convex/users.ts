@@ -1,6 +1,7 @@
 import { query, mutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { requireUser, hashToken } from "./access";
+import { balances, configuredPrice } from "./credits";
 export const updateProfile = mutation({
   args: { name: v.string() },
   returns: v.null(),
@@ -29,18 +30,23 @@ export const me = query({
       process.env.APPROVED_EMAILS?.split(",").map((x) =>
         x.trim().toLowerCase(),
       ) ?? [];
-    const entries = await ctx.db
-      .query("creditEntries")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .take(10000);
+    const credit = await balances(ctx, userId);
+    let answerPriceCents: number | null = null;
+    try {
+      answerPriceCents = configuredPrice();
+    } catch {}
     return {
       id: userId,
       email: user.email,
       name: user.name,
       eligible:
         !!user.eligible || approved.includes(user.email?.toLowerCase() ?? ""),
-      creditBalance: entries.reduce((n, x) => n + x.amount, 0),
+      creditBalance: credit.balanceCents / 100,
+      availableBalance: credit.availableCents / 100,
+      reservedBalance: credit.reservedCents / 100,
       currency: "USD",
+      answerPriceCents,
+      pricingConfigured: answerPriceCents !== null,
       callingEnabled: process.env.LIVE_CALLS_ENABLED === "true",
       emailConfigured:
         !!process.env.RESEND_API_KEY && !!process.env.RESEND_FROM_EMAIL,

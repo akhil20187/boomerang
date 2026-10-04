@@ -1,6 +1,7 @@
 import { query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requireUser } from "./access";
+import { configuredPrice } from "./credits";
 import { productV, shopV } from "./validators";
 export const save = internalMutation({
   args: {
@@ -31,6 +32,10 @@ export const get = query({
       throw new Error(
         "This shop search has expired. Search again for current listings.",
       );
-    return draft;
+    let answerPriceCents: number | null = null;
+    try {
+      answerPriceCents = configuredPrice();
+    } catch {}
+    return { ...draft, attribution: "Google Maps", answerPriceCents };
   },
 });

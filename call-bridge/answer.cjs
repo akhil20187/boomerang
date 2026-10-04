@@ -8,7 +8,7 @@ async function extractAnswer({transcript=[],productDescription,apiKey,model='gpt
   if(!response.ok)return unconfirmed();
   const data=await response.json(),answer=JSON.parse(data.choices?.[0]?.message?.content||'null');
   if(!answer||!['available','unavailable','unconfirmed'].includes(answer.stock)||!['confirmed','different','unconfirmed'].includes(answer.variantMatch)||answer.currency!=='INR'||typeof answer.personalCallNeeded!=='boolean'||!Array.isArray(answer.evidenceQuotes)||answer.evidenceQuotes.some(q=>typeof q!=='string'||!q.trim()||!shopText.includes(q)))return unconfirmed();
-  if((answer.stock!=='unconfirmed'||answer.finalPrice!==null||answer.personalCallNeeded)&&!answer.evidenceQuotes.length)return unconfirmed();
+  if((answer.stock!=='unconfirmed'||answer.variantMatch!=='unconfirmed'||answer.finalPrice!==null||answer.offers!==null||answer.notes!==null||answer.personalCallNeeded)&&!answer.evidenceQuotes.length)return unconfirmed();
   if(answer.finalPrice!==null&&(!Number.isFinite(answer.finalPrice)||answer.finalPrice<0))return unconfirmed();
   if(answer.variantMatch==='different'){answer.stock='unconfirmed';answer.finalPrice=null;}
   return answer;

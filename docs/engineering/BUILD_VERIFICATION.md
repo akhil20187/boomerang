@@ -7,6 +7,7 @@
 - [Live app](https://little-kangaroo-718.convex.site)
 - [Interactive demo](https://little-kangaroo-718.convex.site/demo): sample shops and answers, no calls or charges. The recording is a sample tone.
 - [Account](https://little-kangaroo-718.convex.site/account): email sign-in, customer call name, credit/access status and revocable assistant access keys.
+- [Approved setup guide](https://little-kangaroo-718.convex.site/setup.html): published design preview with the planned server address and a visible notice that calling/chat connections are not available yet.
 
 Convex database/functions and static website are deployed to the existing development deployment. Google, Monid, OpenAI and Resend credentials are configured server-side under explicit user approval. Live calling remains disabled. No real shop calls were placed in this build session.
 
@@ -18,10 +19,12 @@ Convex database/functions and static website are deployed to the existing develo
 - Sample audio: browser audio loaded a 12-second fixture, played, switched to 1.5x and accepted seek input. This does not verify Vobiz recordings.
 - Email sign-in: one transactional sign-in email was received in the authorised AgentMail test inbox; its link signed the test account into the deployed app. No broadcasts/customer emails were sent.
 - Deployed typed-product search returned 18 Google listings for the controlled test pincode. Repair-only listings appeared among retailers; relevance filtering is being corrected.
-- Current check: 54 local tests and 22 Convex tests pass. Local HTTP mocks required sandbox permission to bind ports; no live dial or email is performed by these tests.
+- Current check: 65 local tests and 31 Convex tests pass (96 total). Local HTTP mocks required sandbox permission to bind ports; no live dial or email is performed by these tests.
 - Live task start correctly blocks an unapproved account. Raw server traces found in the error display were replaced with structured customer messages, with regression tests.
 - One deployed Amazon-link check completed: B0H4LBXQDC returned Samsung Galaxy M47, Blaze Blue, 6GB + 128GB, Without Samsung Care, and 14 candidate shops. The exact selected variant appeared before approval. No shop call was started. This verifies one integration run, not repeated extraction reliability.
 - Independent Astra review identified phone-format, callback, links, playback and recovery issues; fixes are being verified before final publication.
+- Credit accounting is implemented locally: configured integer cents with no default price, frozen quotes and consent checking, atomic per-shop holds, one-time charges/releases/refunds, and no charge for empty answers or transport failure. Concurrent overspend and duplicate settlement regression tests pass. These backend changes are not deployed; no real price has been selected.
+- Voice-server container and private volume setup are prepared; configuration validation, local bind choices and evidence extraction tests pass. Docker's daemon is not running, so the image build/run has not been verified.
 
 Screenshots live in [verification](../verification/). Earlier captures may precede final UI fixes; final captures are refreshed after publication.
 
@@ -34,8 +37,9 @@ Screenshots live in [verification](../verification/). Earlier captures may prece
 - Full controlled task with fake bridge through completion, recording ingestion, signed playback and exactly one started/completed email.
   Guarded synthetic task tests already cover no dialing, exactly two mocked notification sends despite retries, private playback and token revocation. Final deployed AgentMail delivery has not run.
 - Always-on audio-server deployment and final live Vobiz/OpenAI/recording test with the user.
-- Charging rule and price, atomic credit reservation/debit/refunds. Current credit visibility/eligibility is not a complete billing system. Paid use stays disabled.
+- Charging rule and price, payment checkout/top-up and dispute/refund operations. Atomic credit reservation/debit/refund machinery is tested locally, but does not prove paid billing. Paid use stays disabled.
 - Google listing retention policy and required attribution treatment beyond temporary search results.
+  [Primary-source review](GOOGLE_LISTING_DATA.md) distinguishes allowed place-ID retention from the unresolved permanent listing snapshots. Attribution is being added to the live card.
 
 ## Run locally
 

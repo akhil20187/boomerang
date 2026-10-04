@@ -11,10 +11,11 @@ test('missing bearer token never reaches the backend', async () => {
 test('task creation forwards selection and retry key with authenticated account token', async () => {
   let request;
   const tools = createTools({mutation:async (fn,args) => {request=args;return {taskId:'task1'};}},'secret-account-token');
-  assert.deepEqual(await tools.start_calls({draftId:'draft1',selectedPlaceIds:['shop1'],idempotencyKey:'same-click'}), {taskId:'task1'});
+  assert.deepEqual(await tools.start_calls({draftId:'draft1',selectedPlaceIds:['shop1'],idempotencyKey:'same-click',expectedAnswerPriceCents:125}), {taskId:'task1'});
   assert.equal(request.accessToken,'secret-account-token');
   assert.deepEqual(request.selectedPlaceIds,['shop1']);
   assert.equal(request.idempotencyKey,'same-click');
+  assert.equal(request.expectedAnswerPriceCents,125);
 });
 test('only Bearer authorization is accepted', () => {
   assert.equal(bearerToken('Basic password'),null);

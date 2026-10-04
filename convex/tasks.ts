@@ -9,12 +9,14 @@ import { v, ConvexError } from "convex/values";
 import { requireUser, requireEligible } from "./access";
 import { validateSelection } from "./domain";
 import { workflow } from "./workflows";
+import { configuredPrice, reserve, balances } from "./credits";
 export const start = mutation({
   args: {
     draftId: v.id("drafts"),
     selectedPlaceIds: v.array(v.string()),
     idempotencyKey: v.string(),
     accessToken: v.optional(v.string()),
+    expectedAnswerPriceCents: v.optional(v.number()),
   },
   returns: v.object({ taskId: v.id("tasks") }),
   handler: async (ctx, args): Promise<{ taskId: any }> => {
@@ -61,6 +63,11 @@ export const start = mutation({
       throw new ConvexError(
         "Add your name to your account before we call shops on your behalf.",
       );
+    const answerPriceCents = configuredPrice();
+    if (args.expectedAnswerPriceCents !== answerPriceCents)
+      throw new ConvexError(
+        "The calling price needs your review. Check the current price and approve the shops again.",
+      );
     if (
       process.env.LIVE_CALLS_ENABLED !== "true" ||
       !process.env.CALL_BRIDGE_URL ||
@@ -89,16 +96,21 @@ export const start = mutation({
       status: "queued",
       approvedAt: Date.now(),
       idempotencyKey: args.idempotencyKey,
+      answerPriceCents,
     });
+    const shopJobIds = [];
     for (const shop of selected)
-      await ctx.db.insert("shopJobs", {
-        taskId,
-        shop,
-        state: "waiting",
-        attemptCount: 0,
-        executor: "AI",
-        billingState: "not_assessed",
-      });
+      shopJobIds.push(
+        await ctx.db.insert("shopJobs", {
+          taskId,
+          shop,
+          state: "waiting",
+          attemptCount: 0,
+          executor: "AI",
+          billingState: "not_assessed",
+        }),
+      );
+    await reserve(ctx, userId, taskId, shopJobIds, answerPriceCents);
     await ctx.db.insert("taskEvents", {
       taskId,
       eventId: `${taskId}:approved`,
@@ -153,6 +165,7 @@ export const get = query({
     );
     return {
       task,
+      credit: await balances(ctx, userId),
       product: task.product,
       shops,
       events,

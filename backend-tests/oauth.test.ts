@@ -10,6 +10,25 @@ afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
+it("accepts exact Claude redirect registration and rejects lookalike hosts or callback prefixes", async () => {
+  vi.stubEnv("CONVEX_SITE_URL", "https://app.convex.site");
+  const t = convexTest(schema, modules);
+  const register = (uri: string) =>
+    t.mutation(internal.oauth.operate, {
+      op: "register",
+      data: { redirect_uris: [uri] },
+    });
+  expect(
+    (await register("https://claude.ai/api/mcp/auth_callback")).status,
+  ).toBe(201);
+  for (const uri of [
+    "https://claude.ai.attacker.example/api/mcp/auth_callback",
+    "https://claude.ai/api/mcp/auth_callback/extra",
+    "https://claude.ai/api/mcp/auth_callback?next=attacker",
+    "https://claude.ai/api/mcp/auth_callback-malicious",
+  ])
+    expect((await register(uri)).body.error).toBe("invalid_redirect_uri");
+});
 it("serves OAuth discovery and stateless MCP tools behind account bearer authentication", async () => {
   vi.stubEnv("CONVEX_SITE_URL", "https://app.convex.site");
   vi.stubEnv("SITE_URL", "https://app.convex.site");

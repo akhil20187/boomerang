@@ -1,0 +1,484 @@
+<meta charset="utf-8">
+<title>Connect Human MCP</title>
+<style>
+/* Layout: a sticky scroll scene (real lavender phone + glass price tag; the Amazon price gets cut, the green nearby-shop tag swings in), then the story in one reading column.
+   Type: the system font only. Two weights: 800 for display and headings, 400 for everything you read. 600 is used sparingly for labels inside the demo card.
+   Surface: flat white, near-black type, green only for "the shop has it". Frosted glass on exactly three surfaces: the two price tags and the copy-address panel.
+   Behind the hero sit soft lavender and green colour fields so the glass has something to blur. */
+:root {
+  --bg: #FFFFFF;
+  --fg: #111110;
+  --muted: #5F5E5A;
+  --faint: #74726C;
+  --line: #DAD7D0;
+  --soft: #F4F3F0;
+  --accent: #111110;
+  --on-accent: #FFFFFF;
+  --win: #0F6B3E;
+  --on-win: #FFFFFF;
+  --win-text: #0F6B3E;
+  --blue: #2341B5;
+  --amber: #7A4A00;
+  --amber-soft: #FBF0DF;
+  --grey: #55544F;
+  /* glass */
+  --glass-fill: rgba(255, 255, 255, 0.56);
+  --glass-line: rgba(255, 255, 255, 0.85);
+  --glass-edge: rgba(17, 17, 16, 0.10);
+  --glass-hi: rgba(255, 255, 255, 0.95);
+  --glass-shadow: rgba(17, 17, 16, 0.24);
+  --win-glass: rgba(15, 107, 62, 0.88);
+  --win-line: rgba(255, 255, 255, 0.30);
+  --win-shadow: rgba(15, 107, 62, 0.45);
+  /* colour fields behind the hero */
+  --field-lav: rgba(203, 190, 232, 0.85);
+  --field-green: rgba(170, 222, 190, 0.80);
+  --phone-shadow: rgba(17, 17, 16, 0.22);
+  /* type */
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  /* spacing scale (4px base) */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px;
+  --radius: 10px;
+  --radius-lg: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121211; --fg: #F2F1ED; --muted: #A8A6A0; --faint: #8E8C86; --line: #34332F; --soft: #1E1D1B;
+    --accent: #F2F1ED; --on-accent: #121211; --win: #167A48; --on-win: #FFFFFF; --win-text: #6FD19B; --blue: #9DB0F5;
+    --amber: #E7B567; --amber-soft: #33281A; --grey: #BDBBB5;
+    --glass-fill: rgba(34, 34, 32, 0.55); --glass-line: rgba(255, 255, 255, 0.16); --glass-edge: rgba(255, 255, 255, 0.12);
+    --glass-hi: rgba(255, 255, 255, 0.10); --glass-shadow: rgba(0, 0, 0, 0.65);
+    --win-glass: rgba(22, 122, 72, 0.90); --win-line: rgba(255, 255, 255, 0.22); --win-shadow: rgba(22, 122, 72, 0.5);
+    --field-lav: rgba(118, 100, 170, 0.40); --field-green: rgba(40, 125, 82, 0.34); --phone-shadow: rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121211; --fg: #F2F1ED; --muted: #A8A6A0; --faint: #8E8C86; --line: #34332F; --soft: #1E1D1B;
+  --accent: #F2F1ED; --on-accent: #121211; --win: #167A48; --on-win: #FFFFFF; --win-text: #6FD19B; --blue: #9DB0F5;
+  --amber: #E7B567; --amber-soft: #33281A; --grey: #BDBBB5;
+  --glass-fill: rgba(34, 34, 32, 0.55); --glass-line: rgba(255, 255, 255, 0.16); --glass-edge: rgba(255, 255, 255, 0.12);
+  --glass-hi: rgba(255, 255, 255, 0.10); --glass-shadow: rgba(0, 0, 0, 0.65);
+  --win-glass: rgba(22, 122, 72, 0.90); --win-line: rgba(255, 255, 255, 0.22); --win-shadow: rgba(22, 122, 72, 0.5);
+  --field-lav: rgba(118, 100, 170, 0.40); --field-green: rgba(40, 125, 82, 0.34); --phone-shadow: rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { overflow-x: clip; }
+body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.55; padding-inline: 16px; padding-block: 0 var(--s8); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--fg); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; border-radius: 6px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Glass (three surfaces only) ---------- */
+.glass {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 30px 60px -30px var(--glass-shadow);
+}
+/* Colour fields: plain radial gradients, no filter, so they stay cheap and edge-free. */
+.field { position: absolute; pointer-events: none; border-radius: 50%; z-index: 0; }
+.field-lav { background: radial-gradient(closest-side, var(--field-lav), transparent 70%); }
+.field-green { background: radial-gradient(closest-side, var(--field-green), transparent 70%); }
+
+/* ---------- Scroll scene ---------- */
+.scrolly { position: relative; height: 300vh; margin-inline: -16px; --p1: 0; --p2: 0; --p3: 0; }
+.stage { position: sticky; top: env(safe-area-inset-top, 0px); height: 100vh; min-height: 620px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s6); padding: var(--s7) 16px var(--s6); overflow: hidden; }
+.stage .field-lav { width: 64vmax; height: 64vmax; left: -16vmax; top: -4vmax; }
+.stage .field-green { width: 56vmax; height: 56vmax; right: -18vmax; bottom: -14vmax; opacity: calc(0.4 + var(--p2) * 0.6); }
+.stage > :not(.field) { position: relative; z-index: 1; }
+.eyebrow { font-size: 12px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-align: center; text-wrap: balance; }
+.scene { position: relative; width: 100%; display: flex; align-items: center; justify-content: center; gap: clamp(20px, 6vw, 88px); flex-wrap: wrap; }
+.phone { width: clamp(170px, 27vw, 320px); height: auto; aspect-ratio: 625 / 960; flex-shrink: 0; transform: rotate(-5deg); filter: drop-shadow(0 28px 36px var(--phone-shadow)); display: block; }
+.tags { position: relative; width: clamp(280px, 36vw, 420px); height: clamp(260px, 25vw, 310px); }
+.tag { position: absolute; left: 0; right: 0; border-radius: var(--radius-lg); padding: var(--s5) var(--s5) var(--s5) 58px; display: flex; flex-direction: column; transform-origin: 22px 50%; }
+.tag::before { content: ""; position: absolute; left: 22px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 50%; border: 1.5px solid currentColor; background: transparent; }
+.tag .price { font-size: clamp(44px, 6vw, 68px); font-weight: 800; letter-spacing: -0.035em; line-height: 1; font-variant-numeric: tabular-nums; }
+.tag .where { font-size: clamp(17px, 1.9vw, 20px); font-weight: 400; margin-top: var(--s2); }
+.tag .note { font-size: 13px; font-weight: 400; opacity: 0.8; margin-top: var(--s1); }
+.tag-old { top: 0; color: var(--fg);
+  transform: rotate(calc(-3deg - var(--p2) * 4deg)) translateY(calc(var(--p2) * -10px)); opacity: calc(1 - var(--p2) * 0.4); }
+.strike { position: absolute; left: 54px; top: calc(var(--s5) + 0.5em); height: 5px; width: 260px; max-width: calc(100% - 80px); background: var(--fg); border-radius: 3px; transform-origin: left center; transform: rotate(-5deg) scaleX(var(--p1)); font-size: clamp(44px, 6vw, 68px); }
+.tag-new { top: 48%; color: var(--on-win); background: var(--win-glass); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); border: 1px solid var(--win-line); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32), 0 32px 60px -24px var(--win-shadow);
+  transform: translateX(calc((1 - var(--p2)) * 120%)) rotate(calc(4deg - var(--p2) * 6deg)); opacity: var(--p2); }
+.tag-new .where { font-weight: 800; letter-spacing: -0.01em; }
+.caption { max-width: 32em; text-align: center; font-size: clamp(18px, 2.2vw, 22px); line-height: 1.4; min-height: 2.9em; }
+.cta { display: flex; flex-direction: column; align-items: center; gap: var(--s3); opacity: var(--p3); transform: translateY(calc((1 - var(--p3)) * 12px)); }
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 54px; padding: 0 var(--s6); border-radius: var(--radius); background: var(--accent); color: var(--on-accent); font-weight: 800; letter-spacing: -0.01em; font-size: 16px; text-decoration: none; }
+.btn-primary:hover { color: var(--on-accent); opacity: 0.9; }
+.avail { font-size: 13px; color: var(--muted); }
+.hint { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); opacity: calc(1 - var(--p1) * 3); }
+@media (max-width: 700px) {
+  .stage { gap: var(--s5); padding-top: var(--s6); min-height: 660px; }
+  .scene { flex-direction: column; gap: var(--s6); }
+  .phone { width: 118px; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.08em; }
+  .tags { width: min(340px, 100%); height: 240px; }
+  .tag { padding: var(--s4) var(--s4) var(--s4) 48px; border-radius: 14px; }
+  .tag::before { left: 18px; }
+  .tag .price { font-size: 40px; }
+  .tag .where { font-size: 17px; margin-top: var(--s1); }
+  .tag .note { font-size: 12px; }
+  .tag-new { top: 46%; }
+  .strike { left: 46px; top: calc(var(--s4) + 18px); width: 185px; max-width: calc(100% - 64px); font-size: 40px; }
+}
+.still .scrolly { height: auto; --p1: 1; --p2: 1; --p3: 1; }
+.still .stage { position: static; height: auto; min-height: 0; padding-block: var(--s8) var(--s5); }
+.still .hint { display: none; }
+
+/* ---------- Story ---------- */
+main { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--s9); padding-top: var(--s7); }
+section { display: flex; flex-direction: column; gap: var(--s5); }
+.kicker { font-size: 12px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: calc(var(--s3) * -1); }
+h2 { font-size: clamp(32px, 4.8vw, 46px); line-height: 1.06; font-weight: 800; letter-spacing: -0.03em; }
+h3 { font-size: 17px; font-weight: 800; letter-spacing: -0.01em; }
+.lede { font-size: 18px; color: var(--muted); }
+.why-turn { font-size: clamp(22px, 3vw, 28px); line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; color: var(--fg); margin-top: var(--s4, 16px); }
+
+.demo { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4); margin-top: var(--s2); }
+.said { display: flex; flex-direction: column; gap: var(--s1); min-height: 124px; justify-content: flex-end; }
+.said p { font-size: 15px; color: var(--faint); line-height: 1.4; transition: opacity .4s ease, color .4s ease; }
+.said p.who { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-bottom: var(--s1); }
+.said p.now { color: var(--fg); font-weight: 800; letter-spacing: -0.01em; }
+.pillrow { display: flex; align-items: center; gap: var(--s3); }
+.pill { width: 96px; height: 48px; border: 1.5px solid var(--fg); border-radius: 24px; display: flex; align-items: center; justify-content: center; gap: 3px; flex-shrink: 0; }
+.pill i { display: block; width: 3px; border-radius: 2px; background: var(--fg); height: 8px; transform-origin: center; }
+.pill i:nth-child(2n) { animation-delay: -.4s; } .pill i:nth-child(3n) { animation-delay: -.7s; }
+.pill.live i { animation: wave 1s ease-in-out infinite; }
+@keyframes wave { 0%, 100% { transform: scaleY(0.5); } 50% { transform: scaleY(1.9); } }
+.pillrow span { font-size: 14px; color: var(--muted); }
+.card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); overflow: hidden; }
+.card-head { padding: var(--s3) var(--s4); display: flex; justify-content: space-between; gap: var(--s2); font-size: 13px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.card-head b { font-weight: 800; letter-spacing: -0.01em; }
+.card-head span { color: var(--muted); font-variant-numeric: tabular-nums; }
+.row { display: flex; align-items: center; gap: var(--s2); padding: var(--s3) var(--s2) var(--s3) var(--s4); border-bottom: 1px solid var(--line); min-height: 76px; }
+.row:last-child { border-bottom: 0; }
+.row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.row-name { font-size: 15px; font-weight: 600; }
+.row-meta { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.row-status { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; margin-top: 2px; }
+.row-status .tagx { font-size: 11px; font-weight: 400; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; line-height: 16px; }
+.dot { width: 7px; height: 7px; border-radius: 4px; background: var(--blue); }
+.st-wait { color: var(--grey); font-weight: 400; } .st-call { color: var(--blue); } .st-stock { color: var(--win-text); } .st-amber { color: var(--amber); } .st-none { color: var(--grey); }
+.rec { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 400; font-variant-numeric: tabular-nums; }
+.icons { display: flex; gap: var(--s1); flex-shrink: 0; }
+.icons span { width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 8px; display: grid; place-items: center; color: var(--fg); }
+.small { font-size: 12px; color: var(--muted); }
+
+.pains { display: flex; flex-direction: column; margin-top: var(--s2); }
+.pain { display: flex; flex-direction: column; gap: var(--s2); padding: var(--s5) 0; border-top: 1px solid var(--line); }
+.pain:last-child { border-bottom: 1px solid var(--line); }
+.pain .was { font-size: clamp(20px, 2.8vw, 26px); line-height: 1.3; font-weight: 400; color: var(--muted); letter-spacing: -0.01em; }
+.pain .was s { text-decoration-thickness: 2px; text-decoration-color: var(--fg); }
+.pain h3 { font-size: 21px; margin-top: var(--s1); letter-spacing: -0.02em; }
+.pain p.how { color: var(--muted); max-width: 46em; }
+
+.copy-one { display: flex; flex-direction: column; gap: var(--s3); padding: var(--s5); border-radius: var(--radius-lg); }
+.copy-one .lead { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; margin-top: var(--s1); }
+.copy-line { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.copy-line code { flex: 1 1 240px; min-width: 0; font-family: var(--mono); font-size: 15px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s3) var(--s4); overflow-wrap: anywhere; user-select: all; display: flex; align-items: center; }
+.btn-copy { min-height: 48px; padding: 0 var(--s5); border: 0; border-radius: var(--radius); background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 800; }
+.btn-copy:hover { opacity: .9; }
+.btn-secondary { min-height: 48px; padding: 0 var(--s4); border: 1px solid var(--fg); border-radius: var(--radius); background: var(--bg); font-size: 14px; font-weight: 800; }
+.notice { background: var(--amber-soft); color: var(--amber); border-radius: var(--radius); padding: var(--s3) var(--s4); font-size: 13px; }
+.toast { font-size: 13px; color: var(--win-text); min-height: 1.2em; }
+.toast:empty { display: none; }
+.tabs { display: flex; gap: var(--s1); border-bottom: 1px solid var(--line); margin-top: var(--s2); }
+.tab { min-height: 46px; padding: 0 var(--s4); border: 0; background: transparent; font-size: 15px; font-weight: 800; letter-spacing: -0.01em; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; border-radius: 6px 6px 0 0; }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.panel { display: flex; flex-direction: column; gap: var(--s4); padding-top: var(--s2); }
+.panel[hidden] { display: none; }
+.plan { font-size: 13px; color: var(--muted); }
+ol.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; counter-reset: step; }
+ol.steps > li { counter-increment: step; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: var(--s3); padding: var(--s4) 0; border-bottom: 1px solid var(--line); }
+ol.steps > li:last-child { border-bottom: 0; }
+ol.steps > li::before { content: counter(step); width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--fg); color: var(--fg); display: grid; place-items: center; font-size: 13px; font-weight: 800; }
+.step-body { min-width: 0; display: flex; flex-direction: column; gap: var(--s1); }
+.step-body p { color: var(--muted); }
+.step-body strong { color: var(--fg); font-weight: 800; }
+.path { font-family: var(--mono); font-size: 13px; background: var(--soft); border-radius: 4px; padding: 1px 6px; white-space: nowrap; color: var(--fg); }
+.copyrow { display: flex; gap: var(--s2); align-items: stretch; flex-wrap: wrap; }
+.prompt { flex: 1 1 260px; min-width: 0; background: var(--soft); border-radius: var(--radius); padding: var(--s4) var(--s5); font-size: 17px; line-height: 1.45; user-select: all; }
+dl.faq { margin: 0; display: flex; flex-direction: column; gap: var(--s4); }
+dl.faq dt { font-weight: 800; letter-spacing: -0.01em; }
+dl.faq dd { margin: var(--s1) 0 0; color: var(--muted); }
+.h-small { font-size: 26px !important; }
+footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: var(--s5); display: flex; flex-direction: column; gap: var(--s2); }
+footer a { color: var(--muted); }
+@media (max-width: 700px) {
+  main { gap: var(--s8); padding-top: var(--s6); }
+  .copy-one { padding: var(--s4); }
+}
+@media (prefers-reduced-motion: reduce) { .pill.live i { animation: none; } .said p { transition: none; } }
+</style>
+
+<h1 class="sr-only">₹79,900 on Amazon. ₹75,900 at a shop 4 km away. Human MCP calls nearby shops for you from ChatGPT or Claude.</h1>
+
+<div class="scrolly" id="scrolly">
+  <div class="stage">
+    <span class="field field-lav" aria-hidden="true"></span>
+    <span class="field field-green" aria-hidden="true"></span>
+    <p class="eyebrow">For everyone who’d rather not call shops</p>
+    <div class="scene" aria-hidden="true">
+      <img class="phone" src="phone-lavender.webp" alt="Lavender smartphone, back view" width="625" height="960" decoding="async">
+      <div class="tags">
+        <div class="tag tag-old glass">
+          <span class="price">₹79,900</span>
+          <span class="where">on Amazon</span>
+          <span class="note">iPhone 17 · 256GB · Lavender</span>
+          <span class="strike"></span>
+        </div>
+        <div class="tag tag-new">
+          <span class="price">₹75,900</span>
+          <span class="where">at a shop 4 km away</span>
+          <span class="note">In stock today · with your ICICI card</span>
+        </div>
+      </div>
+    </div>
+    <p class="caption" id="caption" aria-live="off"></p>
+    <div class="cta">
+      <a class="btn-primary" href="#setup">Add to ChatGPT or Claude</a>
+      <p class="avail">Works in ChatGPT and Claude, on the web and desktop.</p>
+    </div>
+    <p class="hint" aria-hidden="true">Scroll</p>
+  </div>
+</div>
+
+<main>
+  <section aria-labelledby="why-title" class="why">
+    <p class="kicker">Why this exists</p>
+    <h2 id="why-title">Calling shops is painful. So we skip it, and miss the best deal.</h2>
+    <p class="lede">Calling offline shops eats an evening: strangers, hold music, “come and check”. So we call one or two and buy at whatever price we hear. The best price is often at a shop we never called.</p>
+    <p class="why-turn">Now you can call them all, without picking up the phone.</p>
+    <p class="lede">Our AI agents call every relevant shop near you and come back with who has it and the final price after offers.</p>
+  </section>
+
+  <section aria-labelledby="how-title">
+    <p class="kicker">How we found it</p>
+    <h2 id="how-title">Our AI made the calls. You kept chatting.</h2>
+    <div class="demo" aria-label="Example: three shop calls turning into results">
+      <div class="said" id="said" aria-hidden="true"></div>
+      <div class="pillrow" aria-hidden="true"><div class="pill live" id="pill"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span id="pilltext">On the call</span></div>
+      <div class="card">
+        <div class="card-head"><b>iPhone 17 · 256GB · Lavender</b><span id="progress">0 of 3 shops done</span></div>
+        <div class="row" id="row-0"></div>
+        <div class="row" id="row-1"></div>
+        <div class="row" id="row-2"></div>
+      </div>
+      <p class="small">Example search near 500037. Shop names are real listings; answers and prices are sample data.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="pains-title">
+    <p class="kicker">If you’d rather not make the calls</p>
+    <h2 id="pains-title">The calls you hate, gone.</h2>
+    <div class="pains">
+      <div class="pain">
+        <p class="was"><s>Talking to strangers, being put on hold, being told to just come and check.</s></p>
+        <h3>Our AI does the talking.</h3>
+        <p class="how">It asks for stock, the final price and offers, and says it’s calling on your behalf.</p>
+      </div>
+      <div class="pain">
+        <p class="was"><s>A whole evening gone, dialling one shop after another.</s></p>
+        <h3>Pick shops, tap once, keep chatting.</h3>
+        <p class="how">The card in your chat updates as each call ends. We email you the link too.</p>
+      </div>
+      <div class="pain">
+        <p class="was"><s>After all those calls, still not sure I got the best deal.</s></p>
+        <h3>Every shop we called stays on the list.</h3>
+        <p class="how">What each one said, the price after your card offer, and the call recording if you want proof.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="setup-title" id="setup">
+    <p class="kicker">Set it up in 3 minutes</p>
+    <h2 id="setup-title">Copy one address.</h2>
+    <div class="copy-one glass">
+      <div class="copy-line">
+        <code id="server-url">https://[YOUR-APP].convex.site/mcp</code>
+        <button type="button" class="btn-copy" data-copy="server-url" data-toast="toast-url">Copy</button>
+      </div>
+      <p class="toast" id="toast-url" role="status" aria-live="polite"></p>
+      <p class="lead">Paste it into ChatGPT or Claude, and sign in once.</p>
+      <p class="plan">You need a Human MCP account. Sign up on our website first. Calls in ChatGPT and Claude use your account credit.</p>
+      <p class="notice">Not live yet. This address works once the app launches.</p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Choose your AI app">
+      <button type="button" class="tab" role="tab" id="tab-chatgpt" aria-controls="panel-chatgpt" aria-selected="true">ChatGPT</button>
+      <button type="button" class="tab" role="tab" id="tab-claude" aria-controls="panel-claude" aria-selected="false" tabindex="-1">Claude</button>
+    </div>
+    <div class="panel" role="tabpanel" id="panel-chatgpt" aria-labelledby="tab-chatgpt">
+      <p class="plan">Where to paste it in ChatGPT, on the web. Developer mode can depend on your plan and workspace settings.</p>
+      <ol class="steps">
+        <li><div class="step-body"><h3>Turn on Developer mode</h3><p>Open <span class="path">Settings → Security and login</span> and switch on <strong>Developer mode</strong>.</p></div></li>
+        <li><div class="step-body"><h3>Add a new plugin</h3><p>Go to <a href="https://chatgpt.com/plugins">chatgpt.com/plugins</a> and select <strong>+</strong>. Name it <strong>Human MCP</strong>.</p></div></li>
+        <li><div class="step-body"><h3>Paste the address</h3><p>Under <strong>Connection</strong>, paste the address and select <strong>Create</strong>.</p></div></li>
+        <li><div class="step-body"><h3>Sign in, then use it</h3><p>Sign in with your Human MCP account when asked. In a new chat, add <strong>Human MCP</strong> from the <strong>+</strong> menu.</p></div></li>
+      </ol>
+    </div>
+    <div class="panel" role="tabpanel" id="panel-claude" aria-labelledby="tab-claude" hidden>
+      <p class="plan">Where to paste it in Claude, on the web or Claude Desktop. Free plans can add one custom connector. On Team and Enterprise, an owner adds it first in <span class="path">Organization settings → Connectors</span>.</p>
+      <ol class="steps">
+        <li><div class="step-body"><h3>Open Connectors</h3><p>Go to <a href="https://claude.ai/customize/connectors">Customize → Connectors</a>, select <strong>+ Add</strong>, then <strong>Add custom connector</strong>.</p></div></li>
+        <li><div class="step-body"><h3>Paste the address</h3><p>Name it <strong>Human MCP</strong>, paste the address, and select <strong>Continue</strong>. Leave the sign-in settings as Claude shows them, then select <strong>Add</strong>.</p></div></li>
+        <li><div class="step-body"><h3>Sign in once</h3><p>Sign in with your Human MCP account when Claude asks.</p></div></li>
+        <li><div class="step-body"><h3>Turn it on in a chat</h3><p>Select <strong>+</strong> at the bottom left, open <strong>Connectors</strong>, and switch on <strong>Human MCP</strong>.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section aria-labelledby="try">
+    <p class="kicker">Then</p>
+    <h2 id="try">Ask, the way you’d ask a friend.</h2>
+    <div class="copyrow">
+      <p class="prompt" id="sample-prompt">Need an iPhone 17, 256GB, lavender today near 500037. I'll pay with my ICICI card.</p>
+      <button type="button" class="btn-secondary" data-copy="sample-prompt" data-toast="toast-prompt">Copy</button>
+    </div>
+    <p class="toast" id="toast-prompt" role="status" aria-live="polite"></p>
+    <p class="plan">A product link works too, from Amazon, Flipkart or any shop.</p>
+  </section>
+
+  <section aria-labelledby="help">
+    <h2 id="help" class="h-small">If something’s off</h2>
+    <dl class="faq">
+      <div><dt>“Couldn't connect”</dt><dd>Check that the address ends in /mcp and has no spaces. Until launch, the address isn't live, so this is expected.</dd></div>
+      <div><dt>Human MCP doesn't show up in my chat</dt><dd>Turn it on for that chat: the + menu in ChatGPT, or + → Connectors in Claude.</dd></div>
+      <div><dt>I can't find Developer mode in ChatGPT</dt><dd>It depends on your plan and workspace. Use Claude for now, or ask your workspace admin.</dd></div>
+    </dl>
+  </section>
+
+  <footer>
+    <p>Setup steps checked against OpenAI's and Anthropic's help pages on 5 October 2026. Menu names change often. Prices on this page are sample data.</p>
+    <p>Sources: <a href="https://developers.openai.com/apps-sdk/deploy/connect-chatgpt">OpenAI: connect a plugin in ChatGPT</a> · <a href="https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp">Claude: custom connectors</a></p>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var reduce = false;
+  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var scrolly = document.getElementById('scrolly');
+  var caption = document.getElementById('caption');
+  var CAPS = [
+    'Online, it’s ₹79,900. And not in stock for today.',
+    'So our AI called the shops near you…',
+    '…and one 4 km away has it, for ₹4,000 less with your card.'
+  ];
+  var lastCap = -1;
+  function clamp(x) { return Math.max(0, Math.min(1, x)); }
+  function setCap(i) { if (i !== lastCap) { caption.textContent = CAPS[i]; lastCap = i; } }
+  if (reduce) {
+    document.documentElement.classList.add('still');
+    setCap(2);
+  } else {
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var r = scrolly.getBoundingClientRect();
+      var span = Math.max(1, r.height - window.innerHeight);
+      var p = clamp(-r.top / span);
+      var p1 = clamp((p - 0.12) / 0.25);
+      var p2 = clamp((p - 0.42) / 0.28);
+      var p3 = clamp((p - 0.72) / 0.18);
+      scrolly.style.setProperty('--p1', p1.toFixed(3));
+      scrolly.style.setProperty('--p2', p2.toFixed(3));
+      scrolly.style.setProperty('--p3', p3.toFixed(3));
+      setCap(p < 0.12 ? 0 : (p2 < 0.5 ? 1 : 2));
+    }
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+
+  var PHONE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"></path></svg>';
+  var MAP = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 18-8-8 18-2-8-8-2Z"></path></svg>';
+  var PLAY = '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"></path></svg>';
+  var SHOPS = [
+    { name: 'Aptronix · Kukatpally', meta: '★ 4.6 (1,240) · 3.8 km · Open till 9:30 pm',
+      said: ['Hello, is this Aptronix Kukatpally?', 'Do you have the iPhone 17, 256GB, lavender?', 'Yes sir, one piece is there.', 'Final price? Seventy-nine nine hundred.', 'ICICI card gives four thousand off.'],
+      done: '<span class="st-stock">In stock · ₹75,900 with ICICI</span><span class="tagx">AI</span><span class="rec">' + PLAY + ' 1:42</span>' },
+    { name: 'Vijay Sales · Kukatpally', meta: '★ 4.4 (3,105) · 4.1 km · Open till 10 pm',
+      said: ['Hello, is this Vijay Sales?', 'I’m calling on behalf of a customer…', 'Sir, please talk to our manager directly.'],
+      done: '<span class="st-amber">Prefers a personal call</span><span class="tagx">AI</span>' },
+    { name: 'Croma · JNTU', meta: '★ 4.1 (1,120) · 6.4 km · Open till 10 pm',
+      said: ['Hello, is this Croma JNTU?', 'Do you have the iPhone 17 in lavender, 256GB?', 'Not right now, new stock comes Friday.'],
+      done: '<span class="st-none">No stock · expected Friday</span><span class="tagx">AI</span><span class="rec">' + PLAY + ' 0:47</span>' }
+  ];
+  var said = document.getElementById('said'), pill = document.getElementById('pill'), pilltext = document.getElementById('pilltext'), progress = document.getElementById('progress');
+  function rowHtml(s, statusHtml) {
+    return '<div class="row-main"><span class="row-name">' + s.name + '</span><span class="row-meta">' + s.meta + '</span><span class="row-status">' + statusHtml + '</span></div><div class="icons"><span>' + PHONE + '</span><span>' + MAP + '</span></div>';
+  }
+  var WAITING = '<span class="st-wait">Waiting to call</span>';
+  var CALLING = '<span class="dot"></span><span class="st-call">AI agent calling</span>';
+  function setRow(i, html) { document.getElementById('row-' + i).innerHTML = rowHtml(SHOPS[i], html); }
+  function showSaid(i, upto) {
+    var lines = SHOPS[i].said, html = '<p class="who">On the call · ' + SHOPS[i].name.split(' · ')[0] + '</p>';
+    for (var k = 0; k < lines.length; k++) html += '<p class="' + (k === upto - 1 ? 'now' : '') + '" style="opacity:' + (k < upto ? 1 : 0) + '">' + lines[k] + '</p>';
+    said.innerHTML = html;
+  }
+  function finalState() {
+    for (var i = 0; i < SHOPS.length; i++) setRow(i, SHOPS[i].done);
+    progress.textContent = '3 shops called · 1 has it';
+    said.innerHTML = '<p class="who">Every shop accounted for</p><p class="now">1 has it, 1 prefers a personal call, 1 has no stock.</p>';
+    pill.classList.remove('live'); pilltext.textContent = 'Calls done';
+  }
+  if (reduce) { finalState(); }
+  else {
+    var timers = [];
+    function at(ms, fn) { timers.push(setTimeout(fn, ms)); }
+    function run() {
+      timers.forEach(clearTimeout); timers = [];
+      for (var i = 0; i < SHOPS.length; i++) setRow(i, WAITING);
+      progress.textContent = '0 of 3 shops done'; pilltext.textContent = 'On the call';
+      var t = 300;
+      SHOPS.forEach(function (s, i) {
+        at(t, function () { pill.classList.add('live'); setRow(i, CALLING); showSaid(i, 0); });
+        for (var k = 1; k <= s.said.length; k++) { (function (kk) { at(t + kk * 1100, function () { showSaid(i, kk); }); })(k); }
+        t += s.said.length * 1100 + 900;
+        at(t, function () { setRow(i, s.done); progress.textContent = (i + 1) + ' of 3 shops done'; });
+        t += 500;
+      });
+      at(t, finalState);
+      at(t + 5000, run);
+    }
+    run();
+  }
+
+  var tabs = [document.getElementById('tab-chatgpt'), document.getElementById('tab-claude')];
+  var panels = { 'tab-chatgpt': document.getElementById('panel-chatgpt'), 'tab-claude': document.getElementById('panel-claude') };
+  function select(tab, focus) {
+    tabs.forEach(function (t) { var on = t === tab; t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1; panels[t.id].hidden = !on; });
+    if (focus) tab.focus();
+    try { localStorage.setItem('hm-setup-tab', tab.id); } catch (e) {}
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { select(t, false); });
+    t.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); select(tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length], true); }
+    });
+  });
+  var start = null;
+  if (location.hash === '#claude') start = tabs[1]; else if (location.hash === '#chatgpt') start = tabs[0];
+  else { try { var saved = localStorage.getItem('hm-setup-tab'); if (saved) start = document.getElementById(saved); } catch (e) {} }
+  if (start) select(start, false);
+
+  function selectText(el) { var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var src = document.getElementById(btn.getAttribute('data-copy'));
+      var toast = document.getElementById(btn.getAttribute('data-toast'));
+      var text = src.textContent.trim();
+      function fallback() { selectText(src); toast.textContent = 'Selected. Press Ctrl+C or ⌘C to copy.'; }
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(function () { toast.textContent = 'Copied.'; }, fallback); } else { fallback(); }
+    });
+  });
+})();
+</script>

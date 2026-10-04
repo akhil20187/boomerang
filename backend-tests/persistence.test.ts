@@ -189,6 +189,7 @@ describe("saved backend behaviour", () => {
   });
   it("saves approval once and freezes the requested product before dispatch", async () => {
     vi.stubEnv("LIVE_CALLS_ENABLED", "true");
+    vi.stubEnv("ANSWER_PRICE_CENTS", "100");
     vi.stubEnv("CALL_BRIDGE_URL", "https://test.invalid");
     vi.stubEnv("CALL_BRIDGE_SECRET", "test-only");
     const t = setup(),
@@ -198,6 +199,7 @@ describe("saved backend behaviour", () => {
       draftId: s.draftId,
       selectedPlaceIds: ["p1"],
       idempotencyKey: "new-real-start",
+      expectedAnswerPriceCents: 100,
     };
     const first = await user.mutation(api.tasks.start, args),
       second = await user.mutation(api.tasks.start, args);
@@ -215,7 +217,10 @@ describe("saved backend behaviour", () => {
         .withIndex("by_user", (q) => q.eq("userId", s.userId))
         .take(10),
     );
-    expect(entries).toHaveLength(1);
+    expect(entries.filter((entry) => entry.type === "charge")).toHaveLength(0);
+    expect(
+      entries.filter((entry) => entry.type === "reservation"),
+    ).toHaveLength(1);
   });
   it("rejects another account task and draft reads", async () => {
     const t = setup(),
@@ -236,6 +241,7 @@ describe("saved backend behaviour", () => {
     ).toHaveLength(1);
   });
   it("blocks signed-out and disabled live calls without saving a task", async () => {
+    vi.stubEnv("ANSWER_PRICE_CENTS", "100");
     const t = setup(),
       s = await seed(t);
     await expect(
@@ -252,6 +258,7 @@ describe("saved backend behaviour", () => {
           draftId: s.draftId,
           selectedPlaceIds: ["p1"],
           idempotencyKey: "new-request",
+          expectedAnswerPriceCents: 100,
         }),
     ).rejects.toThrow("Live calling is not enabled");
     expect(

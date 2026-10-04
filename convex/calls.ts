@@ -7,6 +7,7 @@ import { internal } from "./_generated/api";
 import { v } from "convex/values";
 import { nextOutcome } from "./domain";
 import { terminalStates } from "./validators";
+import { settle } from "./credits";
 const transcriptV = v.array(
   v.object({ speaker: v.string(), text: v.string() }),
 );
@@ -192,7 +193,10 @@ export const dispatchResult = internalMutation({
         await ctx.scheduler.runAfter(60000, internal.calls.checkAbandoned, {
           attemptId: a._id,
         });
-      else await finishIfReady(ctx, a.taskId);
+      else {
+        await settle(ctx, j._id, false);
+        await finishIfReady(ctx, a.taskId);
+      }
     } else
       await ctx.scheduler.runAfter(
         12 * 60 * 1000,
@@ -356,6 +360,12 @@ export const receive = internalMutation({
       outcome = "disconnected";
     else if (args.status === "reconciliation_required")
       outcome = "technical_error";
+    else if (
+      ["failed", "error", "request_failed", "canceled", "cancelled"].includes(
+        outcome,
+      )
+    )
+      outcome = "technical_error";
     else if (args.status === "completed")
       outcome =
         answer && answer.stock !== "unconfirmed" ? "completed" : "incomplete";
@@ -391,15 +401,22 @@ export const receive = internalMutation({
         state,
         answer,
         retryAt,
-        billingState:
-          state === "answered" || state === "incomplete_answer"
-            ? "not_assessed"
-            : "released",
       });
       if (retryAt)
         await ctx.scheduler.runAt(retryAt, internal.calls.dispatch, {
           shopJobId: j._id,
         });
+      if (terminalStates.has(state))
+        await settle(
+          ctx,
+          j._id,
+          (state === "answered" || state === "incomplete_answer") &&
+            !!answer &&
+            (answer.stock !== "unconfirmed" ||
+              answer.finalPrice !== undefined ||
+              !!answer.notes?.trim() ||
+              !!answer.offers?.trim()),
+        );
     }
     const text =
       state === "answered"

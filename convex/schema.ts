@@ -109,6 +109,7 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_expiry", ["expiresAt"]),
   tasks: defineTable({
+    answerPriceCents: v.optional(v.number()),
     verification: v.optional(v.boolean()),
     userId: v.id("users"),
     draftId: v.id("drafts"),
@@ -141,7 +142,13 @@ export default defineSchema({
     retryAt: v.optional(v.number()),
     answer: v.optional(answerV),
     executor: v.literal("AI"),
-    billingState: v.union(v.literal("not_assessed"), v.literal("released")),
+    billingState: v.union(
+      v.literal("not_assessed"),
+      v.literal("reserved"),
+      v.literal("charged"),
+      v.literal("refunded"),
+      v.literal("released"),
+    ),
     latestAttemptId: v.optional(v.id("callAttempts")),
   }).index("by_task", ["taskId"]),
   callAttempts: defineTable({
@@ -189,6 +196,8 @@ export default defineSchema({
     .index("by_task", ["taskId"])
     .index("by_event", ["eventId"]),
   creditEntries: defineTable({
+    shopJobId: v.optional(v.id("shopJobs")),
+    amountCents: v.optional(v.number()),
     userId: v.id("users"),
     taskId: v.optional(v.id("tasks")),
     amount: v.number(),
@@ -205,6 +214,26 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_operation", ["operationId"]),
+  creditAccounts: defineTable({
+    userId: v.id("users"),
+    balanceCents: v.number(),
+    reservedCents: v.number(),
+  }).index("by_user", ["userId"]),
+  creditReservations: defineTable({
+    userId: v.id("users"),
+    taskId: v.id("tasks"),
+    shopJobId: v.id("shopJobs"),
+    amountCents: v.number(),
+    state: v.union(
+      v.literal("reserved"),
+      v.literal("charged"),
+      v.literal("released"),
+      v.literal("refunded"),
+    ),
+  })
+    .index("by_shop", ["shopJobId"])
+    .index("by_user", ["userId"])
+    .index("by_task", ["taskId"]),
   notifications: defineTable({
     attempts: v.optional(v.number()),
     leaseUntil: v.optional(v.number()),

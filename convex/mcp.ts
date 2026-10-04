@@ -59,8 +59,14 @@ export const tools = [
           maxItems: 20,
         },
         idempotencyKey: { type: "string", minLength: 8, maxLength: 200 },
+        expectedAnswerPriceCents: { type: "integer", minimum: 1 },
       },
-      required: ["draftId", "selectedPlaceIds", "idempotencyKey"],
+      required: [
+        "draftId",
+        "selectedPlaceIds",
+        "idempotencyKey",
+        "expectedAnswerPriceCents",
+      ],
       additionalProperties: false,
     },
     annotations: {

@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node --test voice-test/*.test.cjs call-bridge/*.test.cjs mcp/*.test.mjs web/src/errors.test.ts",
     "test:backend": "vitest run backend-tests",
+    "typecheck": "tsc -p web/tsconfig.json && tsc -p convex/tsconfig.json",
     "dev": "vite --config web/vite.config.ts --host 127.0.0.1",
     "build": "vite build --config web/vite.config.ts && node mcp/build-widget.mjs",
     "preview": "vite preview --config web/vite.config.ts --host 127.0.0.1",

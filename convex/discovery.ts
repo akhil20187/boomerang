@@ -2,6 +2,7 @@ import { action } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v, ConvexError } from "convex/values";
 import { rankShops, isRetailCandidate } from "./domain";
+import { configuredPrice } from "./credits";
 const fetchJson = async (url: string, init?: RequestInit) => {
   const r = await fetch(url, { ...init, signal: AbortSignal.timeout(25000) });
   if (!r.ok) throw new Error(`Provider returned HTTP ${r.status}`);
@@ -244,8 +245,13 @@ export const search = action({
       radiusKm,
       shops: cleanShops as any,
     });
+    let answerPriceCents: number | null = null;
+    try {
+      answerPriceCents = configuredPrice();
+    } catch {}
     return {
       draftId,
+      answerPriceCents,
       product,
       shops: cleanShops,
       pincode: args.pincode,

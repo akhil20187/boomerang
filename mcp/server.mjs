@@ -23,7 +23,7 @@ export function createMcpServer({client, token, widgetHtml, connectDomains=[]}) 
   const definitions = [
     ['find_shops','Find nearby shops that may sell a product. A listing does not confirm stock.',z.object({productInput:z.string().min(2).max(2000),pincode:z.string().regex(/^\d{6}$/),radiusKm:z.number().optional(),cards:z.array(z.string()).optional(),comments:z.string().optional()}),true],
     ['more_shops','Read the saved shop search. Preserve the customer’s selected shops.',z.object({draftId:z.string()}),true],
-    ['start_calls','Start calls only to the shops explicitly selected by the customer. Uses account credit.',z.object({draftId:z.string(),selectedPlaceIds:z.array(z.string()).min(1),idempotencyKey:z.string().min(1)}),false],
+    ['start_calls','Start calls only after the customer selects shops and approves the quoted per-answer price and maximum credit reservation.',z.object({draftId:z.string(),selectedPlaceIds:z.array(z.string()).min(1),idempotencyKey:z.string().min(1),expectedAnswerPriceCents:z.number().int().positive()}),false],
     ['task_status','Read live task progress and per-shop answers. Unknown fields stay unconfirmed.',z.object({taskId:z.string()}),true],
     ['get_recording','Get a private, short-lived playback link for this account’s call recording.',z.object({attemptId:z.string()}),true],
   ];
@@ -40,7 +40,7 @@ export function createMcpServer({client, token, widgetHtml, connectDomains=[]}) 
   return server;
 }
 
-export function createHttpServer({convexUrl,widgetHtml,publicUrl='http://127.0.0.1:3212',websiteUrl='http://127.0.0.1:5173',oauthStorePath,allowedRedirectUris=['https://chatgpt.com/connector_platform_oauth_redirect'],clientFactory=url=>new ConvexHttpClient(url)}) {
+export function createHttpServer({convexUrl,widgetHtml,publicUrl='http://127.0.0.1:3212',websiteUrl='http://127.0.0.1:5173',oauthStorePath,allowedRedirectUris=['https://chatgpt.com/connector_platform_oauth_redirect','https://claude.ai/api/mcp/auth_callback'],clientFactory=url=>new ConvexHttpClient(url)}) {
   const oauth=createOAuth({issuer:publicUrl,connectUrl:new URL('/connect',websiteUrl).href,allowedRedirectUris,storePath:oauthStorePath,mintAccessToken:async(jwt,name)=>{
     const client=clientFactory(convexUrl);client.setAuth(jwt);
     return client.mutation(makeFunctionReference('users:createAccessToken'),{name});

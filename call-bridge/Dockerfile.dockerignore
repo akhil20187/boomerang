@@ -1,0 +1,15 @@
+# Dockerfile-specific ignore file applies to the repository-root build context.
+# Deny everything, then allow only the production files copied by this image.
+**
+!call-bridge/
+!call-bridge/Dockerfile
+!call-bridge/Dockerfile.dockerignore
+!call-bridge/package.json
+!call-bridge/package-lock.json
+!call-bridge/bridge.cjs
+!call-bridge/answer.cjs
+!call-bridge/reconcile.cjs
+!voice-test/
+!voice-test/phone-agent.cjs
+!voice-test/phone-core.cjs
+# No env files, journals, transcripts, recordings, research, git, or host dependencies.

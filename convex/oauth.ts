@@ -98,7 +98,7 @@ export const operate = internalMutation({
         now = Date.now();
       const allowed = (
         process.env.MCP_OAUTH_REDIRECT_URIS ??
-        "https://chatgpt.com/connector_platform_oauth_redirect"
+        "https://chatgpt.com/connector_platform_oauth_redirect,https://claude.ai/api/mcp/auth_callback"
       )
         .split(",")
         .map((s) => s.trim())

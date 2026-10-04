@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError } from "convex/values";
 import type { QueryCtx, MutationCtx } from "./_generated/server";
+import { balances } from "./credits";
 export async function hashToken(token: string) {
   const buffer = await crypto.subtle.digest(
     "SHA-256",
@@ -66,12 +67,8 @@ export async function requireEligible(ctx: MutationCtx, userId: any) {
     throw new ConvexError(
       "Your account needs approval before calls can start.",
     );
-  const entries = await ctx.db
-    .query("creditEntries")
-    .withIndex("by_user", (q) => q.eq("userId", userId))
-    .take(10000);
-  const balance = entries.reduce((n, x) => n + x.amount, 0);
-  if (balance <= 0)
+  const balance = await balances(ctx, userId);
+  if (balance.availableCents <= 0)
     throw new ConvexError("Your account needs credit before calls can start.");
   return user;
 }

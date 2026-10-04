@@ -8,11 +8,26 @@ const {phoneNumber,callLimit}=require('../voice-test/phone-core.cjs');
 const {extractAnswer}=require('./answer.cjs');
 const {reconcileAttempt}=require('./reconcile.cjs');
 
-function createBridge({env=process.env,secret=env.CALL_BRIDGE_SECRET,publicUrl=env.CALL_BRIDGE_PUBLIC_URL,callbackUrl=env.CONVEX_CALLBACK_URL,journalPath=env.CALL_BRIDGE_JOURNAL || path.join(__dirname,'data','attempts.json'),maxConcurrent=Number(env.CALL_BRIDGE_MAX_CONCURRENT || 1),maxSeconds=Number(env.CALL_BRIDGE_MAX_SECONDS || 180),agentFactory=createPhoneAgent,fetchImpl=fetch}={}){
+function validateRuntimeEnv(env=process.env){
+ for(const key of ['CALL_BRIDGE_SECRET','CALL_BRIDGE_PUBLIC_URL','CONVEX_CALLBACK_URL','OPENAI_API_KEY','VOBIZ_AUTH_ID','VOBIZ_AUTH_TOKEN','VOBIZ_FROM_NUMBER'])if(typeof env[key]!=='string'||!env[key].trim())throw Error('Missing '+key);
+ if(env.CALL_BRIDGE_SECRET.length<32)throw Error('CALL_BRIDGE_SECRET must contain at least 32 characters');
+ let publicEndpoint,callbackEndpoint;
+ try{publicEndpoint=new URL(env.CALL_BRIDGE_PUBLIC_URL);}catch{throw Error('CALL_BRIDGE_PUBLIC_URL must be an HTTPS origin');}
+ if(publicEndpoint.protocol!=='https:'||publicEndpoint.username||publicEndpoint.password||publicEndpoint.pathname!=='/'||publicEndpoint.search||publicEndpoint.hash)throw Error('CALL_BRIDGE_PUBLIC_URL must be an HTTPS origin');
+ try{callbackEndpoint=new URL(env.CONVEX_CALLBACK_URL);}catch{throw Error('CONVEX_CALLBACK_URL must be an HTTPS endpoint');}
+ if(callbackEndpoint.protocol!=='https:'||callbackEndpoint.username||callbackEndpoint.password||callbackEndpoint.hash)throw Error('CONVEX_CALLBACK_URL must be an HTTPS endpoint');
+ try{phoneNumber(env.VOBIZ_FROM_NUMBER);}catch{throw Error('VOBIZ_FROM_NUMBER must include its country code');}
+ return {publicUrl:publicEndpoint.origin,callbackUrl:callbackEndpoint.href};
+}
+
+function createBridge({env=process.env,secret=env.CALL_BRIDGE_SECRET,publicUrl=env.CALL_BRIDGE_PUBLIC_URL,callbackUrl=env.CONVEX_CALLBACK_URL,journalPath=env.CALL_BRIDGE_JOURNAL || path.join(__dirname,'data','attempts.json'),bindHost=env.CALL_BRIDGE_BIND_HOST || '127.0.0.1',maxConcurrent=Number(env.CALL_BRIDGE_MAX_CONCURRENT || 1),maxSeconds=Number(env.CALL_BRIDGE_MAX_SECONDS || 180),agentFactory=createPhoneAgent,fetchImpl=fetch}={}){
  if(!secret || secret.length<32)throw Error('CALL_BRIDGE_SECRET must contain at least 32 characters');
  if(!publicUrl || new URL(publicUrl).protocol!=='https:')throw Error('CALL_BRIDGE_PUBLIC_URL must use HTTPS');
  if(!Number.isInteger(maxConcurrent)||maxConcurrent<1||maxConcurrent>10)throw Error('Concurrency must be 1–10');
+ if(!['127.0.0.1','0.0.0.0'].includes(bindHost))throw Error('CALL_BRIDGE_BIND_HOST must be 127.0.0.1 or 0.0.0.0');
  callLimit(maxSeconds);
+ let runtimeConfigured=agentFactory!==createPhoneAgent;
+ if(!runtimeConfigured){try{validateRuntimeEnv({...env,CALL_BRIDGE_SECRET:secret,CALL_BRIDGE_PUBLIC_URL:publicUrl,CONVEX_CALLBACK_URL:callbackUrl});runtimeConfigured=true;}catch{}}
  const attempts=new Map(),routes=new Map(),agents=new Map(),delivering=new Set(),watchdogs=new Map(),reconciling=new Map();
  if(journalPath&&fs.existsSync(journalPath))for(const r of JSON.parse(fs.readFileSync(journalPath,'utf8')))attempts.set(r.attemptId,{...r,status:['requested','dispatching','calling','answered'].includes(r.status)?'reconciliation_required':r.status});
  function persist(){if(!journalPath)return;fs.mkdirSync(path.dirname(journalPath),{recursive:true});fs.writeFileSync(journalPath+'.tmp',JSON.stringify([...attempts.values()]),{mode:0o600});fs.renameSync(journalPath+'.tmp',journalPath);}
@@ -56,7 +71,7 @@ function createBridge({env=process.env,secret=env.CALL_BRIDGE_SECRET,publicUrl=e
   }catch{record.status=record.result?.status==='request_unknown'?'reconciliation_required':'failed';await callback(record);agents.delete(record.attemptId);if(agent)await agent.stop();}
  }
  const server=http.createServer(async(req,res)=>{
-  if(req.method==='GET'&&req.url==='/health')return reply(res,200,{ready:true,active:agents.size,reconciliationRequired:[...attempts.values()].filter(x=>x.status==='reconciliation_required').length});
+  if(req.method==='GET'&&req.url==='/health')return reply(res,runtimeConfigured?200:503,{ready:runtimeConfigured,active:agents.size,reconciliationRequired:[...attempts.values()].filter(x=>x.status==='reconciliation_required').length});
   const recordingRoute=/^\/recording\/([a-f0-9]{48})$/.exec(req.url||'');
   if(recordingRoute&&req.method==='POST'){
    const record=[...attempts.values()].find(r=>r.recording?.token===recordingRoute[1]);if(!record)return reply(res,404,{error:'Not found'});
@@ -68,6 +83,7 @@ function createBridge({env=process.env,secret=env.CALL_BRIDGE_SECRET,publicUrl=e
   if(req.method==='GET'&&req.url.startsWith('/attempts/')){if(!authorised(req))return reply(res,401,{error:'Unauthorised'});let id;try{id=decodeURIComponent(req.url.slice('/attempts/'.length));}catch{return reply(res,400,{error:'Invalid attempt ID'});}const record=attempts.get(id);if(record)await reconcile(record);return reply(res,record?200:404,record||{error:'Attempt not found'});}
   if(req.method!=='POST'||req.url!=='/dispatch')return reply(res,404,{error:'Not found'});
   if(!authorised(req))return reply(res,401,{error:'Unauthorised'});
+  if(!runtimeConfigured)return reply(res,503,{error:'Bridge provider and callback configuration is incomplete'});
   let body='';for await(const chunk of req){body+=chunk;if(body.length>16000)return reply(res,413,{error:'Request too large'});}
   let data;try{data=JSON.parse(body);for(const k of ['attemptId','taskId','shopJobId','customerName','productDescription'])if(typeof data[k]!=='string'||!data[k].trim()||data[k].length>1000)throw Error();data.to=phoneNumber(data.to);if(data.instructions!==undefined&&(typeof data.instructions!=='string'||data.instructions.length>3000))throw Error();}catch{return reply(res,400,{error:'Invalid dispatch'});}
   const fingerprint=crypto.createHash('sha256').update(JSON.stringify([data.taskId,data.shopJobId,data.to,data.productDescription,data.customerName,data.instructions||''])).digest('hex');
@@ -81,8 +97,8 @@ function createBridge({env=process.env,secret=env.CALL_BRIDGE_SECRET,publicUrl=e
  });
  server.on('upgrade',(req,socket,head)=>{const route=/^\/media\/([a-zA-Z0-9]+)$/.exec(req.url||'');if(!route||!routes.has(route[1]))return socket.destroy();const dest=new URL(routes.get(route[1]));const upstream=net.connect(Number(dest.port),dest.hostname,()=>{upstream.write(`${req.method} ${req.url} HTTP/1.1\r\n${req.rawHeaders.reduce((s,v,i)=>s+v+(i%2?'\r\n':': '),'')}\r\n`);if(head.length)upstream.write(head);socket.pipe(upstream);upstream.pipe(socket);});upstream.on('error',()=>socket.destroy());socket.on('error',()=>upstream.destroy());});
  const retry=setInterval(()=>{for(const r of attempts.values())if(r.pendingCallbacks?.length)void deliver(r);void recover();},30000);retry.unref();
- return {recover,listen:port=>new Promise((resolve,reject)=>{server.once('error',reject);server.listen(port,'127.0.0.1',()=>{server.removeListener('error',reject);void recover();resolve();});}),get localUrl(){return 'http://127.0.0.1:'+server.address().port;},async close(){clearInterval(retry);for(const timer of watchdogs.values())clearTimeout(timer);await Promise.all([...agents.values()].filter(Boolean).map(a=>a.stop()));await Promise.all([...reconciling.values()]);await new Promise(resolve=>server.close(resolve));}};
+ return {recover,listen:port=>new Promise((resolve,reject)=>{server.once('error',reject);server.listen(port,bindHost,()=>{server.removeListener('error',reject);void recover();resolve();});}),get bindAddress(){return server.address()?.address||null;},get localUrl(){return 'http://127.0.0.1:'+server.address().port;},async close(){clearInterval(retry);for(const timer of watchdogs.values())clearTimeout(timer);await Promise.all([...agents.values()].filter(Boolean).map(a=>a.stop()));await Promise.all([...reconciling.values()]);await new Promise(resolve=>server.close(resolve));}};
 }
 function normalize(r){return {providerCallId:r.callId||null,providerRequestId:r.requestId||null,durationSeconds:r.durationSeconds,endReason:r.endReason,transportStatus:r.status,transcript:r.transcript||[],errors:r.errors||[]};}
-if(require.main===module){const bridge=createBridge();bridge.listen(Number(process.env.PORT||3212)).then(()=>console.log('Human MCP call bridge ready'));for(const signal of ['SIGINT','SIGTERM'])process.once(signal,()=>bridge.close().then(()=>process.exit()));}
-module.exports={createBridge,normalize};
+if(require.main===module){const runtime=validateRuntimeEnv();const bridge=createBridge(runtime);bridge.listen(Number(process.env.PORT||3212)).then(()=>console.log('Human MCP call bridge ready'));for(const signal of ['SIGINT','SIGTERM'])process.once(signal,()=>bridge.close().then(()=>process.exit()));}
+module.exports={createBridge,normalize,validateRuntimeEnv};
