@@ -117,7 +117,7 @@ it("rejects a changed or missing customer quote before saving any task or held c
         idempotencyKey: "price-review",
         expectedAnswerPriceCents,
       }),
-    ).rejects.toThrow("price needs your review");
+    ).rejects.toThrow("service-call price");
   const balance = await s.user.query(api.users.me, {});
   expect(balance.reservedBalance).toBe(0);
   expect(balance.availableBalance).toBe(5);

@@ -11,9 +11,19 @@ export function configuredPrice() {
     Number(raw) <= 0
   )
     throw new ConvexError(
-      "Calling price is not configured yet. Your account has not been charged.",
+      {code:'service_unavailable',reason:'pricing_not_configured',callingAvailable:false,message:'Shop calling is unavailable because the service price has not been set. No calls started and no credit was charged.'},
     );
   return Number(raw);
+}
+export function callingQuote() {
+  let answerPriceCents: number | null = null;
+  try { answerPriceCents = configuredPrice(); } catch {}
+  const reason = answerPriceCents === null ? 'pricing_not_configured' :
+    process.env.LIVE_CALLS_ENABLED !== 'true' ? 'calling_disabled' :
+    !process.env.CALL_BRIDGE_URL || !process.env.CALL_BRIDGE_SECRET ? 'calling_not_ready' : null;
+  const message = reason === 'pricing_not_configured' ? 'Shop calling is unavailable because the service price has not been set.' :
+    reason ? 'Shop calling is currently unavailable. You can still discover shops.' : null;
+  return {answerPriceCents, callingAvailable: reason === null, callingUnavailableReason: reason, callingUnavailableMessage: message};
 }
 export async function balances(
   ctx: QueryCtx | MutationCtx,

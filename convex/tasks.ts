@@ -58,15 +58,15 @@ export const start = mutation({
       args.selectedPlaceIds,
       draft.shops.map((s) => s.placeId),
     );
+    const answerPriceCents = configuredPrice();
+    if (args.expectedAnswerPriceCents !== answerPriceCents)
+      throw new ConvexError(
+        "Review the current service-call price shown in the shop search and approve the total again. No calls started and no credit was charged.",
+      );
     const customer = await requireEligible(ctx, userId);
     if (!(customer as any).name?.trim())
       throw new ConvexError(
         "Add your name to your account before we call shops on your behalf.",
-      );
-    const answerPriceCents = configuredPrice();
-    if (args.expectedAnswerPriceCents !== answerPriceCents)
-      throw new ConvexError(
-        "The calling price needs your review. Check the current price and approve the shops again.",
       );
     if (
       process.env.LIVE_CALLS_ENABLED !== "true" ||

@@ -2,7 +2,7 @@ import { httpAction } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import { ConvexError } from "convex/values";
 import { metadata } from "./oauth";
-const uiUri = "ui://human-mcp/shops-v1.html";
+const uiUri = "ui://human-mcp/shops-v2.html";
 const textSchema = { type: "string" },
   idSchema = { type: "string", minLength: 1 };
 export const tools = [
@@ -47,7 +47,7 @@ export const tools = [
   {
     name: "start_calls",
     description:
-      "Call only the shops explicitly selected and approved by the customer. Requires an approved account and credit.",
+      "Call only shops explicitly selected and approved by the customer. This is currently unavailable when the shop-search answerPriceCents is null: report that the service price has not been set and do not ask the customer for a product price or an internal cents value. When a service quote exists, show its unit price and maximum total, get approval, and copy that exact quote into expectedAnswerPriceCents. Requires an approved account, credit and enabled calling.",
     inputSchema: {
       type: "object",
       properties: {
@@ -59,13 +59,12 @@ export const tools = [
           maxItems: 20,
         },
         idempotencyKey: { type: "string", minLength: 8, maxLength: 200 },
-        expectedAnswerPriceCents: { type: "integer", minimum: 1 },
+        expectedAnswerPriceCents: { type: "integer", minimum: 1,description:'Optional service-call quote copied exactly from answerPriceCents in find_shops or more_shops after customer approval. Never infer this value or ask the customer to supply it; it is unrelated to the product price. Omit when the service quote is null.' },
       },
       required: [
         "draftId",
         "selectedPlaceIds",
         "idempotencyKey",
-        "expectedAnswerPriceCents",
       ],
       additionalProperties: false,
     },
@@ -377,6 +376,11 @@ export const endpoint = httpAction(async (ctx, request) => {
         structuredContent: result,
       });
     } catch (error) {
+      const detail=error instanceof ConvexError?error.data:null;
+      if(detail&&typeof detail==='object'&&!Array.isArray(detail)&&detail.code==='service_unavailable'&&detail.reason==='pricing_not_configured') {
+        const message='Shop calling is unavailable because the service price has not been set. No calls started and no credit was charged.';
+        return respond({isError:true,content:[{type:'text',text:message}],structuredContent:{code:'service_unavailable',reason:'pricing_not_configured',callingAvailable:false,message}});
+      }
       return respond({
         isError: true,
         content: [

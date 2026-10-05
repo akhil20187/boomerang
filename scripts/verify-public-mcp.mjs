@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import vm from 'node:vm';
 import {Client} from '@modelcontextprotocol/sdk/client/index.js';
 import {StreamableHTTPClientTransport} from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 
@@ -26,6 +27,11 @@ try{
  const widget=await client.readResource({uri:resources[0].uri});
  assert.ok(widget.contents[0].text.includes('__HUMAN_MCP_WIDGET__'));
  assert.ok(widget.contents[0].text.length>10000);
+ const html=widget.contents[0].text;
+ const scripts=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)];
+ assert.equal(scripts.length,2,'published widget must contain marker and one application script');
+ assert.ok(!/<script\b[^>]*\bsrc=/.test(html),'published widget must be self-contained');
+ for(const [, ,source] of scripts)new vm.Script(source);
  console.log('Public MCP tool discovery and self-contained widget verified.');
  if(process.env.MCP_TEST_TASK){
   const result=await client.callTool({name:'task_status',arguments:{taskId:process.env.MCP_TEST_TASK}});

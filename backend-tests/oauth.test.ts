@@ -10,6 +10,22 @@ afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
+it('saved shop discovery explains unavailable service pricing and disabled calling without guessing a price',async()=>{
+  const t=convexTest(schema,modules);
+  const {userId,draftId}=await t.run(async ctx=>{
+    const userId=await ctx.db.insert('users',{email:'availability@example.com'});
+    const draftId=await ctx.db.insert('drafts',{userId,productInput:'Phone',product:{name:'Phone'},pincode:'500037',cards:[],comments:'',radiusKm:10,shops:[],expiresAt:Date.now()+60000});
+    return {userId,draftId};
+  });
+  const user=t.withIdentity({subject:`${userId}|session`});
+  vi.stubEnv('ANSWER_PRICE_CENTS','');vi.stubEnv('LIVE_CALLS_ENABLED','false');
+  const unpriced=await user.query(api.drafts.get,{draftId});
+  expect(unpriced.answerPriceCents).toBeNull();expect(unpriced.callingAvailable).toBe(false);expect(unpriced.callingUnavailableReason).toBe('pricing_not_configured');
+  vi.stubEnv('ANSWER_PRICE_CENTS','125');
+  const disabled=await user.query(api.drafts.get,{draftId});
+  expect(disabled.answerPriceCents).toBe(125);expect(disabled.callingAvailable).toBe(false);expect(disabled.callingUnavailableReason).toBe('calling_disabled');
+});
+it('allows a start request without internal cents and reports unavailable service pricing instead of asking for product price',async()=>{vi.stubEnv('CONVEX_SITE_URL','https://app.convex.site');vi.stubEnv('SITE_URL','https://app.convex.site');vi.stubEnv('ANSWER_PRICE_CENTS','');const t=convexTest(schema,modules);const ids=await t.run(async ctx=>{const userId=await ctx.db.insert('users',{email:'pricing@example.com'});const draftId=await ctx.db.insert('drafts',{userId,productInput:'Phone',product:{name:'Phone'},pincode:'500037',cards:[],comments:'',radiusKm:10,shops:[{placeId:'shop',name:'Shop',address:'Road',ratingCount:100,distanceKm:1,mapsUrl:'https://maps.google.com',fewRatings:false}],expiresAt:Date.now()+60000});return {userId,draftId};});const user=t.withIdentity({subject:`${ids.userId}|session`}),token=await user.mutation(api.users.createAccessToken,{name:'Pricing test'});const rpc=async(method:string,params?:any)=>{const response=await t.fetch('/mcp',{method:'POST',headers:{Authorization:`Bearer ${token.token}`},body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})});return response.json();};const list=await rpc('tools/list');const start=list.result.tools.find((x:any)=>x.name==='start_calls');expect(start.inputSchema.required).not.toContain('expectedAnswerPriceCents');const result=await rpc('tools/call',{name:'start_calls',arguments:{draftId:ids.draftId,selectedPlaceIds:['shop'],idempotencyKey:'no-priced-start'}});expect(result.result.isError).toBe(true);expect(result.result.structuredContent.reason).toBe('pricing_not_configured');expect(result.result.content[0].text).toContain('service price');expect(result.result.content[0].text).not.toContain('expectedAnswerPriceCents');expect(await user.query(api.tasks.list,{})).toHaveLength(0);});
 it("accepts exact Claude redirect registration and rejects lookalike hosts or callback prefixes", async () => {
   vi.stubEnv("CONVEX_SITE_URL", "https://app.convex.site");
   const t = convexTest(schema, modules);
@@ -91,8 +107,9 @@ it("serves OAuth discovery and stateless MCP tools behind account bearer authent
         ),
     ),
   );
+  const resourceUri = (await rpc('resources/list')).result.resources[0].uri;
   expect(
-    (await rpc("resources/read", { uri: "ui://human-mcp/shops-v1.html" }))
+    (await rpc("resources/read", { uri: resourceUri }))
       .result.contents[0].mimeType,
   ).toBe("text/html;profile=mcp-app");
   const invalid = await rpc("tools/call", {

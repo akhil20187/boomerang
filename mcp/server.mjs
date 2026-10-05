@@ -7,12 +7,13 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { registerAppTool, registerAppResource, RESOURCE_MIME_TYPE } from '@modelcontextprotocol/ext-apps/server';
 import { ConvexHttpClient } from 'convex/browser';
 import { makeFunctionReference } from 'convex/server';
+import { ConvexError } from 'convex/values';
 import { z } from 'zod';
 import { bearerToken, createTools } from './core.mjs';
 import { createOAuth } from './oauth.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const uiUri = 'ui://human-mcp/shops-v1.html';
+const uiUri = 'ui://human-mcp/shops-v2.html';
 export function createMcpServer({client, token, widgetHtml, connectDomains=[]}) {
   const server = new McpServer({name:'human-mcp',version:'1.0.0'});
   const tools = createTools(client,token);
@@ -23,7 +24,7 @@ export function createMcpServer({client, token, widgetHtml, connectDomains=[]}) 
   const definitions = [
     ['find_shops','Find nearby shops that may sell a product. A listing does not confirm stock.',z.object({productInput:z.string().min(2).max(2000),pincode:z.string().regex(/^\d{6}$/),radiusKm:z.number().optional(),cards:z.array(z.string()).optional(),comments:z.string().optional()}),true],
     ['more_shops','Read the saved shop search. Preserve the customer’s selected shops.',z.object({draftId:z.string()}),true],
-    ['start_calls','Start calls only after the customer selects shops and approves the quoted per-answer price and maximum credit reservation.',z.object({draftId:z.string(),selectedPlaceIds:z.array(z.string()).min(1),idempotencyKey:z.string().min(1),expectedAnswerPriceCents:z.number().int().positive()}),false],
+    ['start_calls','Start calls only after shop selection and approval of the service price and maximum reservation. If search returns answerPriceCents null, calling is unavailable: explain that the service price has not been set. Do not ask customers for product prices or internal cents. Otherwise display the returned unit price and selected-shop maximum, obtain approval, and copy the exact returned quote.',z.object({draftId:z.string(),selectedPlaceIds:z.array(z.string()).min(1),idempotencyKey:z.string().min(1),expectedAnswerPriceCents:z.number().int().positive().optional().describe('Copy answerPriceCents from the approved shop search when configured. Never infer a price or ask the customer for this internal value. This is the service-call price, unrelated to the product price.')}),false],
     ['task_status','Read live task progress and per-shop answers. Unknown fields stay unconfirmed.',z.object({taskId:z.string()}),true],
     ['get_recording','Get a private, short-lived playback link for this account’s call recording.',z.object({attemptId:z.string()}),true],
   ];
@@ -33,6 +34,11 @@ export function createMcpServer({client, token, widgetHtml, connectDomains=[]}) 
         const result=await tools[name](args);
         return {content:[{type:'text',text:JSON.stringify(result)}],structuredContent:result};
       } catch(error) {
+        const data=error instanceof ConvexError?error.data:undefined;
+        if(data && typeof data==='object' && data.code==='service_unavailable' && data.reason==='pricing_not_configured') {
+          const message='Shop calling is unavailable because the service price has not been set. No calls started and no credit was charged.';
+          return {isError:true,content:[{type:'text',text:message}],structuredContent:{code:'service_unavailable',reason:'pricing_not_configured',callingAvailable:false,message}};
+        }
         return {isError:true,content:[{type:'text',text:error.message}],...(!token?{_meta:{'mcp/www_authenticate':['Bearer error="invalid_token"']}}:{})};
       }
     });
