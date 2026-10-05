@@ -23,7 +23,7 @@ const base = 'https://api.vobiz.ai/api/v1/Account/' + encodeURIComponent(env.VOB
 const session = {
   type:'realtime', model,
   instructions:instructions || `You are Human MCP's automated assistant on a short test phone call with the person building Human MCP. Introduce yourself honestly as their automated calling assistant. Start in ${env.PHONE_TEST_LANGUAGE || 'Telugu'}, using a short, friendly greeting. Hold a natural conversation about how this phone test sounds. Ask one short question at a time. Switch between Telugu, Hindi and English whenever asked. Keep replies concise and pronounce English product names naturally. Do not pretend to be a human, a shopkeeper or to have checked stock. When the person says goodbye, asks to end, or the conversation is finished, call end_call immediately. The application will ask you for a final goodbye and then hang up. Never prolong the call with 'anything else'.`,
-  audio:{input:{format:{type:'audio/pcmu'},transcription:{model:'gpt-4o-mini-transcribe'},turn_detection:{type:'server_vad',create_response:true,interrupt_response:true}},output:{format:{type:'audio/pcmu'},voice:'marin'}},
+  audio:{input:{format:{type:'audio/pcmu'},noise_reduction:{type:'near_field'},transcription:{model:'gpt-4o-mini-transcribe'},turn_detection:{type:'server_vad',threshold:0.7,prefix_padding_ms:300,silence_duration_ms:700,create_response:true,interrupt_response:false}},output:{format:{type:'audio/pcmu'},voice:'marin'}},
   tools:[{type:'function',name:'end_call',description:'Finish the call when the caller says goodbye or asks to end.',parameters:{type:'object',properties:{},additionalProperties:false}}],
   tool_choice:'auto',max_output_tokens:400
 };
@@ -85,6 +85,7 @@ wss.on('connection', phone=>{
   active=phone; const gate=new ClosingGate(); const ai=connectOpenAI();
   let streamId,ready=false,queue=[],closingResponse,goodbyePending=false,endCommandPending=false,fallback;
   let itemId,outputStarted,outputBytes=0;
+  let interruptionTimer,responseActive=false;
   const hardLimit=setTimeout(()=>hangup('configured '+maxSeconds+'-second limit'),maxSeconds*1000);
   ai.on('open',()=>send(ai,{type:'session.update',session}));
   const greet=()=>send(ai,{type:'response.create',response:{instructions:openingInstructions || 'Give your short opening greeting and ask how the person is doing.'}});
@@ -102,9 +103,12 @@ wss.on('connection', phone=>{
   ai.on('message',raw=>{
     let e;try{e=JSON.parse(raw);}catch{return;}
     if(e.type==='session.updated'){ready=true;for(const q of queue)send(ai,q);queue=[];if(streamId)greet();}
-    if(e.type==='response.created') {outputStarted=undefined;outputBytes=0;itemId=undefined;if(goodbyePending){closingResponse=e.response.id;goodbyePending=false;}}
+    if(e.type==='response.created') {responseActive=true;outputStarted=undefined;outputBytes=0;itemId=undefined;if(goodbyePending){closingResponse=e.response.id;goodbyePending=false;}}
     if(e.type==='response.output_audio.delta' && streamId){itemId=e.item_id;outputStarted=outputStarted||Date.now();outputBytes+=Buffer.from(e.delta,'base64').length;send(phone,{event:'playAudio',streamId,media:{contentType:'audio/x-mulaw',sampleRate:8000,payload:e.delta}});}
-    if(e.type==='input_audio_buffer.speech_started' && streamId){send(phone,{event:'clearAudio',streamId});if(itemId&&outputStarted){send(ai,{type:'conversation.item.truncate',item_id:itemId,content_index:0,audio_end_ms:Math.max(0,Math.min(Date.now()-outputStarted,Math.floor(outputBytes/8)))});itemId=undefined;}}
+    // Allow the 700 ms speech-stop silence window to resolve short bursts first.
+    if(e.type==='input_audio_buffer.speech_started' && streamId){clearTimeout(interruptionTimer);interruptionTimer=setTimeout(()=>{if(!itemId)return;send(phone,{event:'clearAudio',streamId});if(responseActive){send(ai,{type:'response.cancel'});responseActive=false;}if(outputStarted){send(ai,{type:'conversation.item.truncate',item_id:itemId,content_index:0,audio_end_ms:Math.max(0,Math.min(Date.now()-outputStarted,Math.floor(outputBytes/8)))});}itemId=undefined;},900);}
+    if(e.type==='input_audio_buffer.speech_stopped')clearTimeout(interruptionTimer);
+    if(e.type==='response.done')responseActive=false;
     if(e.type==='conversation.item.input_audio_transcription.completed'){transcript.push({speaker:'caller',text:e.transcript});save();console.log('Caller transcript received.');}
     if(e.type==='response.output_audio_transcript.done'){transcript.push({speaker:'agent',text:e.transcript});save();console.log('Agent transcript received.');}
     if(e.type==='response.function_call_arguments.done' && e.name==='end_call' && !gate.closing){gate.begin();send(ai,{type:'conversation.item.create',item:{type:'function_call_output',call_id:e.call_id,output:'Call ending. Say one brief goodbye in the current language.'}});endCommandPending=true;fallback=setTimeout(()=>hangup('closing fallback'),20000);}
@@ -114,7 +118,7 @@ wss.on('connection', phone=>{
   });
   ai.on('error',()=>hangup('OpenAI connection failed'));
   ai.on('close',()=>{if(phone.readyState===WebSocket.OPEN)phone.close();});
-  phone.on('close',()=>{clearTimeout(hardLimit);clearTimeout(fallback);ai.close();save();console.log('Telephone audio disconnected.');});
+  phone.on('close',()=>{clearTimeout(hardLimit);clearTimeout(fallback);clearTimeout(interruptionTimer);ai.close();save();console.log('Telephone audio disconnected.');});
   phone.on('error',()=>hangup('telephone stream failed'));
 });
 async function start() {
