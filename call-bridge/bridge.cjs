@@ -68,7 +68,7 @@ function createBridge({env=process.env,secret=env.CALL_BRIDGE_SECRET,publicUrl=e
    agents.set(record.attemptId,agent);await agent.start();const result=await agent.call();if(!record.answeredAt)record.status='requested';record.result=normalize(result);persist();
    const watchdog=setTimeout(async()=>{record.status='reconciliation_required';await callback(record);await agent.stop();agents.delete(record.attemptId);},(maxSeconds+90)*1000);watchdog.unref();watchdogs.set(record.attemptId,watchdog);
    agent.completed.then(async result=>{clearTimeout(watchdog);watchdogs.delete(record.attemptId);record.result={...record.result,...normalize(result)};record.result.answer=await extractAnswer({transcript:result.transcript,productDescription:record.productDescription,apiKey:env.OPENAI_API_KEY,model:env.OPENAI_SUMMARY_MODEL||'gpt-4.1-mini',fetchImpl});record.status=result.status==='request_unknown'?'reconciliation_required':'completed';await callback(record);agents.delete(record.attemptId);const localUrl=agent.localUrl;await agent.stop();for(const [token,url]of routes)if(url===localUrl)routes.delete(token);}).catch(()=>{});
-  }catch{record.status=record.result?.status==='request_unknown'?'reconciliation_required':'failed';await callback(record);agents.delete(record.attemptId);if(agent)await agent.stop();}
+  }catch{record.status=record.result?.transportStatus==='request_unknown'?'reconciliation_required':'failed';await callback(record);agents.delete(record.attemptId);if(agent)await agent.stop();}
  }
  const server=http.createServer(async(req,res)=>{
   if(req.method==='GET'&&req.url==='/health')return reply(res,runtimeConfigured?200:503,{ready:runtimeConfigured,active:agents.size,reconciliationRequired:[...attempts.values()].filter(x=>x.status==='reconciliation_required').length});
@@ -84,8 +84,8 @@ function createBridge({env=process.env,secret=env.CALL_BRIDGE_SECRET,publicUrl=e
   if(req.method!=='POST'||req.url!=='/dispatch')return reply(res,404,{error:'Not found'});
   if(!authorised(req))return reply(res,401,{error:'Unauthorised'});
   if(!runtimeConfigured)return reply(res,503,{error:'Bridge provider and callback configuration is incomplete'});
-  let body='';for await(const chunk of req){body+=chunk;if(body.length>16000)return reply(res,413,{error:'Request too large'});}
-  let data;try{data=JSON.parse(body);for(const k of ['attemptId','taskId','shopJobId','customerName','productDescription'])if(typeof data[k]!=='string'||!data[k].trim()||data[k].length>1000)throw Error();data.to=phoneNumber(data.to);if(data.instructions!==undefined&&(typeof data.instructions!=='string'||data.instructions.length>3000))throw Error();}catch{return reply(res,400,{error:'Invalid dispatch'});}
+  const chunks=[];let bytes=0;for await(const chunk of req){bytes+=chunk.length;if(bytes>64000)return reply(res,413,{error:'Request too large'});chunks.push(chunk);}const body=Buffer.concat(chunks).toString('utf8');
+  let data;try{data=JSON.parse(body);for(const k of ['attemptId','taskId','shopJobId','customerName','productDescription'])if(typeof data[k]!=='string'||!data[k].trim()||data[k].length>(k==='productDescription'?12000:1000))throw Error();data.to=phoneNumber(data.to);if(data.instructions!==undefined&&(typeof data.instructions!=='string'||data.instructions.length>3000))throw Error();}catch{return reply(res,400,{error:'Invalid dispatch'});}
   const fingerprint=crypto.createHash('sha256').update(JSON.stringify([data.taskId,data.shopJobId,data.to,data.productDescription,data.customerName,data.instructions||''])).digest('hex');
   const existing=attempts.get(data.attemptId);
   if(existing)return reply(res,existing.fingerprint===fingerprint?200:409,{attemptId:existing.attemptId,status:existing.status});

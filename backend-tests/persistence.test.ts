@@ -94,6 +94,35 @@ afterEach(() => {
   vi.useRealTimers();
 });
 describe("saved backend behaviour", () => {
+  it('reconciles the bridge journal response through authenticated read-only lookup without dispatching again',async()=>{
+    const t=setup(),s=await seed(t);
+    vi.stubEnv('CALL_BRIDGE_URL','https://bridge.example.com/');vi.stubEnv('CALL_BRIDGE_SECRET','test-secret');
+    const request=vi.fn(async(url,options)=>{
+      expect(String(url)).toBe(`https://bridge.example.com/attempts/${s.attemptId}`);
+      expect(options.headers.Authorization).toBe('Bearer test-secret');
+      expect(options.method).toBeUndefined();
+      return Response.json({attemptId:s.attemptId,status:'completed',result:{providerCallId:'provider-call',transportStatus:'completed',transcript:[{speaker:'caller',text:'Yes, we have the exact printer.'}],answer:{stock:'available',variantMatch:'confirmed',finalPrice:null,currency:'INR',offers:null,notes:'Exact printer confirmed.',personalCallNeeded:false,evidenceQuotes:['Yes, we have the exact printer.']}},reconciliation:{source:'provider_cdr',checkedAt:Date.now()}});
+    });
+    vi.stubGlobal('fetch',request);
+    await t.action(internal.calls.checkAbandoned,{attemptId:s.attemptId});
+    await t.action(internal.calls.checkAbandoned,{attemptId:s.attemptId});
+    expect(request).toHaveBeenCalledTimes(1);
+    const job=await t.run(ctx=>ctx.db.get(s.shopJobId));
+    expect(job?.state).toBe('answered');expect(job?.answer?.stock).toBe('available');expect(job?.attemptCount).toBe(1);
+  });
+  it('downloads recording evidence only from an explicitly allowed HTTPS provider host',async()=>{
+    const t=setup(),s=await seed(t);vi.stubEnv('RECORDING_ALLOWED_HOSTS','recordings.example.com');
+    const request=vi.fn(async(_url:any,_options:any)=>new Response(new Blob(['synthetic audio'],{type:'audio/mpeg'})));vi.stubGlobal('fetch',request);
+    const ids={attemptId:s.attemptId,taskId:s.taskId,shopJobId:s.shopJobId,eventId:'provider-recording'};
+    for(const url of ['http://recordings.example.com/call.mp3','https://recordings.example.com.attacker.test/call.mp3','https://user:password@recordings.example.com/call.mp3'])
+      await expect(t.action(internal.recordings.ingest,{...ids,url})).rejects.toThrow('Recording host is not approved');
+    expect(request).not.toHaveBeenCalled();
+    await t.action(internal.recordings.ingest,{...ids,url:'https://recordings.example.com/call.mp3'});
+    await t.action(internal.recordings.ingest,{...ids,url:'https://recordings.example.com/call.mp3'});
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request.mock.calls[0][1].redirect).toBe('error');
+    expect((await t.run(ctx=>ctx.db.get(s.attemptId)))?.recordingStatus).toBe('ready');
+  });
   it("uses international shop numbers and excludes listings outside the exact radius", async () => {
     const t = setup(),
       s = await seed(t);
