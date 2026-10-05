@@ -1,0 +1,17 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import assert from 'node:assert/strict';
+const origin = 'https://voice-bridge-development.up.railway.app';
+const secret = readFileSync(fileURLToPath(new URL('../.env.voice', import.meta.url)), 'utf8').match(/^CALL_BRIDGE_SECRET=(.+)$/m)?.[1];
+assert.ok(secret?.length >= 32);
+const health = await fetch(`${origin}/health`, { signal: AbortSignal.timeout(15000) });
+assert.equal(health.status, 200);
+const state = await health.json();
+assert.equal(state.ready, true);
+assert.equal(state.active, 0);
+assert.equal(state.reconciliationRequired, 0);
+const forbidden = await fetch(`${origin}/dispatch`, { method: 'POST', body: '{}', signal: AbortSignal.timeout(15000) });
+assert.equal(forbidden.status, 401);
+const lookup = await fetch(`${origin}/attempts/nonexistent-deployment-smoke`, { headers: { Authorization: `Bearer ${secret}` }, signal: AbortSignal.timeout(15000) });
+assert.equal(lookup.status, 404);
+console.log(JSON.stringify({ ready: true, active: 0, reconciliationRequired: 0, unauthenticatedDispatch: 401, authenticatedMissingAttempt: 404, callsPlaced: 0 }));

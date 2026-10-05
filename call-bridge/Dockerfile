@@ -19,7 +19,7 @@ RUN mkdir -p /var/lib/human-mcp \
     && chown node:node /var/lib/human-mcp \
     && chmod 700 /var/lib/human-mcp
 USER node
-VOLUME ["/var/lib/human-mcp"]
+# Persistent journal storage is attached explicitly by the hosting platform.
 EXPOSE 3212
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD node -e "fetch('http://127.0.0.1:'+process.env.PORT+'/health',{signal:AbortSignal.timeout(4000)}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"

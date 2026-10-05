@@ -1,6 +1,6 @@
 # Railway voice server — 5 October 2026
 
-The user authorised a small Railway server to make calling functional (D91). Infrastructure is created; the voice application is not deployed or remotely verified yet.
+The user authorised a small Railway server to make calling functional (D91) and explicitly approved the credential transfer (D93). The voice application is deployed and its no-dial health/access checks pass. Actual calling remains a user-run final test.
 
 ## Created infrastructure
 
@@ -11,9 +11,9 @@ The user authorised a small Railway server to make calling functional (D91). Inf
 - HTTPS domain: `https://voice-bridge-development.up.railway.app`, target port 3212.
 - Dockerfile: `call-bridge/Dockerfile`; health check `/health`; sleeping disabled, 60-second shutdown drain.
 
-## Outstanding blockers
+## Current configuration
 
-Automatic approval review rejected copying the existing local OpenAI and Vobiz credentials to Railway. Specific permission is pending. No credentials were transferred. Customer price is also pending; `ANSWER_PRICE_CENTS` remains unset and `LIVE_CALLS_ENABLED=false` in Convex.
+The earlier credential-transfer rejection is resolved by D93's explicit approval. OpenAI/Vobiz runtime credentials and matching bridge secrets are configured. The user selected $0.10 per useful shop answer (D92); `ANSWER_PRICE_CENTS=10` and `LIVE_CALLS_ENABLED=true` are configured. Approval and credit gates remain enforced.
 
 ## Prepared deployment
 
@@ -27,4 +27,6 @@ Railway starts a minimal bootstrap as root to repair mounted-volume ownership; i
 
 75 local tests and 36 backend tests pass; TypeScript checks pass. Regression coverage includes uncertain dispatch without redial, longer product descriptions without truncation, bootstrap permission restrictions, authenticated recovery and recording download restrictions. Local mock-server tests require permission to bind localhost outside the sandbox. Docker daemon is unavailable locally, so actual image/volume startup must be checked on Railway.
 
-After deployment, check remote `/health`, unauthenticated dispatch rejection and authenticated lookup of a nonexistent attempt. These checks must not create an attempt or contact a phone. Health only proves process configuration/readiness, not that provider credentials work. Real calling and recording playback remain user-run final verification. The exact recording hostname must be observed from Vobiz before enabling recording downloads; never guess a wildcard.
+Deployment `ab1ebc9f-b2c4-41b1-a932-7bbce12792a3` succeeded with a mounted volume and passing platform health check. Remote `/health` returned ready=true with zero active/uncertain attempts; unauthenticated dispatch returned 401; authenticated lookup of a nonexistent attempt returned 404. The checks created no call or provider request. One completed simulated job and no queued jobs existed before enabling the feature. Railway rejected the first build's Docker VOLUME instruction; it was removed, retaining the explicit Railway volume.
+
+Health only proves process configuration/readiness, not that provider credentials work. Real calling, live media and recording playback remain user-run final verification. The exact recording hostname must be observed from Vobiz before enabling recording downloads; never guess a wildcard. Refreshed ChatGPT rendering remains unverified.
