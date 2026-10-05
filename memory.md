@@ -14,6 +14,10 @@ This is the decision record for future sessions. “Active” means agreed direc
 
 ## Active decisions
 
+- **D89 — 2026-10-05 — Active:** Publish the protected ChatGPT/Claude connection and sign-in routes at little-kangaroo-718.convex.site, keeping shop calling disabled. Source: user “Approve” in direct reply to the specific deployment permission question. Resolves the automatic approval deployment blocker; deployment and final controlled tests must still be verified.
+
+- **5 October 2026 — D89 execution verified:** Protected MCP/OAuth backend published. Authenticated public SDK discovered five tools, read widget and saved simulated task; temporary access was revoked and reuse rejected. One marked task finished without dialing, private synthetic WAV fetched and unauthorised playback rejected. Exactly one started and one completed email arrived in AgentMail, each with the protected task link; replay did not resend. Signed-in status page showed simulated evidence. Credit/relevance corrections deployed; price unset and real calling disabled. Actual ChatGPT/Claude linking/rendering and voice hosting still unverified. [Verification report](docs/engineering/BUILD_VERIFICATION.md).
+
 - **D88 — 2026-10-05 — Active:** Use ChatGPT's Create/Add custom MCP server connection in Developer Mode as the sprint testing/demo route for the in-chat cards. Public directory publication is separate and requires OpenAI review. Source: user, “You have an option to Create & Add your own MCP servers - i think that will be good.” Official [testing guide](https://developers.openai.com/plugins/deploy/connect-chatgpt) supports testing optional UI through this route; [publishing guide](https://developers.openai.com/plugins/deploy/submission) requires approval for publication. Account access, live server connection and card rendering remain unverified. Refines D44/D62 without changing their scope.
 
 | ID | Recorded | Decision | Source |

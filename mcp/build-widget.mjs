@@ -23,10 +23,12 @@ const publicSite=process.env.MCP_PUBLIC_URL || process.env.CONVEX_SITE_URL || 'h
 const setup=setupSource
  .replace('https://[YOUR-APP].convex.site/mcp',new URL('/mcp',publicSite).href)
  .replace('Sign up on our website first.','<a href="/account">Sign in on our website</a> first.')
+ .replace('Not live yet. This address works once the app launches.','The connection server is live for testing. Shop calling remains disabled; ChatGPT and Claude card rendering still needs a final check.')
+ .replace("Until launch, the address isn't live, so this is expected.",'The connection server is live for testing. If it fails, sign in on our website and check the address again.')
  .replace('Leave the sign-in settings as Claude shows them, then select <strong>Add</strong>.','Keep sign-in enabled. Under <strong>OAuth client</strong>, choose <strong>Register automatically</strong>, then select <strong>Add</strong>.')
  .replace('https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp','https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp')
  .replace('A product link works too, from Amazon, Flipkart or any shop.','Paste an Amazon product link, or describe the product, model and colour. If we cannot read a link, use a description.');
-const previewNotice='<p style="margin:0;padding:14px 20px;font:14px/1.5 system-ui,sans-serif;color:#1a1a19;background:#fff;text-align:center">Preview: shop search is available. Calling and chat connections are not available yet. <a href="/">Search shops</a> · <a href="/demo">Try the demo</a></p>';
+const previewNotice='<p style="margin:0;padding:14px 20px;font:14px/1.5 system-ui,sans-serif;color:#1a1a19;background:#fff;text-align:center">Preview: shop search and the connection server are available for testing. Shop calling remains disabled. <a href="/">Search shops</a> · <a href="/demo">Try the demo</a></p>';
 const setupHtml=`<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width, initial-scale=1">${setup.slice(0,styleEnd)}</head><body>${previewNotice}${setup.slice(styleEnd)}</body></html>`;
 await fs.writeFile(path.join(directory,'setup.html'),setupHtml);
 await fs.copyFile(path.resolve('design/pages/phone-lavender.webp'),path.join(directory,'phone-lavender.webp'));
