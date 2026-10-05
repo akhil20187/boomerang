@@ -8,6 +8,22 @@ const modules = import.meta.glob([
   "!../convex/**/*.d.ts",
 ]);
 afterEach(() => vi.unstubAllEnvs());
+it("approved welcome credit is exactly five dollars and repeated approval cannot duplicate it", async () => {
+  const t = convexTest(schema, modules);
+  const email = "welcome-test@example.com";
+  const userId = await t.run(ctx => ctx.db.insert("users", { email }));
+  const user = t.withIdentity({ subject: `${userId}|session` });
+  expect((await user.query(api.users.me, {})).availableBalance).toBe(0);
+  for (let i = 0; i < 2; i++)
+    await t.mutation(internal.admin.approve, { email, grantWelcomeCredit: true });
+  const account = await user.query(api.users.me, {});
+  expect(account.eligible).toBe(true);
+  expect(account.creditBalance).toBe(5);
+  expect(account.availableBalance).toBe(5);
+  expect(account.reservedBalance).toBe(0);
+  const grants = await t.run(ctx => ctx.db.query("creditEntries").collect());
+  expect(grants.filter(entry => entry.type === "grant")).toHaveLength(1);
+});
 async function setup(price = "300") {
   vi.stubEnv("ANSWER_PRICE_CENTS", price);
   vi.stubEnv("LIVE_CALLS_ENABLED", "true");
