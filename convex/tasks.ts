@@ -10,6 +10,8 @@ import { requireUser, requireEligible } from "./access";
 import { validateSelection } from "./domain";
 import { workflow } from "./workflows";
 import { configuredPrice, reserve, balances } from "./credits";
+import { paginationOptsValidator } from "convex/server";
+import { terminalStates } from "./validators";
 export const start = mutation({
   args: {
     draftId: v.id("drafts"),
@@ -145,11 +147,17 @@ export const get = query({
       .query("notifications")
       .withIndex("by_task_type", (q) => q.eq("taskId", task._id))
       .take(2);
+    const reservations=await ctx.db.query('creditReservations').withIndex('by_task',q=>q.eq('taskId',task._id)).take(21);
     const shops = await Promise.all(
       jobs.map(async (j) => {
         const attempt = j.latestAttemptId
           ? await ctx.db.get(j.latestAttemptId)
           : null;
+        const savedAttempts=await ctx.db.query('callAttempts').withIndex('by_job',q=>q.eq('shopJobId',j._id)).order('asc').take(10);
+        const attempts=await Promise.all(savedAttempts.map(async a=>{
+          const transcript=await ctx.db.query('transcriptSegments').withIndex('by_attempt_sequence',q=>q.eq('attemptId',a._id)).take(501);
+          return {_id:a._id,number:a.number,status:a.status,state:a.status,executor:a.executor,startedAt:a.startedAt,answeredAt:a.answeredAt,endedAt:a.endedAt,durationSeconds:a.durationSeconds,answer:a.answer,failureReason:a.endReason,recordingAvailable:!!a.recordingId,recordingStatus:a.recordingId?'ready':a.recordingStatus==='processing'||!!a.answeredAt&&(!a.endedAt||Date.now()-a.endedAt<120000)?'processing':'unavailable',transcript:transcript.slice(0,500),transcriptTruncated:transcript.length>500};
+        }));
         return {
           ...j,
           ...j.shop,
@@ -160,11 +168,14 @@ export const get = query({
           recordingUrl: null,
           recordingAvailable: !!attempt?.recordingId,
           calledAt: attempt?.startedAt,
+          recordingStatus:attempts.find(a=>a._id===j.latestAttemptId)?.recordingStatus??'unavailable',
+          chargedCents:reservations.filter(r=>r.shopJobId===j._id&&r.state==='charged').reduce((n,r)=>n+r.amountCents,0),
+          attempts,
         };
       }),
     );
     return {
-      task,
+      task:{...task,chargedCents:reservations.filter(r=>r.state==='charged').reduce((n,r)=>n+r.amountCents,0)},
       credit: await balances(ctx, userId),
       product: task.product,
       shops,
@@ -186,6 +197,20 @@ export const list = query({
       .order("desc")
       .take(50);
   },
+});
+export const history=query({
+  args:{paginationOpts:paginationOptsValidator,accessToken:v.optional(v.string())},
+  returns:v.any(),
+  handler:async(ctx,args)=>{
+    const userId=await requireUser(ctx,args.accessToken);
+    const result=await ctx.db.query('tasks').withIndex('by_user',q=>q.eq('userId',userId)).order('desc').paginate(args.paginationOpts);
+    const page=await Promise.all(result.page.map(async task=>{
+      const jobs=await ctx.db.query('shopJobs').withIndex('by_task',q=>q.eq('taskId',task._id)).take(21);
+      const reservations=await ctx.db.query('creditReservations').withIndex('by_task',q=>q.eq('taskId',task._id)).take(21);
+      return {...task,summary:{shopCount:jobs.length,resolvedCount:jobs.filter(j=>terminalStates.has(j.state)).length,availableCount:jobs.filter(j=>j.answer?.stock==='available').length,unreachableCount:jobs.filter(j=>j.state==='unreachable').length,unconfirmedCount:jobs.filter(j=>j.state==='incomplete_answer'||j.answer?.stock==='unconfirmed').length,chargedCents:reservations.filter(r=>r.state==='charged').reduce((n,r)=>n+r.amountCents,0),active:task.status==='queued'||task.status==='running'}};
+    }));
+    return {...result,page};
+  }
 });
 export const context = internalQuery({
   args: { taskId: v.id("tasks") },

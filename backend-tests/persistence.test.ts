@@ -94,6 +94,14 @@ afterEach(() => {
   vi.useRealTimers();
 });
 describe("saved backend behaviour", () => {
+  it('paginates only the signed-in customers tasks with settled charges and outcomes',async()=>{
+    const t=setup(),s=await seed(t);await t.run(async ctx=>{await ctx.db.patch(s.taskId,{status:'finished'});await ctx.db.patch(s.shopJobId,{state:'answered',answer:{stock:'available',variantMatch:'yes',finalPrice:1200,currency:'INR'}});await ctx.db.insert('creditReservations',{userId:s.userId,taskId:s.taskId,shopJobId:s.shopJobId,amountCents:10,state:'charged'});await ctx.db.insert('tasks',{userId:s.otherId,draftId:s.draftId,title:'Private other task',type:'shop_calls',detailsVersion:1,product:{name:'Private'},pincode:'500037',cards:[],comments:'',status:'running',approvedAt:Date.now(),idempotencyKey:'other'});});
+    const page=await t.withIdentity({subject:s.userId}).query(api.tasks.history,{paginationOpts:{numItems:1,cursor:null}});expect(page.page).toHaveLength(1);expect(page.page[0]._id).toBe(s.taskId);expect(page.page[0].summary).toMatchObject({shopCount:1,resolvedCount:1,availableCount:1,chargedCents:10,active:false});expect(page.isDone).toBe(true);
+    await expect(t.withIdentity({subject:s.otherId}).query(api.tasks.get,{taskId:s.taskId})).rejects.toThrow('Task not found');
+  });
+  it('returns ordered per-attempt private transcripts without exposing recording URLs',async()=>{
+    const t=setup(),s=await seed(t);await t.run(async ctx=>{await ctx.db.insert('transcriptSegments',{attemptId:s.attemptId,sequence:1,speaker:'caller',text:'It costs 1200.',timestamp:Date.now()});await ctx.db.insert('transcriptSegments',{attemptId:s.attemptId,sequence:0,speaker:'agent',text:'Is it available?',timestamp:Date.now()});});const result=await t.withIdentity({subject:s.userId}).query(api.tasks.get,{taskId:s.taskId});expect(result.shops[0].attempts).toHaveLength(1);expect(result.shops[0].attempts[0].transcript.map(x=>x.text)).toEqual(['Is it available?','It costs 1200.']);expect(result.shops[0].attempts[0].recordingAvailable).toBe(false);expect(result.shops[0].attempts[0].recordingUrl).toBeUndefined();
+  });
   it('retries a temporary private recording download failure without losing evidence',async()=>{
     vi.useFakeTimers();const t=setup(),s=await seed(t);vi.stubEnv('RECORDING_ALLOWED_HOSTS','media.vobiz.ai');vi.stubEnv('CALL_BRIDGE_URL','https://bridge.example.com');vi.stubEnv('CALL_BRIDGE_SECRET','bridge-secret');let count=0;vi.stubGlobal('fetch',vi.fn(async()=>++count===1?new Response('starting',{status:503}):new Response('audio',{headers:{'content-type':'audio/mpeg'}})));
     await t.action(internal.recordings.ingest,{attemptId:s.attemptId,taskId:s.taskId,shopJobId:s.shopJobId,eventId:'retry-recording',url:'https://media.vobiz.ai/v1/Account/a/Recording/rec.mp3'});

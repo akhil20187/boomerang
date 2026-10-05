@@ -1,0 +1,5 @@
+import type {TaskSummary} from './types';
+export const money=(dollars:number)=>'$'+Number(dollars).toFixed(2);
+export const taskLabel=(name:string)=>name.includes('|')?(name.split('|')[0].trim()||name):name;
+export function taskDate(timestamp:number){const day=new Date(timestamp);const today=new Date();const yesterday=new Date();yesterday.setDate(today.getDate()-1);return day.toDateString()===today.toDateString()?'Today':day.toDateString()===yesterday.toDateString()?'Yesterday':day.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:day.getFullYear()!==today.getFullYear()?'numeric':undefined})}
+export function taskOutcome(summary:TaskSummary['summary']):[string,string]{if(summary.active)return [`${summary.resolvedCount} of ${summary.shopCount} shops checked`,'blue'];if(summary.availableCount)return [`${summary.availableCount} ${summary.availableCount===1?'shop has':'shops have'} it`,'green'];if(summary.unreachableCount===summary.shopCount)return ['Couldn’t reach the shops','amber'];if(summary.unconfirmedCount)return ['Some details unconfirmed','amber'];return ['No confirmed stock','grey']}
