@@ -52,7 +52,19 @@ function createBridge({env=process.env,secret=env.CALL_BRIDGE_SECRET,publicUrl=e
    if(changed)await callback(record);
   })();reconciling.set(record.attemptId,operation);try{await operation;}finally{reconciling.delete(record.attemptId);}
  }
- async function recover(){for(const record of attempts.values())await reconcile(record);}
+ const recordingRecoveries=new Map();
+ function approvedMediaUrl(raw){const u=new URL(raw);if(u.protocol!=='https:'||u.hostname!=='media.vobiz.ai'||u.port||u.username||u.password||!u.pathname.startsWith('/v1/Account/'+encodeURIComponent(env.VOBIZ_AUTH_ID)+'/Recording/'))throw Error('Unapproved recording URL');return u.href;}
+ async function recoverRecording(record){
+  if(record.status!=='completed'||record.recording?.status!=='processing'||!env.VOBIZ_AUTH_ID||!env.VOBIZ_AUTH_TOKEN)return;
+  if(recordingRecoveries.has(record.attemptId))return recordingRecoveries.get(record.attemptId);
+  const operation=(async()=>{try{
+   const callId=record.recording.callId;const response=await fetchImpl('https://api.vobiz.ai/api/v1/Account/'+encodeURIComponent(env.VOBIZ_AUTH_ID)+'/Recording/?call_uuid='+encodeURIComponent(callId)+'&limit=20',{headers:{'X-Auth-ID':env.VOBIZ_AUTH_ID,'X-Auth-Token':env.VOBIZ_AUTH_TOKEN},signal:AbortSignal.timeout(15000)});
+   if(!response.ok)return;const data=await response.json();const matches=(data.objects||[]).filter(r=>r.call_uuid===callId&&r.recording_id&&r.recording_url&&(!record.recording.recordingId||record.recording.recordingId===r.recording_id));if(matches.length!==1)return;
+   const r=matches[0],url=approvedMediaUrl(r.recording_url);const duration=Number(r.recording_duration_ms);const fields=r.recording_duration_ms!=null&&Number.isFinite(duration)&&duration>=0?{durationSeconds:duration/1000}:{};
+   record.recording={...record.recording,status:'ready',recordingId:r.recording_id,url,...fields};record.result={...record.result,recording:{status:'ready',recordingId:r.recording_id,url,...fields}};persist();await callback(record);
+  }catch{/* A failed read must not redial or mark a nonexistent recording ready. */}})();recordingRecoveries.set(record.attemptId,operation);try{await operation;}finally{recordingRecoveries.delete(record.attemptId);}
+ }
+ async function recover(){for(const record of attempts.values()){await reconcile(record);await recoverRecording(record);}}
  async function startRecording(record,callId){
   if(record.recording||!env.VOBIZ_AUTH_ID||!env.VOBIZ_AUTH_TOKEN)return;
   record.recording={status:'starting',token:crypto.randomBytes(24).toString('hex'),callId};persist();
@@ -89,7 +101,9 @@ If the shop wants a person, refuses, says goodbye or asks to end, call end_call 
   }
   const route=/^\/(answer|status)\/([a-zA-Z0-9]+)$/.exec(req.url||'');
   if(route&&req.method==='POST'&&routes.has(route[2])){const dest=new URL(routes.get(route[2]));const upstream=http.request({hostname:dest.hostname,port:dest.port,path:req.url,method:'POST',headers:{'content-type':req.headers['content-type']||'application/x-www-form-urlencoded'}},r=>{res.writeHead(r.statusCode,r.headers);r.pipe(res);});upstream.on('error',()=>reply(res,502,{error:'Call endpoint unavailable'}));req.pipe(upstream);return;}
-  if(req.method==='GET'&&req.url.startsWith('/attempts/')){if(!authorised(req))return reply(res,401,{error:'Unauthorised'});let id;try{id=decodeURIComponent(req.url.slice('/attempts/'.length));}catch{return reply(res,400,{error:'Invalid attempt ID'});}const record=attempts.get(id);if(record)await reconcile(record);return reply(res,record?200:404,record||{error:'Attempt not found'});}
+  const recordingDownload=/^\/attempts\/([^/?]+)\/recording$/.exec(req.url||'');
+  if(req.method==='GET'&&recordingDownload){if(!authorised(req))return reply(res,401,{error:'Unauthorised'});const record=attempts.get(recordingDownload[1]);if(!record)return reply(res,404,{error:'Attempt not found'});await recoverRecording(record);if(record.recording?.status!=='ready')return reply(res,404,{error:'Recording not ready'});try{const url=approvedMediaUrl(record.recording.url);const upstream=await fetchImpl(url,{headers:{'X-Auth-ID':env.VOBIZ_AUTH_ID,'X-Auth-Token':env.VOBIZ_AUTH_TOKEN},redirect:'error',signal:AbortSignal.timeout(25000)});if(!upstream.ok||Number(upstream.headers.get('content-length')||0)>25000000)throw Error();const type=upstream.headers.get('content-type')||'';if(!/^(audio\/|application\/octet-stream)/.test(type))throw Error();const bytes=Buffer.from(await upstream.arrayBuffer());if(bytes.length>25000000)throw Error();res.writeHead(200,{'content-type':type,'content-length':bytes.length,'cache-control':'no-store'});return res.end(bytes);}catch{return reply(res,502,{error:'Recording download unavailable'});}}
+  if(req.method==='GET'&&req.url.startsWith('/attempts/')){if(!authorised(req))return reply(res,401,{error:'Unauthorised'});let id;try{id=decodeURIComponent(req.url.slice('/attempts/'.length));}catch{return reply(res,400,{error:'Invalid attempt ID'});}const record=attempts.get(id);if(record){await reconcile(record);await recoverRecording(record);}return reply(res,record?200:404,record||{error:'Attempt not found'});}
   if(req.method!=='POST'||req.url!=='/dispatch')return reply(res,404,{error:'Not found'});
   if(!authorised(req))return reply(res,401,{error:'Unauthorised'});
   if(!runtimeConfigured)return reply(res,503,{error:'Bridge provider and callback configuration is incomplete'});

@@ -116,6 +116,7 @@ export const ingest = internalAction({
     eventId: v.string(),
     url: v.string(),
     durationSeconds: v.optional(v.number()),
+    retry: v.optional(v.number()),
   },
   returns: v.null(),
   handler: async (ctx, args): Promise<null> => {
@@ -142,11 +143,24 @@ export const ingest = internalAction({
       throw new Error(
         "Recording host is not approved. Configure RECORDING_ALLOWED_HOSTS.",
       );
-    const response = await fetch(url.toString(), {
-      redirect: "error",
-      signal: AbortSignal.timeout(25000),
-    });
-    if (!response.ok) throw new Error("Recording download failed");
+    let downloadUrl=url.toString();
+    let headers: Record<string,string> | undefined;
+    if(url.hostname==='media.vobiz.ai'){
+      if(!process.env.CALL_BRIDGE_URL||!process.env.CALL_BRIDGE_SECRET)throw new Error('Private recording bridge is not configured');
+      const bridge=new URL(process.env.CALL_BRIDGE_URL);
+      if(bridge.protocol!=='https:'||bridge.username||bridge.password||bridge.search||bridge.hash)throw new Error('Invalid private recording bridge');
+      downloadUrl=`${bridge.origin}/attempts/${encodeURIComponent(args.attemptId)}/recording`;
+      headers={Authorization:`Bearer ${process.env.CALL_BRIDGE_SECRET}`};
+    }
+    let response: Response;
+    try {
+      response=await fetch(downloadUrl,{...(headers?{headers}:{}),redirect:'error',signal:AbortSignal.timeout(25000)});
+      if(!response.ok)throw new Error('Recording download failed');
+    } catch(error) {
+      const retry=args.retry??0;
+      if(retry<3){await ctx.scheduler.runAfter(15000*(retry+1),internal.recordings.ingest,{...args,retry:retry+1});return null;}
+      throw error;
+    }
     if (Number(response.headers.get("content-length") ?? 0) > 25000000)
       throw new Error("Recording too large");
     const blob = await response.blob();
@@ -154,7 +168,7 @@ export const ingest = internalAction({
     if (!/^(audio\/|application\/octet-stream)/.test(blob.type))
       throw new Error("Recording is not an audio file");
     const recordingId = await ctx.storage.store(blob);
-    const { url: _, ...metadata } = args;
+    const { url: _, retry: _retry, ...metadata } = args;
     await ctx.runMutation(internal.recordings.attach, {
       ...metadata,
       recordingId,

@@ -94,6 +94,16 @@ afterEach(() => {
   vi.useRealTimers();
 });
 describe("saved backend behaviour", () => {
+  it('retries a temporary private recording download failure without losing evidence',async()=>{
+    vi.useFakeTimers();const t=setup(),s=await seed(t);vi.stubEnv('RECORDING_ALLOWED_HOSTS','media.vobiz.ai');vi.stubEnv('CALL_BRIDGE_URL','https://bridge.example.com');vi.stubEnv('CALL_BRIDGE_SECRET','bridge-secret');let count=0;vi.stubGlobal('fetch',vi.fn(async()=>++count===1?new Response('starting',{status:503}):new Response('audio',{headers:{'content-type':'audio/mpeg'}})));
+    await t.action(internal.recordings.ingest,{attemptId:s.attemptId,taskId:s.taskId,shopJobId:s.shopJobId,eventId:'retry-recording',url:'https://media.vobiz.ai/v1/Account/a/Recording/rec.mp3'});
+    await t.finishAllScheduledFunctions(()=>vi.runAllTimers());expect(count).toBe(2);expect((await t.run(ctx=>ctx.db.get(s.attemptId)))?.recordingStatus).toBe('ready');
+  });
+  it('downloads authenticated Vobiz media through the private bridge without provider keys in Convex',async()=>{
+    const t=setup(),s=await seed(t);vi.stubEnv('RECORDING_ALLOWED_HOSTS','media.vobiz.ai');vi.stubEnv('CALL_BRIDGE_URL','https://bridge.example.com');vi.stubEnv('CALL_BRIDGE_SECRET','bridge-secret');
+    const request=vi.fn(async(url,options)=>{expect(String(url)).toBe(`https://bridge.example.com/attempts/${s.attemptId}/recording`);expect(options.headers.Authorization).toBe('Bearer bridge-secret');expect(options.redirect).toBe('error');return new Response('private audio',{headers:{'content-type':'audio/mpeg'}});});vi.stubGlobal('fetch',request);
+    await t.action(internal.recordings.ingest,{attemptId:s.attemptId,taskId:s.taskId,shopJobId:s.shopJobId,eventId:'vobiz-recording',url:'https://media.vobiz.ai/v1/Account/a/Recording/rec.mp3'});expect(request).toHaveBeenCalledTimes(1);expect((await t.run(ctx=>ctx.db.get(s.attemptId)))?.recordingStatus).toBe('ready');
+  });
   it('reconciles the bridge journal response through authenticated read-only lookup without dispatching again',async()=>{
     const t=setup(),s=await seed(t);
     vi.stubEnv('CALL_BRIDGE_URL','https://bridge.example.com/');vi.stubEnv('CALL_BRIDGE_SECRET','test-secret');

@@ -2,6 +2,13 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const {createBridge}=require('./bridge.cjs');
 const payload={attemptId:'attempt-1',taskId:'task-1',shopJobId:'shop-1',to:'+919876543210',customerName:'Akhil',productDescription:'iPhone 17 lavender 256 GB'};
+test('completed recording recovers from provider lookup and downloads privately without redial',async t=>{
+ const fs=require('node:fs'),os=require('node:os'),path=require('node:path');const dir=fs.mkdtempSync(path.join(os.tmpdir(),'recording-recovery-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));const journalPath=path.join(dir,'attempts.json');fs.writeFileSync(journalPath,JSON.stringify([{...payload,status:'completed',recording:{status:'processing',callId:'call-1'},result:{providerCallId:'call-1',transcript:[]}}]));
+ const requests=[],callbacks=[];const s=await setup(t,{journalPath,env:{VOBIZ_AUTH_ID:'a',VOBIZ_AUTH_TOKEN:'token'},callbackUrl:'https://convex.example/api/call-event',fetchImpl:async(url,o)=>{requests.push({url,o});if(url.includes('/Recording/?'))return Response.json({objects:[{call_uuid:'call-1',recording_id:'rec-1',recording_url:'https://media.vobiz.ai/v1/Account/a/Recording/rec-1.mp3',recording_duration_ms:15000}]});if(url.startsWith('https://media.vobiz.ai/')){assert.equal(o.headers['X-Auth-Token'],'token');assert.equal(o.redirect,'error');return new Response('audio bytes',{headers:{'content-type':'audio/mpeg'}});}callbacks.push(JSON.parse(o.body));return {ok:true};}});
+ await s.bridge.recover();const state=await(await fetch(s.bridge.localUrl+'/attempts/attempt-1',{headers:{authorization:'Bearer '+'a'.repeat(32)}})).json();assert.equal(state.recording.status,'ready');assert.equal(state.recording.durationSeconds,15);assert.equal(callbacks.at(-1).recording.recordingId,'rec-1');
+ const before=requests.length;assert.equal((await fetch(s.bridge.localUrl+'/attempts/attempt-1/recording')).status,401);assert.equal(requests.length,before);
+ const download=await fetch(s.bridge.localUrl+'/attempts/attempt-1/recording',{headers:{authorization:'Bearer '+'a'.repeat(32)}});assert.equal(download.status,200);assert.equal(await download.text(),'audio bytes');assert.equal(s.calls,0);
+});
 async function setup(t,options={}){
  let calls=0;
  const bridge=createBridge({secret:'a'.repeat(32),publicUrl:'https://bridge.example',journalPath:null,agentFactory:()=>({localUrl:'http://127.0.0.1:1',start:async()=>{},call:async()=>{calls++;return {status:'requested'};},stop:async()=>{},completed:new Promise(()=>{})}),...options});
