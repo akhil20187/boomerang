@@ -3,12 +3,13 @@ import { convexTest } from "convex-test";
 import workflowTest from "@convex-dev/workflow/test";
 import schema from "../convex/schema";
 import { api, internal } from "../convex/_generated/api";
+import { approveWithWelcomeCredit } from '../convex/onboarding';
 const modules = import.meta.glob([
   "../convex/**/*.{ts,js}",
   "!../convex/**/*.d.ts",
 ]);
 afterEach(() => vi.unstubAllEnvs());
-it("approved welcome credit is exactly five dollars and repeated approval cannot duplicate it", async () => {
+it("welcome credit is exactly one dollar and repeated approval cannot duplicate it", async () => {
   const t = convexTest(schema, modules);
   const email = "welcome-test@example.com";
   const userId = await t.run(ctx => ctx.db.insert("users", { email }));
@@ -18,11 +19,27 @@ it("approved welcome credit is exactly five dollars and repeated approval cannot
     await t.mutation(internal.admin.approve, { email, grantWelcomeCredit: true });
   const account = await user.query(api.users.me, {});
   expect(account.eligible).toBe(true);
-  expect(account.creditBalance).toBe(5);
-  expect(account.availableBalance).toBe(5);
+  expect(account.creditBalance).toBe(1);
+  expect(account.availableBalance).toBe(1);
   expect(account.reservedBalance).toBe(0);
   const grants = await t.run(ctx => ctx.db.query("creditEntries").collect());
   expect(grants.filter(entry => entry.type === "grant")).toHaveLength(1);
+});
+it('verified signup onboarding approves and grants once, preserving existing welcome grants', async () => {
+  const t = convexTest(schema, modules);
+  const userId = await t.run(ctx => ctx.db.insert('users', {email:'signup@example.com'}));
+  await t.run(ctx => approveWithWelcomeCredit(ctx, userId));
+  await t.run(ctx => approveWithWelcomeCredit(ctx, userId));
+  const account = await t.withIdentity({subject:`${userId}|session`}).query(api.users.me, {});
+  expect(account.eligible).toBe(true);
+  expect(account.availableBalance).toBe(1);
+  const existing = await t.run(async ctx => {
+    const id = await ctx.db.insert('users', {email:'legacy@example.com'});
+    await ctx.db.insert('creditEntries', {userId:id,amount:5,currency:'USD',type:'grant',reason:'Legacy welcome credit',operationId:`welcome:${id}`});
+    return id;
+  });
+  await t.run(ctx => approveWithWelcomeCredit(ctx, existing));
+  expect((await t.withIdentity({subject:`${existing}|session`}).query(api.users.me, {})).creditBalance).toBe(5);
 });
 async function setup(price = "300") {
   vi.stubEnv("ANSWER_PRICE_CENTS", price);

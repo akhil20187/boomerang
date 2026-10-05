@@ -1,0 +1,587 @@
+<meta charset="utf-8">
+<title>Human MCP Landing Story</title>
+<style>
+/* Layout: a story told by scrolling. 1) the pain, then the turn; 2) a live call: transcript left, shop list right, in sync; 3) before/after rows that flip as you reach them; 4) setup. White ground, black type, green only for "the shop has it". */
+:root {
+  --bg: #FFFFFF;
+  --fg: #111110;
+  --muted: #64625D;
+  --faint: #9C9992;
+  --line: #E4E2DC;
+  --soft: #F5F4F1;
+  --accent: #111110;
+  --on-accent: #FFFFFF;
+  --win: #0F6B3E;
+  --win-soft: #E5F2EA;
+  --blue: #2341B5;
+  --blue-soft: #EAEEFB;
+  --amber: #7A4A00;
+  --amber-soft: #FBF0DF;
+  --grey: #55544F;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121211; --fg: #F2F1ED; --muted: #A8A6A0; --faint: #77756F; --line: #2E2D2A; --soft: #1C1B19;
+    --accent: #F2F1ED; --on-accent: #121211; --win: #6FD19B; --win-soft: #16291E; --blue: #9DB0F5; --blue-soft: #1A2033;
+    --amber: #E7B567; --amber-soft: #2E2416; --grey: #BDBBB5; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121211; --fg: #F2F1ED; --muted: #A8A6A0; --faint: #77756F; --line: #2E2D2A; --soft: #1C1B19;
+  --accent: #F2F1ED; --on-accent: #121211; --win: #6FD19B; --win-soft: #16291E; --blue: #9DB0F5; --blue-soft: #1A2033;
+  --amber: #E7B567; --amber-soft: #2E2416; --grey: #BDBBB5; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.55; padding-inline: 20px; padding-block: 0 72px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--fg); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; border-radius: 4px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.wrap { max-width: 1080px; margin: 0 auto; position: relative; }
+.kicker { font-size: 13px; font-weight: 600; color: var(--muted); }
+
+/* 1. The pain, then the turn (sticky, two beats) */
+.open { position: relative; height: 220vh; }
+.open-stage { position: sticky; top: env(safe-area-inset-top, 0px); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; gap: 28px; padding-block: 64px; }
+.open h1 { font-size: clamp(42px, 7vw, 88px); line-height: 0.98; font-weight: 800; letter-spacing: -0.045em; display: flex; flex-direction: column; gap: 6px; }
+.open h1 .l2 { color: var(--muted); transition: color .5s ease; }
+.turn { display: flex; flex-direction: column; gap: 24px; align-items: flex-start; transition: opacity .5s ease, transform .5s ease; }
+.turn p.big { font-size: clamp(24px, 3.4vw, 40px); line-height: 1.15; font-weight: 700; letter-spacing: -0.025em; max-width: 18em; }
+.turn .sub { font-size: 18px; font-weight: 400; letter-spacing: 0; color: var(--muted); max-width: 32em; }
+.open[data-beat="0"] .turn { opacity: 0.18; transform: translateY(10px); }
+.open[data-beat="1"] .l2 { color: var(--fg); }
+.btn-primary { display: inline-flex; align-items: center; min-height: 52px; padding: 0 26px; border-radius: 8px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 16px; text-decoration: none; }
+.btn-primary:hover { color: var(--on-accent); opacity: .88; }
+.avail { font-size: 13px; color: var(--muted); }
+.scrollcue { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; transition: opacity .4s ease; }
+.open[data-beat="1"] .scrollcue { opacity: 0; }
+
+
+/* Story beats: one sentence per screen; each comes alive as it reaches the middle */
+.top-kicker { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 28px); left: 0; right: 0; max-width: 1080px; margin: 0 auto; padding-inline: 20px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.story { display: flex; flex-direction: column; }
+.beat { --v: 0; min-height: 70vh; display: flex; align-items: center; padding-block: 48px; }
+.beat.first { min-height: 100vh; }
+.beat p, .beat h1 { font-size: clamp(40px, 7.2vw, 92px); line-height: 1.02; font-weight: 800; letter-spacing: -0.045em; max-width: 13.5em; margin: 0;
+  opacity: calc(0.14 + var(--v) * 0.86); transform: translateY(calc((1 - var(--v)) * 28px)); transition: opacity .12s linear, transform .12s linear; }
+.beat .mark { box-shadow: inset 0 calc(var(--v) * -0.16em) 0 var(--win-soft); }
+.turn-wrap { display: flex; flex-direction: column; gap: 28px; }
+.turn-wrap h1 { margin-bottom: 16px; }
+@media (max-width: 600px) { .turn-wrap h1 { margin-bottom: 4px; } }
+.turn-wrap .sub { font-size: clamp(18px, 1.8vw, 21px); font-weight: 400; letter-spacing: 0; line-height: 1.5; color: var(--muted); max-width: 32em; opacity: calc(var(--v)); transform: none; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; opacity: var(--v); }
+.beat .pain-lines { display: flex; flex-direction: column; gap: 0.18em; }
+.still .beat { --v: 1 !important; min-height: 0; padding-block: 40px; }
+.still .beat.first { padding-top: 96px; }
+@media (max-width: 600px) {
+  .beat { min-height: 62vh; }
+  .beat p, .beat h1 { font-size: clamp(36px, 10.5vw, 48px); letter-spacing: -0.035em; }
+}
+
+/* 2. Coffee: transcript left, shops right */
+.chapter { padding-block: 160px 24px; display: flex; flex-direction: column; gap: 36px; }
+@media (max-width: 600px) { .chapter { padding-block: 96px 16px; gap: 28px; } }
+.chapter h2 { font-size: clamp(34px, 5.2vw, 60px); line-height: 1.02; font-weight: 800; letter-spacing: -0.035em; max-width: 14em; }
+.chapter .intro { font-size: 18px; color: var(--muted); max-width: 34em; margin-top: -12px; }
+.call { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 28px; align-items: start; }
+@media (max-width: 760px) { .call { grid-template-columns: minmax(0, 1fr); gap: 14px; } .transcript { min-height: 0; } .transcript .line.old { display: none; } }
+.panel { border: 1px solid var(--line); border-radius: 12px; background: var(--bg); overflow: hidden; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 13px; flex-wrap: wrap; }
+.panel-head b { font-weight: 700; }
+.panel-head span { color: var(--muted); font-variant-numeric: tabular-nums; }
+.live { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); font-weight: 600; }
+.live i { width: 7px; height: 7px; border-radius: 4px; background: var(--blue); }
+@media (prefers-reduced-motion: no-preference) { .live i { animation: pulse 1.4s ease-out infinite; } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(35,65,181,.45); } 70% { box-shadow: 0 0 0 7px rgba(35,65,181,0); } 100% { box-shadow: 0 0 0 0 rgba(35,65,181,0); } }
+.transcript { padding: 16px; display: flex; flex-direction: column; gap: 10px; min-height: 340px; }
+.line { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; align-items: baseline; transition: opacity .35s ease; }
+.line .who { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.line .said { font-size: 15px; line-height: 1.45; color: var(--muted); }
+.line.now .said { color: var(--fg); font-weight: 600; }
+.line.shop .said { font-style: normal; }
+.line.key .said mark { background: var(--win-soft); color: var(--win); border-radius: 4px; padding: 0 3px; font-weight: 700; }
+.line.keyamber .said mark { background: var(--amber-soft); color: var(--amber); border-radius: 4px; padding: 0 3px; font-weight: 700; }
+.line.keygrey .said mark { background: var(--soft); color: var(--grey); border-radius: 4px; padding: 0 3px; font-weight: 700; }
+.row { display: flex; align-items: center; gap: 10px; padding: 14px 12px 14px 16px; border-bottom: 1px solid var(--line); border-left: 0; transition: background .35s ease; }
+.row:last-child { border-bottom: 0; }
+.row.active { background: var(--blue-soft); }
+.row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.row-name { font-size: 15px; font-weight: 600; }
+.row-meta { font-size: 12px; color: var(--muted); }
+.status { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-height: 22px; }
+.status.wait { color: var(--grey); font-weight: 500; }
+.status.call { color: var(--blue); }
+.status.win { color: var(--win); }
+.status.amber { color: var(--amber); }
+.status.grey { color: var(--grey); }
+.status .rec { font-size: 12px; font-weight: 500; color: var(--muted); }
+.status.flash { animation: flash .6s ease; }
+@keyframes flash { 0% { transform: translateX(-4px); opacity: .3; } 100% { transform: none; opacity: 1; } }
+.icons { display: flex; gap: 4px; flex-shrink: 0; }
+.icons span { width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 8px; display: grid; place-items: center; }
+.call-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.small { font-size: 12px; color: var(--muted); }
+.btn-quiet { min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-size: 14px; font-weight: 600; }
+.btn-quiet:hover { background: var(--soft); }
+
+/* 3. Before / after rows that flip as you reach them */
+.compare { display: flex; flex-direction: column; }
+.compare-head, .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+.compare-head { padding-bottom: 12px; border-bottom: 2px solid var(--fg); font-size: 13px; font-weight: 700; }
+.compare-head span:first-child { color: var(--muted); }
+.pair { padding: 22px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.pair .old { font-size: clamp(17px, 2vw, 21px); line-height: 1.35; color: var(--fg); text-decoration: line-through; text-decoration-color: transparent; text-decoration-thickness: 2px; transition: color .5s ease, text-decoration-color .5s ease; }
+.pair .new { font-size: clamp(17px, 2vw, 21px); line-height: 1.35; font-weight: 700; color: var(--faint); display: flex; gap: 10px; align-items: baseline; transition: color .5s ease; }
+.pair .new svg { flex-shrink: 0; color: var(--win); opacity: 0; transition: opacity .5s ease; }
+.pair.on .old { color: var(--muted); text-decoration-color: var(--muted); }
+.pair.on .new { color: var(--fg); }
+.pair.on .new svg { opacity: 1; }
+@media (max-width: 560px) { .compare-head, .pair { gap: 14px; } }
+
+/* 4. Setup */
+.setup { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+@media (max-width: 760px) { .setup { grid-template-columns: minmax(0, 1fr); } }
+.copy-box { border: 1px solid var(--line); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+.copy-box .lead { font-size: 18px; font-weight: 700; }
+.copy-line { display: flex; gap: 8px; flex-wrap: wrap; }
+.copy-line code { flex: 1 1 240px; min-width: 0; font-family: var(--mono); font-size: 14px; background: var(--soft); border-radius: 8px; padding: 12px 14px; overflow-x: auto; white-space: nowrap; user-select: all; }
+.btn-copy { min-height: 46px; padding: 0 22px; border: 0; border-radius: 8px; background: var(--accent); color: var(--on-accent); font-weight: 700; }
+.notice { background: var(--amber-soft); color: var(--amber); border-radius: 8px; padding: 10px 14px; font-size: 13px; }
+.toast { font-size: 13px; color: var(--win); min-height: 1.2em; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tab { min-height: 44px; padding: 0 14px; border: 0; background: transparent; font-weight: 700; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.tabpanel[hidden] { display: none; }
+ol.steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+ol.steps li:last-child { border-bottom: 0; }
+ol.steps li::before { content: counter(s); width: 26px; height: 26px; border: 1px solid var(--line); border-radius: 6px; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+ol.steps b { display: block; }
+ol.steps span { color: var(--muted); font-size: 15px; }
+.path { font-family: var(--mono); font-size: 13px; background: var(--soft); border-radius: 4px; padding: 1px 5px; white-space: nowrap; }
+.prompt { flex: 1 1 260px; min-width: 0; background: var(--soft); border-radius: 8px; padding: 14px 16px; font-size: 17px; user-select: all; }
+.takeaway { padding-block: 160px 24px; gap: 24px; }
+.takeaway h2 { font-size: clamp(40px, 6.4vw, 80px); line-height: 1.02; max-width: 13em; }
+.takeaway-sub { font-size: clamp(24px, 3.4vw, 40px); line-height: 1.15; font-weight: 700; letter-spacing: -0.025em; color: var(--fg); }
+.handoff { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+@media (max-width: 760px) { .handoff { grid-template-columns: minmax(0, 1fr); } }
+.handoff-step { border-top: 2px solid var(--fg); padding-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.handoff-step + .handoff-step { border-top-color: var(--line); }
+.handoff-when { font-size: 13px; font-weight: 700; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.handoff-what { font-size: clamp(18px, 2vw, 22px); line-height: 1.4; font-weight: 600; }
+.soon { font-size: 12px; font-weight: 700; color: var(--amber); background: var(--amber-soft); border-radius: 6px; padding: 2px 8px; }
+.signup { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 14px; }
+.signup-lead { font-weight: 700; font-size: 16px; }
+.demo-head { align-self: stretch; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.view-switch { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 10px; }
+.view-switch button { min-height: 36px; min-width: 64px; padding: 0 14px; border: 0; border-radius: 7px; background: transparent; font-size: 14px; font-weight: 600; color: var(--muted); }
+.view-switch button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.chat-side { display: none; }
+.chat-main { min-width: 0; display: flex; flex-direction: column; }
+.chat-top .app-only { display: none; }
+.chat-demo[data-view="web"] .chat-window { max-width: 920px; border-radius: 14px; display: grid; grid-template-columns: 200px minmax(0, 1fr); }
+.chat-demo[data-view="web"] .chat-side { display: flex; flex-direction: column; gap: 6px; padding: 14px 10px; background: var(--soft); border-right: 1px solid var(--line); font-size: 13px; }
+.side-new { font-weight: 600; padding: 8px 10px; }
+.side-label { font-size: 11px; font-weight: 700; color: var(--faint); padding: 12px 10px 2px; }
+.side-item { padding: 7px 10px; border-radius: 8px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.side-item.on { background: var(--line); color: var(--fg); }
+.chat-demo[data-view="web"] .chat-top { justify-content: flex-start; padding: 0 18px; place-items: center start; }
+.chat-demo[data-view="web"] .chat-body { width: 100%; max-width: 600px; margin: 0 auto; padding: 24px 20px; }
+.chat-demo[data-view="web"] .mini-card { max-width: 440px; }
+.chat-demo[data-view="web"] .chat-input { width: calc(100% - 40px); max-width: 560px; margin: 8px auto 20px; }
+.chat-demo[data-view="app"] .chat-window { max-width: 380px; border-radius: 40px; border-width: 8px; border-color: var(--fg); }
+.chat-demo[data-view="app"] .chat-top { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; }
+.chat-demo[data-view="app"] .chat-top .app-only { display: inline; color: var(--muted); }
+@media (max-width: 700px) { .chat-demo[data-view="web"] .chat-window { grid-template-columns: minmax(0, 1fr); } .chat-demo[data-view="web"] .chat-side { display: none; } }
+.chat-demo { margin: 40px 0 0; display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.chat-demo figcaption { font-weight: 700; font-size: 18px; align-self: stretch; }
+.chat-window { width: 100%; max-width: 440px; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: var(--bg); }
+.chat-top { height: 48px; display: grid; place-items: center; font-size: 15px; font-weight: 500; border-bottom: 1px solid var(--line); }
+.chat-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.bubble { align-self: flex-end; max-width: 82%; background: var(--soft); border-radius: 20px; padding: 10px 14px; font-size: 15px; line-height: 21px; }
+.reply { font-size: 15px; line-height: 22px; }
+.mini-card { border: 1px solid #DAD7D0; border-radius: 8px; overflow: hidden; background: #FFFFFF; color: #1A1A19; }
+.mc-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+.mc-photo { width: 56px; height: 56px; flex-shrink: 0; border-radius: 8px; background: #F4F2F8; display: grid; place-items: center; }
+.mc-title { font-size: 15px; font-weight: 600; line-height: 20px; }
+.mc-sub { font-size: 13px; line-height: 18px; color: #6B6A66; margin-top: 4px; }
+.mc-list-head { display: flex; justify-content: space-between; gap: 8px; padding: 10px 16px 6px; border-top: 1px solid #EFEDE8; font-size: 12px; color: #6B6A66; }
+.mc-list-head b { font-size: 13px; color: #1A1A19; }
+.mc-row { display: flex; align-items: center; gap: 12px; margin: 0 6px; padding: 8px 10px; min-height: 52px; border-radius: 6px; }
+.mc-row.on { background: #F5F4F1; }
+.mc-tick { width: 20px; height: 20px; flex-shrink: 0; border-radius: 4px; border: 1.5px solid #A8A59D; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #FFFFFF; }
+.mc-row.on .mc-tick { background: #1A1A19; border-color: #1A1A19; }
+.mc-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.mc-text b { font-size: 14px; font-weight: 500; }
+.mc-text span { font-size: 12px; color: #6B6A66; }
+.mc-rate { font-size: 12px; font-weight: 500; white-space: nowrap; }
+.mc-rate i { font-style: normal; font-weight: 400; color: #6B6A66; }
+.mc-foot { padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 8px; }
+.mc-btn { height: 44px; border-radius: 8px; background: #1A1A19; color: #FFFFFF; display: grid; place-items: center; font-size: 15px; font-weight: 600; }
+.mc-small { font-size: 11px; color: #6B6A66; text-align: center; }
+.chat-input { margin: 0 16px 16px; height: 44px; border: 1px solid var(--line); border-radius: 22px; display: flex; align-items: center; padding: 0 18px; font-size: 15px; color: var(--faint); }
+.task-map { position: relative; display: flex; flex-direction: column; align-items: center; }
+.hub { position: relative; z-index: 1; }
+.hub span { display: inline-flex; align-items: center; min-height: 52px; padding: 0 28px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 20px; font-weight: 700; letter-spacing: -0.01em; box-shadow: 0 10px 30px rgba(0,0,0,.14); }
+.branches { display: block; width: 100%; height: 110px; overflow: visible; }
+.branches path { fill: none; stroke: var(--line); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.task-map.drawn .branches path { stroke: var(--blue); }
+@media (prefers-reduced-motion: no-preference) {
+  .branches { clip-path: inset(0 0 100% 0); transition: clip-path 1s ease; }
+  .branches path { transition: stroke .6s ease; }
+  .task-map.drawn .branches { clip-path: inset(0 0 -2px 0); }
+  .task { opacity: 0; transform: translateY(10px); transition: opacity .45s ease, transform .45s ease, border-color .2s ease; transition-delay: calc(var(--i, 0) * 40ms + 500ms); }
+  .task-map.drawn .task { opacity: 1; transform: none; }
+}
+.task-grid { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.task { position: relative; display: flex; align-items: center; gap: 14px; min-height: 92px; padding: 18px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+.task:hover { border-color: var(--faint); }
+.task-icon { width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; background: var(--soft); display: grid; place-items: center; color: var(--fg); }
+.task.is-live .task-icon { background: var(--win-soft); color: var(--win); }
+.task-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.task-text b { font-size: 16px; line-height: 1.25; font-weight: 700; }
+.task-tag { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.task-state { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); }
+.task.is-live .task-state { color: var(--win); }
+.task.cta { padding: 0; border: 0; background: var(--accent); }
+.task.cta a { flex: 1; align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 18px 20px; color: var(--on-accent); text-decoration: none; font-size: 17px; }
+.task.cta a:hover { opacity: .9; }
+.tasks-chapter > .small { text-align: center; }
+@media (max-width: 1000px) { .task-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .branches path:nth-child(4), .branches path:nth-child(5) { display: none; } }
+@media (max-width: 600px) { .task-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; } .task { min-height: 72px; padding: 14px; } .branches { height: 48px; } .branches path:not(:first-child) { display: none; } }
+.plan-note { font-size: 13px; color: var(--muted); padding-top: 12px; }
+.final-cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 8px; }
+.btn-big { display: inline-flex; align-items: center; gap: 12px; min-height: 64px; padding: 0 30px; border-radius: 12px; background: var(--accent); color: var(--on-accent); font-size: 19px; font-weight: 700; text-decoration: none; box-shadow: 0 12px 30px rgba(0,0,0,.16); transition: transform .15s ease, box-shadow .15s ease; }
+.btn-big:hover { color: var(--on-accent); transform: translateY(-2px); box-shadow: 0 16px 36px rgba(0,0,0,.2); }
+.btn-big span { transition: transform .15s ease; }
+.btn-big:hover span { transform: translateX(4px); }
+.btn-ghost { display: inline-flex; align-items: center; min-height: 64px; padding: 0 24px; border: 1px solid var(--line); border-radius: 12px; font-size: 17px; font-weight: 700; text-decoration: none; }
+.btn-ghost:hover { background: var(--soft); }
+@media (max-width: 600px) { .btn-big, .btn-ghost { width: 100%; justify-content: center; font-size: 17px; } }
+.faq { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+.faq b { display: block; margin-bottom: 4px; }
+.faq p { color: var(--muted); font-size: 15px; }
+footer { margin-top: 72px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+
+.still .open { height: auto; }
+.still .open-stage { position: static; min-height: 0; padding-block: 72px 24px; }
+.still .turn { opacity: 1 !important; transform: none !important; }
+.still .scrollcue { display: none; }
+</style>
+
+<div class="wrap">
+
+  <p class="top-kicker">Human MCP · for ChatGPT and Claude</p>
+
+  <section class="story" aria-label="Why Human MCP">
+    <div class="beat first"><p>The best deal isn’t always online.</p></div>
+    <div class="beat"><p>We just don’t check <span class="mark">offline.</span></p></div>
+    <div class="beat"><p>Because calling shops is a pain.</p></div>
+    <div class="beat"><p class="pain-lines"><span>Calling strangers.</span><span>Waiting on hold to speak to them.</span><span>“Come and check” to know.</span></p></div>
+    <div class="beat"><p>So we call one or two, and buy at the first price we hear.</p></div>
+    <div class="beat"><p>The best price was at a shop we never called.</p></div>
+    <div class="beat turn-beat">
+      <div class="turn-wrap">
+        <h1>Now you can call them all, without picking up the phone.</h1>
+        <p class="sub">Our AI agents call every relevant shop near you and come back with who has it and the final price after offers.</p>
+        <div class="cta-row"><a class="btn-primary" href="#setup">Add to ChatGPT or Claude</a><span class="avail">Works in ChatGPT on the web, and in Claude on web, desktop and mobile.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="coffee" aria-labelledby="coffee-title">
+    <p class="kicker">How it works</p>
+    <h2 id="coffee-title">We handle the calls while you enjoy your coffee.</h2>
+    <p class="intro">Ask ChatGPT or Claude, pick the shops, tap once. Here’s what happens on the calls.</p>
+    <div class="call">
+      <div class="panel" aria-label="Call transcript">
+        <div class="panel-head"><b id="t-title">On the call</b><span class="live" id="t-live"><i></i>Live</span></div>
+        <div class="transcript" id="transcript" aria-live="off"></div>
+      </div>
+      <div class="panel" aria-label="Shops and their status">
+        <div class="panel-head"><b>iPhone 17 · 256GB · Lavender · near 500037</b><span id="progress">0 of 3 shops done</span></div>
+        <div id="rows"></div>
+      </div>
+    </div>
+    <div class="call-foot">
+      <p class="small">Example search. Shop names are real listings; answers and prices are sample data.</p>
+    </div>
+  </section>
+
+  <section class="chapter" aria-labelledby="human-title">
+    <p class="kicker">When a shop won’t talk to AI</p>
+    <h2 id="human-title">Some shops want a person. That’s fine.</h2>
+    <div class="handoff">
+      <div class="handoff-step"><p class="handoff-when">Today</p><p class="handoff-what">We tell you which shops asked for a person. You aren’t charged for them.</p></div>
+      <div class="handoff-step"><p class="handoff-when">Next <span class="soon">Coming soon</span></p><p class="handoff-what">A person from our team calls those shops for you, and for any call our AI couldn’t finish. You still don’t pick up the phone.</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" aria-labelledby="cmp-title">
+    <p class="kicker">What changes</p>
+    <h2 id="cmp-title">The same evening, two ways.</h2>
+    <div class="compare" id="compare">
+      <div class="compare-head"><span>Calling shops yourself</span><span>With Human MCP</span></div>
+      <div class="pair"><p class="old">You call 2 or 3 shops, then give up.</p><p class="new"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17 19 7"></path></svg>Our AI calls every relevant shop near you.</p></div>
+      <div class="pair"><p class="old">Hold music and “come and check”.</p><p class="new"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17 19 7"></path></svg>You get stock and the final price.</p></div>
+      <div class="pair"><p class="old">You buy at the first price you hear.</p><p class="new"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17 19 7"></path></svg>You see every answer and pick the best.</p></div>
+      <div class="pair"><p class="old">No proof of what they said.</p><p class="new"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17 19 7"></path></svg>Each call’s recording, if you want it.</p></div>
+    </div>
+  </section>
+
+  <section class="chapter tasks-chapter" id="tasks" aria-labelledby="tasks-title">
+    <p class="kicker">What else it can do</p>
+    <h2 id="tasks-title">Any call you’d rather not make.</h2>
+    <p class="intro">Shop calls work today. These are next, through the same assistant.</p>
+    <div class="task-map">
+      <div class="hub"><span>Human MCP</span></div>
+      <svg class="branches" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M500 0 V120"/><path d="M500 0 C500 90 300 40 300 120"/><path d="M500 0 C500 90 700 40 700 120"/><path d="M500 0 C500 90 100 50 100 120"/><path d="M500 0 C500 90 900 50 900 120"/>
+      </svg>
+      <ul class="task-grid">
+        <li class="task is-live"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9"/><path d="M3 9h18"/><path d="M9 20v-6h6v6"/></svg></span><span class="task-text"><span class="task-state">Live</span><b>Find it in nearby shops</b><span class="task-tag">stock + final price</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4V3Z"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>Hold it for me</b><span class="task-tag">reserve stock</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-45 12 12)"/><path d="m9.5 9.5 5 5"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>Medicine near me</b><span class="task-tag">pharmacy stock</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5 2.5-2.5Z"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>Repair quotes</b><span class="task-tag">AC · plumber · electrician</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18M12 13v5M9.5 15.5h5"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>Doctor appointments</b><span class="task-tag">clinic slots</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2 1-3 3-3 6v4h3"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>Table for tonight</b><span class="task-tag">restaurant booking</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14v-5l-2-5H7l-2 5v5Z"/><path d="M5 12h14"/><circle cx="8" cy="17" r="2"/><circle cx="16" cy="17" r="2"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>Car and bike service</b><span class="task-tag">service slots</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7Z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>Movers and packers</b><span class="task-tag">moving quotes</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>Rental enquiries</b><span class="task-tag">flats + PGs</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 9 10-5 10 5-10 5L2 9Z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>School admissions</b><span class="task-tag">seats + fees</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19l1-5.8-4.3-4.1 5.9-.9L12 3Z"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>Event bookings</b><span class="task-tag">venues + caterers</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/><path d="M19 20a3 3 0 0 1-3 2h-2"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>Customer care for you</b><span class="task-tag">waits on hold</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>Human follow-up</b><span class="task-tag">when AI can’t finish</span></span></li>
+        <li class="task"><span class="task-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span><span class="task-text"><span class="task-state">Coming soon</span><b>Expert second opinion</b><span class="task-tag">insurance · money · education</span></span></li>
+        <li class="task cta"><a href="#setup"><b>Add to ChatGPT or Claude</b><span aria-hidden="true">→</span></a></li>
+      </ul>
+    </div>
+    <p class="small">“Coming soon” tasks aren’t available yet. Today, Human MCP calls shops for stock and the final price.</p>
+  </section>
+
+  <section class="chapter" id="setup" aria-labelledby="setup-title">
+    <p class="kicker">Set it up in 3 minutes</p>
+    <h2 id="setup-title">Copy one address. Paste it. Ask.</h2>
+    <div class="setup">
+      <div class="copy-box">
+        <p class="lead">Your Human MCP address</p>
+        <div class="copy-line"><code id="server-url">https://little-kangaroo-718.convex.site/mcp</code><button type="button" class="btn-copy" data-copy="server-url" data-toast="toast-url">Copy</button></div>
+        <p class="toast" id="toast-url" role="status" aria-live="polite"></p>
+        <p style="color:var(--muted);font-size:15px">Paste it into ChatGPT or Claude and sign in once with your Human MCP account. Calls use your account credit.</p>
+        <div class="signup"><div><p class="signup-lead">New here? Sign up and get $1 free credit.</p><p class="small">Verify your email to get approved automatically and start testing immediately.</p></div><a class="btn-primary" href="https://little-kangaroo-718.convex.site/account">Get Started</a></div>
+        <p class="notice">Live for testing. Shop calling is in early testing, so some calls may not go through yet.</p>
+      </div>
+      <div>
+        <div class="tabs" role="tablist" aria-label="Choose your AI app">
+          <button type="button" class="tab" role="tab" id="tab-chatgpt" aria-controls="p-chatgpt" aria-selected="true">ChatGPT</button>
+          <button type="button" class="tab" role="tab" id="tab-claude" aria-controls="p-claude" aria-selected="false" tabindex="-1">Claude</button>
+        </div>
+        <div class="tabpanel" role="tabpanel" id="p-chatgpt" aria-labelledby="tab-chatgpt">
+          <ol class="steps">
+            <li><div><b>Turn on Developer mode</b><span><span class="path">Settings → Security and login</span> → Developer mode.</span></div></li>
+            <li><div><b>Add a new plugin</b><span>Go to <a href="https://chatgpt.com/plugins">chatgpt.com/plugins</a>, select +, name it Human MCP and add a short description.</span></div></li>
+            <li><div><b>Paste the address</b><span>Under Connection, paste it and select Create.</span></div></li>
+            <li><div><b>Sign in, then use it</b><span>In a new chat, add Human MCP from the tools menu.</span></div></li>
+          </ol>
+          <p class="plan-note">Needs Developer mode: ChatGPT Business, Enterprise and Edu. On Pro, Human MCP can connect but may not be able to start calls. On Business, your admin may need to turn Developer mode on.</p>
+        </div>
+        <div class="tabpanel" role="tabpanel" id="p-claude" aria-labelledby="tab-claude" hidden>
+          <ol class="steps">
+            <li><div><b>Open Connectors</b><span>Go to <a href="https://claude.ai/customize/connectors">Customize → Connectors</a>, then + Add → Add custom connector.</span></div></li>
+            <li><div><b>Paste the address</b><span>Name it Human MCP, paste the address, select Continue, then Continue again.</span></div></li>
+            <li><div><b>Choose sign-in, then Add</b><span>Under Authentication, choose Sign in now. Under OAuth client, choose Register automatically. Select Add and sign in with your Human MCP account.</span></div></li>
+            <li><div><b>Turn it on in a chat</b><span>+ → Connectors → switch on Human MCP.</span></div></li>
+          </ol>
+          <p class="plan-note">Works on Free, Pro, Max, Team and Enterprise. On Team and Enterprise, an owner adds it under Organization settings → Connectors.</p>
+        </div>
+      </div>
+    </div>
+    <figure class="chat-demo" data-view="web">
+      <div class="demo-head"><figcaption>What you’ll see in the chat</figcaption>
+        <div class="view-switch" role="group" aria-label="Preview"><button type="button" data-view="web" aria-pressed="true">Web</button><button type="button" data-view="app" aria-pressed="false">App</button></div></div>
+      <div class="chat-window" aria-label="Example chat in ChatGPT">
+        <div class="chat-side" aria-hidden="true"><span class="side-new">New chat</span><span class="side-label">Recent</span><span class="side-item on">Buy iPhone 17 today</span><span class="side-item">Weekend trip plan</span><span class="side-item">Fix sink leak</span></div>
+        <div class="chat-main">
+        <div class="chat-top"><span class="app-only" aria-hidden="true">☰</span>New chat<span class="app-only" aria-hidden="true">✎</span></div>
+        <div class="chat-body">
+          <p class="bubble">Need an iPhone 17, 256GB, lavender today near 500037. I'll pay with my ICICI card.</p>
+          <p class="reply">Here’s what I found near 500037. Pick the shops and I’ll have them called.</p>
+          <section class="mini-card" aria-label="Example shop card">
+            <div class="mc-head"><div class="mc-photo" aria-hidden="true"><svg width="40" height="48" viewBox="0 0 64 76" fill="none"><rect x="14" y="2" width="36" height="72" rx="8" fill="#CFC4E6" stroke="#B3A5D3" stroke-width="1.5"/><rect x="18" y="7" width="17" height="21" rx="6" fill="#BDB0DA"/><circle cx="23" cy="13" r="3.4" fill="#2E2A38"/><circle cx="23" cy="22" r="3.4" fill="#2E2A38"/></svg></div><div><p class="mc-title">5 shops near 500037 may have your iPhone 17</p><p class="mc-sub">Pick the shops. Our AI calls them for stock and the final price after offers.</p></div></div>
+            <div class="mc-list-head"><b>5 shops</b><span>Highest rated · 50+ Google ratings</span></div>
+            <div class="mc-row on"><span class="mc-tick">✓</span><span class="mc-text"><b>Aptronix · Kukatpally</b><span>3.8 km · Open till 9:30 pm</span></span><span class="mc-rate">★ 4.6 <i>(1,240)</i></span></div>
+            <div class="mc-row on"><span class="mc-tick">✓</span><span class="mc-text"><b>Vijay Sales · Kukatpally</b><span>4.1 km · Open till 10 pm</span></span><span class="mc-rate">★ 4.4 <i>(3,105)</i></span></div>
+            <div class="mc-row"><span class="mc-tick"></span><span class="mc-text"><b>Croma · JNTU</b><span>6.4 km · Open till 10 pm</span></span><span class="mc-rate">★ 4.1 <i>(1,120)</i></span></div>
+            <div class="mc-foot"><span class="mc-btn">Call 2 shops</span><span class="mc-small">Calls use your account credit. A listing doesn’t confirm stock.</span></div>
+          </section>
+        </div>
+        <div class="chat-input">Ask anything</div>
+        </div>
+      </div>
+      <p class="small">Example. After you tap “Call 2 shops”, this same card shows each call live, then every shop’s answer.</p>
+    </figure>
+  </section>
+
+  <section class="chapter takeaway" aria-labelledby="takeaway-title">
+    <h2 id="takeaway-title">No more putting it off because you’d have to call strangers.</h2>
+    <p class="takeaway-sub">We handle the calls for you.</p>
+    <div class="final-cta">
+      <a class="btn-big" href="#setup">Add to ChatGPT or Claude <span aria-hidden="true">→</span></a>
+      <a class="btn-ghost" href="https://little-kangaroo-718.convex.site/account">Get $1 free credit</a>
+    </div>
+    <p class="small">Takes about 3 minutes. Pay only for shops that give you an answer.</p>
+  </section>
+
+  <footer>
+    <p>Setup steps checked against OpenAI's and Anthropic's help pages on 5 October 2026. Prices on this page are sample data.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var reduce = false;
+  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  if (reduce) document.documentElement.classList.add('still');
+
+  /* 1. Story beats come alive near the middle of the screen; before/after rows flip as you reach them */
+  var beats = [].slice.call(document.querySelectorAll('.beat'));
+  function onScroll() {
+    var vh = innerHeight;
+    beats.forEach(function (el) {
+      if (reduce) { el.style.setProperty('--v', 1); return; }
+      var r = el.getBoundingClientRect();
+      var c = r.top + r.height / 2;
+      var d = Math.max(0, Math.abs(c - vh * 0.5) - vh * 0.08) / (vh * 0.42);
+      var v = Math.max(0, Math.min(1, 1 - d));
+      v = v * v * (3 - 2 * v);
+      el.style.setProperty('--v', v.toFixed(3));
+    });
+    document.querySelectorAll('.pair').forEach(function (el) {
+      var t = el.getBoundingClientRect().top;
+      if (reduce || t < vh * 0.7) el.classList.add('on'); else el.classList.remove('on');
+    });
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(function () { ticking = false; onScroll(); }); } }, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+
+  /* 2. Live call: transcript and shop rows in sync */
+  var PHONE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"></path></svg>';
+  var MAP = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 18-8-8 18-2-8-8-2Z"></path></svg>';
+  var SHOPS = [
+    { name: 'Aptronix · Kukatpally', meta: '★ 4.6 (1,240) · 3.8 km · Open till 9:30 pm' },
+    { name: 'Vijay Sales · Kukatpally', meta: '★ 4.4 (3,105) · 4.1 km · Open till 10 pm' },
+    { name: 'Croma · JNTU', meta: '★ 4.1 (1,120) · 6.4 km · Open till 10 pm' }
+  ];
+  var S = {
+    wait: ['wait', 'Waiting to call'],
+    call: ['call', 'AI agent calling'],
+    stock: ['win', 'In stock'],
+    stockPrice: ['win', 'In stock · ₹75,900 with ICICI <span class="rec">▶ 1:42</span>'],
+    personal: ['amber', 'Prefers a personal call'],
+    none: ['grey', 'No stock · expected Friday <span class="rec">▶ 0:47</span>']
+  };
+  var SCRIPT = [
+    { shop: 0, set: 'call' },
+    { shop: 0, who: 'AI', say: 'Hello, is this Aptronix Kukatpally? I’m calling on behalf of a customer.' },
+    { shop: 0, who: 'Shop', say: 'Yes, tell me.' },
+    { shop: 0, who: 'AI', say: 'Do you have the iPhone 17, 256GB, in lavender?' },
+    { shop: 0, who: 'Shop', say: '<mark>Yes sir, one piece is there.</mark>', key: 'key', set: 'stock' },
+    { shop: 0, who: 'AI', say: 'What’s the final price, and any card offers?' },
+    { shop: 0, who: 'Shop', say: '<mark>Seventy-nine nine hundred. ICICI card gets four thousand off.</mark>', key: 'key', set: 'stockPrice', done: true },
+    { shop: 1, set: 'call' },
+    { shop: 1, who: 'AI', say: 'Hello, is this Vijay Sales Kukatpally? I’m calling on behalf of a customer.' },
+    { shop: 1, who: 'Shop', say: '<mark>Sir, please talk to our manager directly.</mark>', key: 'keyamber', set: 'personal', done: true },
+    { shop: 2, set: 'call' },
+    { shop: 2, who: 'AI', say: 'Hello, is this Croma JNTU? Do you have the iPhone 17, 256GB, lavender?' },
+    { shop: 2, who: 'Shop', say: '<mark>Not right now. New stock comes Friday.</mark>', key: 'keygrey', set: 'none', done: true }
+  ];
+  var rowsEl = document.getElementById('rows'), tEl = document.getElementById('transcript'), tTitle = document.getElementById('t-title'), tLive = document.getElementById('t-live'), prog = document.getElementById('progress');
+  var state, doneCount, timers = [], lines = [];
+  function renderRows(activeShop, flashShop) {
+    rowsEl.innerHTML = SHOPS.map(function (s, i) {
+      var st = S[state[i]];
+      return '<div class="row' + (i === activeShop ? ' active' : '') + '"><div class="row-main"><span class="row-name">' + s.name + '</span><span class="row-meta">' + s.meta + '</span><span class="status ' + st[0] + (i === flashShop ? ' flash' : '') + '">' + (state[i] === 'call' ? '<span class="live"><i></i></span>' : '') + st[1] + '</span></div><div class="icons"><span>' + PHONE + '</span><span>' + MAP + '</span></div></div>';
+    }).join('');
+  }
+  function renderLines() {
+    tEl.innerHTML = lines.map(function (l, i) {
+      return '<div class="line ' + (l.who === 'Shop' ? 'shop ' : '') + (l.key || '') + (i === lines.length - 1 ? ' now' : '') + (i < lines.length - 3 ? ' old' : '') + '"><span class="who">' + l.who + '</span><span class="said">' + l.say + '</span></div>';
+    }).join('');
+  }
+  function reset() {
+    timers.forEach(clearTimeout); timers = [];
+    state = ['wait', 'wait', 'wait']; doneCount = 0; lines = [];
+    tTitle.textContent = 'On the call'; tLive.style.visibility = 'visible';
+    prog.textContent = '0 of 3 shops done';
+    renderRows(-1, -1); renderLines();
+  }
+  function finish() {
+    tTitle.textContent = 'All calls done'; tLive.style.visibility = 'hidden';
+    prog.textContent = '3 shops called · 1 has it';
+    renderRows(-1, -1);
+  }
+  function play() {
+    reset();
+    var t = 400, current = -1;
+    SCRIPT.forEach(function (step) {
+      timers.push(setTimeout(function () {
+        if (step.shop !== current) { current = step.shop; lines = []; tTitle.textContent = 'On the call · ' + SHOPS[step.shop].name; }
+        if (step.say) { lines.push(step); renderLines(); }
+        var flash = -1;
+        if (step.set) { state[step.shop] = step.set; flash = step.shop; }
+        if (step.done) { doneCount++; prog.textContent = doneCount + ' of 3 shops done'; }
+        renderRows(step.shop, flash);
+      }, t));
+      t += step.say ? 1700 : 500;
+    });
+    timers.push(setTimeout(finish, t + 400));
+    timers.push(setTimeout(play, t + 4400));
+  }
+  function showFinal() {
+    state = ['stockPrice', 'personal', 'none']; lines = SCRIPT.filter(function (s) { return s.shop === 0 && s.say; });
+    tTitle.textContent = 'On the call · ' + SHOPS[0].name; renderLines(); finish();
+  }
+  if (reduce) { showFinal(); }
+  else {
+    reset();
+    var started = false;
+    var coffee = document.getElementById('coffee');
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && !started) { started = true; play(); } }); }, { threshold: 0.35 }).observe(coffee);
+    } else { play(); }
+  }
+
+  /* Task map: branches draw, then cards appear, when the section is reached */
+  var map = document.querySelector('.task-map');
+  [].forEach.call(document.querySelectorAll('.task'), function (el, i) { el.style.setProperty('--i', i); });
+  if (reduce || !('IntersectionObserver' in window)) { map.classList.add('drawn'); }
+  else { new IntersectionObserver(function (es, o) { es.forEach(function (e) { if (e.isIntersecting) { map.classList.add('drawn'); o.disconnect(); } }); }, { threshold: 0.2 }).observe(map); }
+
+  /* Web / App preview switch */
+  var demo = document.querySelector('.chat-demo');
+  [].forEach.call(document.querySelectorAll('.view-switch button'), function (btn, i, all) {
+    btn.addEventListener('click', function () { demo.dataset.view = btn.dataset.view; [].forEach.call(all, function (b) { b.setAttribute('aria-pressed', b === btn); }); });
+  });
+
+  /* Tabs and copy */
+  var tabs = [document.getElementById('tab-chatgpt'), document.getElementById('tab-claude')];
+  var panels = { 'tab-chatgpt': document.getElementById('p-chatgpt'), 'tab-claude': document.getElementById('p-claude') };
+  function select(tab, focus) { tabs.forEach(function (x) { var on = x === tab; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; panels[x.id].hidden = !on; }); if (focus) tab.focus(); }
+  tabs.forEach(function (x, i) {
+    x.addEventListener('click', function () { select(x); });
+    x.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); select(tabs[(i + 1) % 2], true); } });
+  });
+  document.querySelectorAll('[data-copy]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var src = document.getElementById(b.dataset.copy), toast = document.getElementById(b.dataset.toast), txt = src.textContent.trim();
+      function fb() { var r = document.createRange(); r.selectNodeContents(src); var s = getSelection(); s.removeAllRanges(); s.addRange(r); toast.textContent = 'Selected. Press Ctrl+C or ⌘C to copy.'; }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast.textContent = 'Copied.'; }, fb); else fb();
+    });
+  });
+})();
+</script>

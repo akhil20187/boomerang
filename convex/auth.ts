@@ -1,5 +1,6 @@
 import { convexAuth } from "@convex-dev/auth/server";
 import { Email } from "@convex-dev/auth/providers/Email";
+import { approveWithWelcomeCredit } from './onboarding';
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [
     Email({
@@ -35,6 +36,11 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
     }),
   ],
   callbacks: {
+    async afterUserCreatedOrUpdated(ctx, args) {
+      // Email signup is complete only after the sign-in link is verified.
+      if (args.type === 'verification')
+        await approveWithWelcomeCredit(ctx, args.userId);
+    },
     async redirect({ redirectTo }) {
       const base = process.env.SITE_URL ?? "http://localhost:5173";
       if (!redirectTo) return base;
