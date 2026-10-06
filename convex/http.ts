@@ -6,6 +6,41 @@ import { auth } from "./auth";
 import { endpoint, oauthHttp } from "./mcp";
 const http = httpRouter();
 auth.addHttpRoutes(http);
+// The shareable skill should open as readable text, not a binary download.
+http.route({ path: "/SKILL.md", method: "GET", handler: httpAction(async () => {
+  const response = await fetch(`${process.env.CONVEX_SITE_URL}/boomerang-skill.md`,
+    { signal: AbortSignal.timeout(15000) });
+  const body = await response.text();
+  if (!response.ok || !body.startsWith("---\nname: boomerang\n"))
+    return new Response("Skill unavailable", { status: 503 });
+  return new Response(body, { headers: {
+    "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-cache",
+    "X-Content-Type-Options": "nosniff",
+  } });
+}) });
+// Static hosting stores the landing page's sample calls as generic bytes without range support,
+// which Safari refuses for audio. Serve them as audio/mpeg with byte ranges.
+for (const name of ["aptronix-sample-call.mp3", "aptronix-sample-call-hi.mp3"])
+  http.route({ path: `/audio/${name}`, method: "GET", handler: httpAction(async (_ctx, request) => {
+    const source = await fetch(`${process.env.CONVEX_SITE_URL}/sample-audio/${name}`,
+      { signal: AbortSignal.timeout(15000) });
+    if (!source.ok) return new Response("Audio unavailable", { status: 503 });
+    const bytes = new Uint8Array(await source.arrayBuffer());
+    const headers: Record<string, string> = {
+      "Content-Type": "audio/mpeg", "Accept-Ranges": "bytes",
+      "Cache-Control": "public, max-age=3600", "X-Content-Type-Options": "nosniff",
+    };
+    const range = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get("Range") ?? "");
+    if (!range || (!range[1] && !range[2]))
+      return new Response(bytes, { headers: { ...headers, "Content-Length": String(bytes.length) } });
+    const start = range[1] ? Number(range[1]) : Math.max(0, bytes.length - Number(range[2]));
+    const end = range[1] && range[2] ? Math.min(Number(range[2]), bytes.length - 1) : bytes.length - 1;
+    if (start > end || start >= bytes.length)
+      return new Response(null, { status: 416, headers: { ...headers, "Content-Range": `bytes */${bytes.length}` } });
+    return new Response(bytes.slice(start, end + 1), { status: 206, headers: {
+      ...headers, "Content-Range": `bytes ${start}-${end}/${bytes.length}`, "Content-Length": String(end - start + 1),
+    } });
+  }) });
 // Keep old setup bookmarks from exposing the withdrawn guide.
 for (const path of ["/setup", "/setup.html"])
   http.route({ path, method: "GET", handler: httpAction(async () =>

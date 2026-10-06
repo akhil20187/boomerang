@@ -13,9 +13,9 @@ import { bearerToken, createTools } from './core.mjs';
 import { createOAuth } from './oauth.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const uiUri = 'ui://human-mcp/shops-v3.html';
+const uiUri = 'ui://boomerang/shops-v3.html';
 export function createMcpServer({client, token, widgetHtml, connectDomains=[]}) {
-  const server = new McpServer({name:'human-mcp',version:'1.0.0'});
+  const server = new McpServer({name:'boomerang',version:'1.0.0'});
   const tools = createTools(client,token);
   registerAppResource(server,'shop-card',uiUri,{},async()=>({contents:[{
     uri:uiUri,mimeType:RESOURCE_MIME_TYPE,text:widgetHtml,
@@ -54,7 +54,7 @@ export function createHttpServer({convexUrl,widgetHtml,publicUrl='http://127.0.0
   return http.createServer(async(req,res)=>{
     if(await oauth.handle(req,res))return;
     const url=new URL(req.url,publicUrl);
-    if(url.pathname==='/health') {res.writeHead(200,{'Content-Type':'application/json'});return res.end(JSON.stringify({ready:true,service:'human-mcp',authentication:'account bearer token'}));}
+    if(url.pathname==='/health') {res.writeHead(200,{'Content-Type':'application/json'});return res.end(JSON.stringify({ready:true,service:'boomerang',authentication:'account bearer token'}));}
     if(url.pathname!=='/mcp') {res.writeHead(404);return res.end('Not found');}
     if(req.method!=='POST') {res.writeHead(405,{Allow:'POST'});return res.end();}
     const presented=bearerToken(req.headers.authorization);
@@ -78,5 +78,5 @@ if(process.argv[1]===fileURLToPath(import.meta.url)) {
   if(!convexUrl)throw new Error('CONVEX_URL must point to the deployed backend.');
   const widgetHtml=await fs.readFile(path.join(root,'web/dist/widget.html'),'utf8');
   const port=Number(process.env.MCP_PORT || 3212);
-  createHttpServer({convexUrl,widgetHtml,publicUrl:process.env.MCP_PUBLIC_URL || `http://127.0.0.1:${port}`,websiteUrl:process.env.SITE_URL || 'http://127.0.0.1:5173',allowedRedirectUris:process.env.MCP_OAUTH_REDIRECT_URIS?.split(',').map(x=>x.trim()).filter(Boolean)}).listen(port,process.env.MCP_BIND_HOST || '127.0.0.1',()=>console.log(`Human MCP ready on port ${port}`));
+  createHttpServer({convexUrl,widgetHtml,publicUrl:process.env.MCP_PUBLIC_URL || `http://127.0.0.1:${port}`,websiteUrl:process.env.SITE_URL || 'http://127.0.0.1:5173',allowedRedirectUris:process.env.MCP_OAUTH_REDIRECT_URIS?.split(',').map(x=>x.trim()).filter(Boolean)}).listen(port,process.env.MCP_BIND_HOST || '127.0.0.1',()=>console.log(`Boomerang ready on port ${port}`));
 }

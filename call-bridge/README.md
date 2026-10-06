@@ -1,4 +1,4 @@
-# Human MCP call bridge
+# Boomerang call bridge
 
 The bridge handles authenticated dispatch only. It reuses the tested Vobiz/OpenAI phone agent, tracks attempts on disk, forwards provider media, extracts evidenced shop answers and reports to Convex. No call is made by starting the process. Saved attempts can trigger read-only provider reconciliation. Live provider behavior is not verified by the automated tests.
 
@@ -33,13 +33,13 @@ Expose `/health`, `/dispatch`, `/answer/*`, `/status/*`, `/media/*` and `/record
 From the repository root:
 
 ```sh
-docker build --pull -f call-bridge/Dockerfile -t human-mcp-call-bridge:local .
-docker volume create human-mcp-bridge-smoke
-docker run --detach --name human-mcp-bridge-smoke \
+docker build --pull -f call-bridge/Dockerfile -t boomerang-call-bridge:local .
+docker volume create boomerang-bridge-smoke
+docker run --detach --name boomerang-bridge-smoke \
   --read-only --cap-drop=ALL --security-opt=no-new-privileges \
   --stop-timeout=60 \
   --publish 127.0.0.1:3213:3212 \
-  --mount type=volume,source=human-mcp-bridge-smoke,target=/var/lib/human-mcp \
+  --mount type=volume,source=boomerang-bridge-smoke,target=/var/lib/human-mcp \
   --env CALL_BRIDGE_SECRET=local-smoke-test-only-not-a-real-secret-000000 \
   --env CALL_BRIDGE_PUBLIC_URL=https://bridge.example.invalid \
   --env CONVEX_CALLBACK_URL=https://callback.example.invalid/api/call-event \
@@ -47,12 +47,12 @@ docker run --detach --name human-mcp-bridge-smoke \
   --env VOBIZ_AUTH_ID=fake-local-smoke-id \
   --env VOBIZ_AUTH_TOKEN=fake-local-smoke-token \
   --env VOBIZ_FROM_NUMBER=+919000000000 \
-  human-mcp-call-bridge:local
+  boomerang-call-bridge:local
 curl --fail http://127.0.0.1:3213/health
-docker inspect --format '{{.State.Health.Status}}' human-mcp-bridge-smoke
-docker exec human-mcp-bridge-smoke id
-docker stop human-mcp-bridge-smoke
-docker rm human-mcp-bridge-smoke
+docker inspect --format '{{.State.Health.Status}}' boomerang-bridge-smoke
+docker exec boomerang-bridge-smoke id
+docker stop boomerang-bridge-smoke
+docker rm boomerang-bridge-smoke
 ```
 
 The smoke check uses fake configuration values, an empty new volume and no valid provider credentials. Do not POST `/dispatch` during this check. Expected health is `ready:true`, `active:0`; Docker health becomes `healthy` after its first health probe. The process runs as `node` (UID 1000), not root. Retain or remove the separate smoke volume as needed; it is separate from production call history.
@@ -64,14 +64,14 @@ The image installs only locked `ws@8.21.0`, skips package install scripts and op
 Create a private environment file outside the repository/build context containing only the required bridge/provider configuration above. Supply secrets at runtime through `--env-file` or the hosting platform's secret settings; never use Docker build arguments for secrets.
 
 ```sh
-docker volume create human-mcp-bridge-data
-docker run --detach --name human-mcp-call-bridge \
+docker volume create boomerang-bridge-data
+docker run --detach --name boomerang-call-bridge \
   --restart unless-stopped --stop-timeout=60 \
   --read-only --cap-drop=ALL --security-opt=no-new-privileges \
   --publish 127.0.0.1:3212:3212 \
-  --mount type=volume,source=human-mcp-bridge-data,target=/var/lib/human-mcp \
+  --mount type=volume,source=boomerang-bridge-data,target=/var/lib/human-mcp \
   --env-file /absolute/private/path/call-bridge.env \
-  human-mcp-call-bridge:local
+  boomerang-call-bridge:local
 ```
 
 Named volumes inherit the image's journal directory permissions (UID 1000, mode 0700). For an existing host bind mount, the directory must instead be writable by UID 1000 and restricted to that owner. The journal file is saved with mode 0600. Configure the chosen HTTPS proxy to forward HTTP and WebSocket upgrades to localhost port 3212; retain this same data volume during upgrades. The container's health check only requests `/health` and never calls providers.

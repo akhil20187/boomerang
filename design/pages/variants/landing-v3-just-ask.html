@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boomerang · Just ask</title>
+<style>
+/* Hallmark · macrostructure: Workbench (the page is the chat) · tone: plain, confident · anchor hue: green (has it) · system: DESIGN.md */
+:root {
+  --bg: #FFFFFF;
+  --fg: #1A1A19;
+  --muted: #64625D;
+  --faint: #9C9992;
+  --line: #E4E2DC;
+  --card-line: #DAD7D0;
+  --soft: #F5F4F1;
+  --accent: #1A1A19;
+  --on-accent: #FFFFFF;
+  --win: #17573A;
+  --win-soft: #E5F2EA;
+  --blue: #2341B5;
+  --blue-soft: #EAEEFB;
+  --amber: #7A4A00;
+  --amber-soft: #FBF0DF;
+  --grey: #55544F;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --col: 640px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121211; --fg: #F2F1ED; --muted: #A8A6A0; --faint: #77756F; --line: #2E2D2A; --card-line: #3A3935; --soft: #1C1B19;
+    --accent: #F2F1ED; --on-accent: #121211; --win: #6FD19B; --win-soft: #16291E; --blue: #9DB0F5; --blue-soft: #1A2033;
+    --amber: #E7B567; --amber-soft: #2E2416; --grey: #BDBBB5; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121211; --fg: #F2F1ED; --muted: #A8A6A0; --faint: #77756F; --line: #2E2D2A; --card-line: #3A3935; --soft: #1C1B19;
+  --accent: #F2F1ED; --on-accent: #121211; --win: #6FD19B; --win-soft: #16291E; --blue: #9DB0F5; --blue-soft: #1A2033;
+  --amber: #E7B567; --amber-soft: #2E2416; --grey: #BDBBB5; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { overflow-x: clip; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { margin: 0; font-style: normal; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--fg); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; border-radius: 4px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.page { padding-inline: 20px; }
+@media (max-width: 400px) { .page { padding-inline: 16px; } }
+
+/* Brand lockup (from landing-story): green #16A34A lives only in the logo */
+.top { max-width: 1120px; margin: 0 auto; padding-top: 24px; }
+.site-brand { display: inline-flex; align-items: center; gap: 7px; color: var(--fg); text-decoration: none; font-size: 20px; font-weight: 800; letter-spacing: -0.045em; line-height: 1; }
+.site-brand svg { width: 26px; height: 26px; flex-shrink: 0; }
+
+/* Fold */
+.fold { max-width: var(--col); margin: 0 auto; padding: clamp(56px, 11vh, 120px) 0 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.fold h1 { font-size: clamp(40px, 8vw, 80px); line-height: 1; font-weight: 800; letter-spacing: -0.045em; max-width: 10em; }
+.fold h1 span { display: block; color: var(--muted); }
+.fold .pain { margin-top: 24px; font-size: clamp(17px, 1.8vw, 20px); color: var(--muted); max-width: 30em; line-height: 1.5; }
+.cta { margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 8px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 16px; text-decoration: none; white-space: nowrap; transition: opacity .15s ease; }
+.btn-primary:hover { opacity: .86; }
+.small { font-size: 13px; color: var(--muted); }
+
+/* The conversation */
+.convo { padding-top: clamp(56px, 9vh, 96px); }
+.step { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, var(--col)) minmax(0, 1fr); column-gap: 48px; max-width: 1240px; margin: 0 auto; padding-bottom: 72px; }
+.step > .body { grid-column: 2; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.note { grid-row: 1; align-self: start; font-size: 14px; line-height: 1.5; color: var(--muted); max-width: 17em; padding-top: 6px; border-top: 1px solid var(--line); margin-top: 32px; }
+.note b { display: block; color: var(--fg); font-weight: 700; margin-bottom: 2px; }
+.note.left { grid-column: 1; justify-self: end; text-align: right; }
+.note.right { grid-column: 3; justify-self: start; }
+.note.low { margin-top: var(--low, 320px); }
+.side { grid-row: 1; display: flex; flex-direction: column; min-width: 0; }
+.side.left { grid-column: 1; align-items: flex-end; text-align: right; }
+.side.right { grid-column: 3; align-items: flex-start; }
+.side .note { max-width: 17em; }
+@media (max-width: 1100px) {
+  .step { display: flex; flex-direction: column; max-width: var(--col); padding-bottom: 56px; }
+  .step > .note, .side.left { order: -1; }
+  .step > .body { grid-column: 1; grid-row: auto; }
+  .side, .side.left, .side.right { grid-column: 1; grid-row: auto; align-items: stretch; text-align: left; }
+  .side .note { margin-top: 0 !important; }
+  .side.right { margin-top: 24px; gap: 14px; }
+  .note, .note.left, .note.right, .note.low { grid-column: 1; grid-row: auto; justify-self: stretch; text-align: left; max-width: none; margin: 0 0 14px; padding: 0 0 0 12px; border-top: 0; border-left: 2px solid var(--line); }
+}
+.step.first { padding-bottom: 0; }
+.fold-bubble { max-width: var(--col); margin: 48px auto 0; display: flex; flex-direction: column; }
+
+.bubble { align-self: flex-end; max-width: 84%; background: var(--soft); border-radius: 20px 20px 6px 20px; padding: 12px 16px; font-size: 16px; line-height: 1.45; }
+.who { font-size: 12px; font-weight: 600; color: var(--faint); }
+.who.me { align-self: flex-end; }
+.reply { font-size: 16px; line-height: 1.55; }
+.stamp { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; color: var(--faint); font-variant-numeric: tabular-nums; }
+.stamp::before, .stamp::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.tap { align-self: flex-end; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.tap i { font-style: normal; display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: 6px; background: var(--accent); color: var(--on-accent); font-weight: 600; font-size: 12px; }
+
+/* The card: one card, three shapes. Crisp: 8px corners, thin borders, no shadows */
+.card { border: 1px solid var(--card-line); border-radius: 8px; background: var(--bg); overflow: hidden; }
+.c-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+.c-photo { width: 52px; height: 52px; flex-shrink: 0; border-radius: 8px; background: #F4F2F8; display: grid; place-items: center; }
+.c-title { font-size: 16px; font-weight: 600; line-height: 1.3; }
+.c-sub { font-size: 13px; line-height: 1.4; color: var(--muted); margin-top: 3px; }
+.c-listhead { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 10px 16px 6px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.c-listhead b { font-size: 13px; color: var(--fg); }
+.pick { display: flex; align-items: center; gap: 12px; margin: 0 6px; padding: 8px 10px; min-height: 56px; border-radius: 6px; }
+.pick.on { background: var(--soft); }
+.tick { width: 20px; height: 20px; flex-shrink: 0; border-radius: 4px; border: 1.5px solid var(--faint); display: grid; place-items: center; color: var(--on-accent); }
+.pick.on .tick { background: var(--accent); border-color: var(--accent); }
+.shop { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.shop b { font-size: 15px; font-weight: 500; }
+.meta { font-size: 12px; color: var(--muted); }
+.meta .r { color: var(--fg); font-weight: 500; }
+.more { margin: 2px 16px 0; padding: 10px 0; border-top: 1px solid var(--line); font-size: 13px; font-weight: 600; }
+.c-foot { padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 8px; }
+.c-btn { min-height: 44px; border-radius: 8px; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-size: 15px; font-weight: 600; }
+.c-small { font-size: 12px; color: var(--muted); text-align: center; }
+
+.bar { height: 4px; margin: 0 16px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--fg); border-radius: 2px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px 0; }
+.tag { font-size: 12px; font-weight: 600; border-radius: 6px; padding: 2px 8px; white-space: nowrap; }
+.tag.win { color: var(--win); background: var(--win-soft); }
+.tag.blue { color: var(--blue); background: var(--blue-soft); }
+.tag.amber { color: var(--amber); background: var(--amber-soft); }
+.tag.grey { color: var(--grey); background: var(--soft); }
+.picked { padding: 10px 16px 4px; font-size: 12px; color: var(--muted); }
+.row { display: flex; gap: 10px; align-items: flex-start; padding: 12px 16px; border-top: 1px solid var(--line); }
+.row .shop { gap: 3px; }
+.status { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.status.win { color: var(--win); }
+.status.blue { color: var(--blue); }
+.status.amber { color: var(--amber); }
+.status.grey { color: var(--grey); }
+.kind { font-size: 11px; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; line-height: 18px; }
+.dot { width: 7px; height: 7px; border-radius: 4px; background: var(--blue); flex-shrink: 0; }
+@media (prefers-reduced-motion: no-preference) { .dot { animation: pulse 1.4s ease-out infinite; } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(35,65,181,.45); } 70% { box-shadow: 0 0 0 7px rgba(35,65,181,0); } 100% { box-shadow: 0 0 0 0 rgba(35,65,181,0); } }
+.icons { display: flex; gap: 4px; flex-shrink: 0; }
+.icons span { width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 8px; display: grid; place-items: center; color: var(--fg); }
+@media (max-width: 360px) { .icons span:last-child { display: none; } }
+
+/* Results: the climax */
+.climax { max-width: var(--col); margin: 0 auto; padding: 24px 0 40px; text-align: center; }
+.climax h2 { font-size: clamp(34px, 6vw, 60px); line-height: 1.02; font-weight: 800; letter-spacing: -0.04em; max-width: 12em; margin: 0 auto; }
+.climax p { margin: 16px auto 0; font-size: clamp(17px, 1.8vw, 19px); color: var(--muted); max-width: 28em; }
+.card.big { border-color: var(--fg); }
+.row.open { flex-direction: column; gap: 0; padding: 0; }
+.row.open > .row-top { display: flex; gap: 10px; align-items: flex-start; width: 100%; padding: 14px 16px 0; }
+.answer { width: 100%; padding: 12px 16px 16px 16px; display: flex; flex-direction: column; gap: 14px; }
+.price { display: flex; flex-direction: column; gap: 2px; }
+.price strong { font-size: clamp(34px, 6vw, 44px); line-height: 1; font-weight: 800; letter-spacing: -0.035em; color: var(--win); font-variant-numeric: tabular-nums; }
+.price span { font-size: 13px; color: var(--muted); }
+.vs { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; }
+.vs s { color: var(--muted); }
+.vs b { color: var(--win); }
+.quote { font-size: 13px; line-height: 1.5; color: var(--fg); border-left: 2px solid var(--line); padding-left: 10px; }
+.quote span { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; font-size: 13px; margin: 0; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+.facts .unk { color: var(--amber); font-weight: 600; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+.timeline li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px; font-variant-numeric: tabular-nums; }
+.timeline li b { font-weight: 600; color: var(--fg); }
+.proof-label { font-size: 12px; font-weight: 700; color: var(--fg); }
+.calm { font-size: 13px; color: var(--muted); }
+
+/* Recording player (WhatsApp voice note principle, our own surface) */
+.player { display: flex; flex-direction: column; gap: 4px; }
+.pl-main { display: flex; align-items: center; gap: 10px; }
+.speed { min-width: 44px; min-height: 44px; display: grid; place-items: center; border: 0; background: transparent; padding: 0; }
+.speed span { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; height: 24px; border-radius: 12px; background: var(--soft); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.play { width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: transparent; padding: 0; color: var(--fg); flex-shrink: 0; }
+.wave { position: relative; flex: 1; min-width: 0; height: 32px; display: flex; align-items: center; gap: 2px; cursor: pointer; }
+.wave i { flex: 1; min-width: 1px; max-width: 4px; border-radius: 2px; background: var(--faint); opacity: .55; }
+.wave i.on { background: var(--fg); opacity: 1; }
+.wave .head { position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 6px; background: var(--fg); left: 0; pointer-events: none; }
+.pl-times { display: flex; justify-content: space-between; padding-left: 98px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 420px) { .pl-times { padding-left: 0; } }
+
+.person { width: 100%; padding: 0 16px 14px; display: flex; flex-direction: column; gap: 6px; }
+.person p { font-size: 13px; }
+.soon { font-size: 11px; font-weight: 700; color: var(--amber); background: var(--amber-soft); border-radius: 4px; padding: 1px 6px; white-space: nowrap; }
+.c-end { padding: 12px 16px 14px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.c-end a { font-weight: 600; }
+.sample { font-size: 12px; color: var(--muted); text-align: center; }
+
+/* After */
+.after { max-width: var(--col); margin: 0 auto; padding: 72px 0 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; border-top: 1px solid var(--line); }
+.after h2 { font-size: clamp(36px, 6.4vw, 64px); line-height: 1.02; font-weight: 800; letter-spacing: -0.045em; }
+.next { font-size: 15px; color: var(--muted); max-width: 34em; }
+.next b { color: var(--fg); font-weight: 600; }
+
+/* Setup */
+.setup { max-width: 960px; margin: 0 auto; padding: 96px 0 0; scroll-margin-top: 24px; }
+.setup h2 { font-size: clamp(30px, 4.4vw, 44px); line-height: 1.05; font-weight: 800; letter-spacing: -0.035em; max-width: 16em; }
+.setup .lede { margin-top: 10px; color: var(--muted); font-size: 16px; max-width: 34em; }
+.setup-grid { margin-top: 32px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+@media (max-width: 800px) { .setup-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
+.copy-box { border: 1px solid var(--card-line); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.copy-box .lead { font-size: 16px; font-weight: 700; }
+.copy-line { display: flex; gap: 8px; align-items: center; }
+.copy-line code { flex: 1; min-width: 0; font-family: var(--mono); font-size: 13px; line-height: 1.4; background: var(--soft); border-radius: 8px; padding: 13px 12px; overflow-wrap: anywhere; user-select: all; }
+@media (max-width: 420px) { .copy-line { flex-direction: column; align-items: stretch; } .copy-line code { font-size: 12px; } }
+.btn-copy { flex-shrink: 0; min-height: 46px; padding: 0 18px; border: 0; border-radius: 8px; background: var(--accent); color: var(--on-accent); font-weight: 700; white-space: nowrap; }
+.toast { font-size: 13px; color: var(--muted); min-height: 1.2em; margin-top: -4px; }
+.signup { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 14px; }
+.signup b { display: block; font-size: 15px; }
+.btn-quiet { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1px solid var(--card-line); border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.btn-quiet:hover { background: var(--soft); }
+.notice { background: var(--amber-soft); color: var(--amber); border-radius: 8px; padding: 10px 12px; font-size: 13px; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tab { min-height: 44px; padding: 0 14px; border: 0; background: transparent; font-weight: 700; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.tabpanel[hidden] { display: none; }
+ol.steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+ol.steps li:last-child { border-bottom: 0; }
+ol.steps li::before { content: counter(s); width: 24px; height: 24px; border: 1px solid var(--line); border-radius: 6px; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+ol.steps b { display: block; font-size: 15px; }
+ol.steps span { color: var(--muted); font-size: 14px; }
+.path { font-family: var(--mono); font-size: 12px; background: var(--soft); border-radius: 4px; padding: 1px 5px; }
+.plan-note { font-size: 13px; color: var(--muted); padding-top: 10px; }
+
+footer { max-width: 960px; margin: 96px auto 0; padding: 16px 0 40px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+
+/* Reveal on scroll: content is visible by default; JS only hides what it will reveal */
+.js-reveal .rv { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+.js-reveal .rv.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .js-reveal .rv { opacity: 1; transform: none; transition: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="top">
+    <a class="site-brand" href="/" aria-label="Boomerang home"><svg viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-12 50 50)"><path d="M30 12 V60" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/><path d="M30 56 Q32 38 53 38 Q75 38 75 61 Q75 84 55 84" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/><circle cx="32" cy="82" r="8.5" fill="#16A34A"/></g></svg><span>boomerang</span></a>
+  </header>
+
+  <main>
+    <section class="fold" aria-labelledby="hero">
+      <h1 id="hero">Ask once. <span>We call every shop.</span></h1>
+      <p class="pain">No calling strangers, no hold music, no “come and check”. Just the shops that have it, and the final price after offers.</p>
+      <div class="cta">
+        <a class="btn-primary" href="#setup">Add to ChatGPT or Claude</a>
+        <p class="small">Setup takes about 3 minutes. $1 free credit to try it.</p>
+      </div>
+    </section>
+
+    <div class="fold-bubble" aria-label="Example conversation starts">
+      <p class="who me">You</p>
+      <p class="bubble">Need an iPhone 17, 256GB, lavender today near 500037. I’ll pay with my ICICI card.</p>
+    </div>
+
+    <div class="convo" aria-label="Example conversation">
+
+      <!-- 1. Shop picker -->
+      <section class="step rv" aria-label="Step 1: you pick the shops">
+        <p class="note left"><b>You pick.</b>Nothing is called without your tap.</p>
+        <div class="body">
+          <p class="who">Your assistant, using Boomerang</p>
+          <p class="reply">Here’s what I found near 500037. Pick the shops and I’ll have them called.</p>
+          <div class="card" aria-label="Shop picker card">
+            <div class="c-head">
+              <div class="c-photo" aria-hidden="true"><svg width="36" height="44" viewBox="0 0 64 76" fill="none"><rect x="14" y="2" width="36" height="72" rx="8" fill="#CFC4E6" stroke="#B3A5D3" stroke-width="1.5"/><rect x="18" y="7" width="17" height="21" rx="6" fill="#BDB0DA"/><circle cx="23" cy="13" r="3.4" fill="#2E2A38"/><circle cx="23" cy="22" r="3.4" fill="#2E2A38"/></svg></div>
+              <div><p class="c-title">5 shops near 500037 may have your iPhone 17</p><p class="c-sub">Pick the shops. Our AI calls them for stock and the final price after offers.</p></div>
+            </div>
+            <div class="c-listhead"><b>5 shops</b><span>Highest rated · 50+ Google ratings</span></div>
+            <div class="pick on"><span class="tick" aria-label="Ticked"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="shop"><b>Aptronix · Kukatpally</b><span class="meta"><span class="r">★ 4.6 (1,240)</span> · 3.8 km · Open till 9:30 pm</span></span></div>
+            <div class="pick on"><span class="tick" aria-label="Ticked"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="shop"><b>Vijay Sales · Kukatpally</b><span class="meta"><span class="r">★ 4.4 (3,105)</span> · 4.1 km · Open till 10 pm</span></span></div>
+            <div class="pick on"><span class="tick" aria-label="Ticked"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.5l4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="shop"><b>Croma · JNTU</b><span class="meta"><span class="r">★ 4.1 (1,120)</span> · 6.4 km · Open till 10 pm</span></span></div>
+            <p class="more">Show 2 more shops</p>
+            <div class="c-foot"><span class="c-btn">Call 3 shops</span><span class="c-small">Calls use your account credit. A listing doesn’t confirm stock.</span></div>
+          </div>
+        </div>
+        <p class="note right low" style="--low: 260px"><b>Real ratings, with the count.</b>Highest rated first, so you start with shops people trust.</p>
+      </section>
+
+      <!-- 2. Live status -->
+      <section class="step rv" aria-label="Step 2: the calls happen">
+        <p class="note right"><b>One calm line per shop.</b>It moves on by itself. You don’t have to watch.</p>
+        <div class="body">
+          <p class="tap">You tapped <i>Call 3 shops</i></p>
+          <p class="stamp">6:46 pm · the same card, a few minutes later</p>
+          <div class="card" aria-label="Call status card">
+            <div class="c-head">
+              <div class="c-photo" aria-hidden="true"><svg width="36" height="44" viewBox="0 0 64 76" fill="none"><rect x="14" y="2" width="36" height="72" rx="8" fill="#CFC4E6" stroke="#B3A5D3" stroke-width="1.5"/><rect x="18" y="7" width="17" height="21" rx="6" fill="#BDB0DA"/><circle cx="23" cy="13" r="3.4" fill="#2E2A38"/><circle cx="23" cy="22" r="3.4" fill="#2E2A38"/></svg></div>
+              <div><p class="c-title">1 of 3 shops done</p><p class="c-sub">iPhone 17 · 256GB · Lavender · near 500037</p></div>
+            </div>
+            <div class="bar" aria-hidden="true"><i style="width:34%"></i></div>
+            <div class="tags"><span class="tag win">1 in stock</span><span class="tag blue">1 calling</span><span class="tag amber">1 retrying</span></div>
+            <p class="picked">3 shops picked: Aptronix, Vijay Sales, Croma</p>
+            <div class="row"><span class="shop"><b>Aptronix · Kukatpally</b><span class="meta">★ 4.6 (1,240) · 3.8 km · Open till 9:30 pm</span><span class="status win">In stock · ₹75,900 with ICICI <span class="kind">AI</span></span></span><span class="icons" aria-hidden="true"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></svg></span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-8-8 18-2-8-8-2Z"/></svg></span></span></div>
+            <div class="row"><span class="shop"><b>Vijay Sales · Kukatpally</b><span class="meta">★ 4.4 (3,105) · 4.1 km · Open till 10 pm</span><span class="status blue"><span class="dot" aria-hidden="true"></span>AI agent calling · answered <span class="kind">AI</span></span></span><span class="icons" aria-hidden="true"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></svg></span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-8-8 18-2-8-8-2Z"/></svg></span></span></div>
+            <div class="row"><span class="shop"><b>Croma · JNTU</b><span class="meta">★ 4.1 (1,120) · 6.4 km · Open till 10 pm</span><span class="status amber">No answer · retry at 6:52 <span class="kind">AI</span></span></span><span class="icons" aria-hidden="true"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></svg></span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-8-8 18-2-8-8-2Z"/></svg></span></span></div>
+          </div>
+        </div>
+        <p class="note left low" style="--low: 300px"><b>No pick-up? We try again.</b>Once, a few minutes later.</p>
+      </section>
+
+      <!-- 3. Results: the climax -->
+      <div class="climax rv">
+        <h2>Then the answers come back. With proof.</h2>
+        <p>Who has it, the final price after offers, and the call itself, so you can hear it for yourself.</p>
+      </div>
+
+      <section class="step rv" aria-label="Step 3: the answers come back">
+        <div class="side left">
+          <p class="note"><b>The final price comes first.</b>The price after offers, in the shop’s own words. Never a guess.</p>
+          <p class="note" style="margin-top:560px"><b>Every shop stays on the list,</b>even the ones that didn’t pick up the first time.</p>
+        </div>
+        <div class="body">
+          <p class="stamp">6:58 pm · all calls done</p>
+          <div class="card big" aria-label="Results card">
+            <div class="c-head">
+              <div class="c-photo" aria-hidden="true"><svg width="36" height="44" viewBox="0 0 64 76" fill="none"><rect x="14" y="2" width="36" height="72" rx="8" fill="#CFC4E6" stroke="#B3A5D3" stroke-width="1.5"/><rect x="18" y="7" width="17" height="21" rx="6" fill="#BDB0DA"/><circle cx="23" cy="13" r="3.4" fill="#2E2A38"/><circle cx="23" cy="22" r="3.4" fill="#2E2A38"/></svg></div>
+              <div><p class="c-title">3 shops called · 1 has it</p><p class="c-sub">iPhone 17 · 256GB · Lavender · near 500037</p></div>
+            </div>
+            <div class="bar" aria-hidden="true"><i style="width:100%"></i></div>
+            <div class="tags"><span class="tag win">1 in stock</span><span class="tag amber">1 prefers a person</span><span class="tag grey">1 no stock</span></div>
+            <p class="picked">3 shops picked: Aptronix, Vijay Sales, Croma</p>
+
+            <div class="row open">
+              <div class="row-top"><span class="shop"><b>Aptronix · Kukatpally</b><span class="meta">★ 4.6 (1,240) · 3.8 km · Open till 9:30 pm</span><span class="status win">In stock · 1 piece <span class="kind">AI</span></span></span><span class="icons" aria-hidden="true"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></svg></span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-8-8 18-2-8-8-2Z"/></svg></span></span></div>
+              <div class="answer">
+                <div class="price"><strong>₹75,900</strong><span>Final price with your ICICI card</span></div>
+                <div class="vs"><span>Amazon: <s>₹79,900</s></span><b>₹4,000 less, 3.8 km away</b></div>
+                <p class="quote">“It’s ₹79,900. With ICICI card you get four thousand off, so ₹75,900 final.”<span>What the shop said</span></p>
+                <dl class="facts"><dt>Stock</dt><dd>1 piece, lavender, 256GB</dd><dt>No-cost EMI</dt><dd class="unk">Unconfirmed</dd><dt>Hold for you</dt><dd class="unk">Unconfirmed</dd></dl>
+                <div>
+                  <p class="proof-label">Proof</p>
+                  <ol class="timeline"><li><span>6:44 pm</span><span><b>AI agent called</b> on your behalf</span></li><li><span>6:45 pm</span><span>Shop answered · in stock</span></li><li><span>6:46 pm</span><span>Final price given · call ended</span></li></ol>
+                </div>
+                <div class="player" aria-label="Call recording, 1 minute 42 seconds">
+                  <div class="pl-main">
+                    <button type="button" class="speed" aria-label="Playback speed"><span>1x</span></button>
+                    <button type="button" class="play" aria-label="Play recording"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path class="ic-play" d="M5 3.2v13.6c0 .6.7 1 1.2.7l10.6-6.8c.5-.3.5-1.1 0-1.4L6.2 2.5c-.5-.3-1.2.1-1.2.7Z" fill="currentColor"/><g class="ic-pause" style="display:none" fill="currentColor"><rect x="4.5" y="3" width="4" height="14" rx="1"/><rect x="11.5" y="3" width="4" height="14" rx="1"/></g></svg></button>
+                    <div class="wave" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="102" aria-valuenow="0"><span class="head"></span></div>
+                  </div>
+                  <div class="pl-times"><span class="el">0:00</span><span>Called 6:44 pm · 1:42</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row open">
+              <div class="row-top"><span class="shop"><b>Vijay Sales · Kukatpally</b><span class="meta">★ 4.4 (3,105) · 4.1 km · Open till 10 pm</span><span class="status amber">Prefers a personal call · not charged <span class="kind">AI</span></span></span><span class="icons" aria-hidden="true"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></svg></span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-8-8 18-2-8-8-2Z"/></svg></span></span></div>
+              <div class="person">
+                <p class="calm">6:47 pm · The shop asked to speak to a person. Best to call them directly. No charge for this shop.</p>
+                <p class="calm"><span class="soon">Coming soon</span> Someone from our team calls them for you.</p>
+              </div>
+            </div>
+
+            <div class="row"><span class="shop"><b>Croma · JNTU</b><span class="meta">★ 4.1 (1,120) · 6.4 km · Open till 10 pm</span><span class="status grey">No stock · expected Friday <span class="kind">2 tries</span></span><span class="meta">No answer at 6:46 · answered the retry at 6:52 · ▶ 0:47</span></span><span class="icons" aria-hidden="true"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></svg></span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-8-8 18-2-8-8-2Z"/></svg></span></span></div>
+
+            <div class="c-end"><span class="small">You pay only for shops that gave an answer.</span><a href="#setup">Open full results on website</a></div>
+          </div>
+          <p class="sample">Example search. Shop names are real listings; answers and prices are sample data.</p>
+        </div>
+        <div class="side right">
+          <p class="note" style="margin-top:440px"><b>Hear the call yourself.</b>Who called, when, and the recording sit beside every answer.</p>
+          <p class="note" style="margin-top:120px"><b>Some shops want a person.</b>We tell you which ones, and you aren’t charged for them.</p>
+        </div>
+      </section>
+
+      <!-- 4. You choose -->
+      <section class="step rv" aria-label="Step 4: you choose">
+        <p class="note left"><b>You choose where to buy.</b>We only make the calls.</p>
+        <div class="body">
+          <p class="who me">You</p>
+          <p class="bubble">Going to Aptronix.</p>
+        </div>
+      </section>
+    </div>
+
+    <section class="after rv" aria-labelledby="try">
+      <h2 id="try">Now try it yourself.</h2>
+      <a class="btn-primary" href="#setup">Add to ChatGPT or Claude</a>
+      <p class="next"><b>Live today: shop calls.</b> Next: medicine stock, repair quotes, table bookings and more, through the same assistant.</p>
+    </section>
+
+    <section class="setup" id="setup" aria-labelledby="setup-title">
+      <h2 id="setup-title">Copy one address. Paste it. Ask.</h2>
+      <p class="lede">About 3 minutes, once. Then just ask your assistant.</p>
+      <div class="setup-grid">
+        <div class="copy-box">
+          <p class="lead">Your Boomerang address</p>
+          <div class="copy-line"><code id="server-url">https://little-kangaroo-718.convex.site/mcp</code><button type="button" class="btn-copy" data-copy="server-url">Copy</button></div>
+          <p class="toast" id="toast" role="status" aria-live="polite"></p>
+          <p class="small">Paste it into ChatGPT or Claude and sign in once with your Boomerang account. Calls use your account credit.</p>
+          <div class="signup"><div><b>New here? Sign up and get $1 free credit.</b><span class="small">Verify your email and start testing right away.</span></div><a class="btn-quiet" href="https://little-kangaroo-718.convex.site/account">Get started</a></div>
+          <p class="notice">Live for testing. Shop calling is in early testing, so some calls may not go through yet.</p>
+        </div>
+        <div>
+          <div class="tabs" role="tablist" aria-label="Choose your AI app">
+            <button type="button" class="tab" role="tab" id="tab-chatgpt" aria-controls="p-chatgpt" aria-selected="true">ChatGPT</button>
+            <button type="button" class="tab" role="tab" id="tab-claude" aria-controls="p-claude" aria-selected="false" tabindex="-1">Claude</button>
+          </div>
+          <div class="tabpanel" role="tabpanel" id="p-chatgpt" aria-labelledby="tab-chatgpt">
+            <ol class="steps">
+              <li><div><b>Turn on Developer mode</b><span><span class="path">Settings → Security and login</span> → Developer mode.</span></div></li>
+              <li><div><b>Add a new plugin</b><span>Go to <a href="https://chatgpt.com/plugins">chatgpt.com/plugins</a>, select +, name it Boomerang.</span></div></li>
+              <li><div><b>Paste the address</b><span>Under Connection, paste it and select Create.</span></div></li>
+              <li><div><b>Sign in, then ask</b><span>In a new chat, add Boomerang from the tools menu.</span></div></li>
+            </ol>
+            <p class="plan-note">Needs Developer mode: ChatGPT Business, Enterprise and Edu. On Business, your admin may need to turn it on.</p>
+          </div>
+          <div class="tabpanel" role="tabpanel" id="p-claude" aria-labelledby="tab-claude" hidden>
+            <ol class="steps">
+              <li><div><b>Open Connectors</b><span>Go to <a href="https://claude.ai/customize/connectors">Customize → Connectors</a>, then + Add → Add custom connector.</span></div></li>
+              <li><div><b>Paste the address</b><span>Name it Boomerang, paste the address, select Continue, then Continue again.</span></div></li>
+              <li><div><b>Sign in, then Add</b><span>Choose Sign in now and Register automatically. Select Add and sign in with your Boomerang account.</span></div></li>
+              <li><div><b>Turn it on in a chat</b><span>+ → Connectors → switch on Boomerang.</span></div></li>
+            </ol>
+            <p class="plan-note">Works on Free, Pro, Max, Team and Enterprise. On Team and Enterprise, an owner adds it under Organization settings → Connectors.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Boomerang calls shops so you don’t have to. The conversation on this page is an example; answers and prices are sample data.</footer>
+</div>
+
+<script>
+(function () {
+  var reduce = false;
+  try { reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  /* Reveal steps as they enter the screen. Without JS or with reduced motion, everything is simply shown. */
+  if (!reduce && 'IntersectionObserver' in window) {
+    document.documentElement.classList.add('js-reveal');
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+    [].forEach.call(document.querySelectorAll('.rv'), function (el) { io.observe(el); });
+  }
+
+  /* Recording player: visual only on this example page (no audio file). */
+  var wave = document.querySelector('.wave');
+  if (wave) {
+    var H = [6,10,16,12,20,26,18,12,8,14,22,28,24,16,10,6,12,18,26,30,22,14,10,16,20,12,8,14,24,20,12,6,10,18,22,16,10,8,12,6];
+    var head = wave.querySelector('.head');
+    H.forEach(function (h) { var i = document.createElement('i'); i.style.height = h + 'px'; wave.insertBefore(i, head); });
+    var bars = wave.querySelectorAll('i'), total = 102, pos = 0, playing = false, timer = null, speed = 1;
+    var el = document.querySelector('.pl-times .el'), playBtn = document.querySelector('.play'), sp = document.querySelector('.speed span');
+    function fmt(s) { s = Math.round(s); return Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2); }
+    function draw() {
+      var f = pos / total;
+      [].forEach.call(bars, function (b, i) { b.classList.toggle('on', (i + 0.5) / bars.length <= f); });
+      head.style.left = (f * 100) + '%';
+      el.textContent = fmt(pos);
+      wave.setAttribute('aria-valuenow', Math.round(pos));
+    }
+    function setPlaying(p) {
+      playing = p;
+      playBtn.querySelector('.ic-play').style.display = p ? 'none' : '';
+      playBtn.querySelector('.ic-pause').style.display = p ? '' : 'none';
+      playBtn.setAttribute('aria-label', p ? 'Pause recording' : 'Play recording');
+      clearInterval(timer);
+      if (p) timer = setInterval(function () { pos += 0.25 * speed; if (pos >= total) { pos = 0; setPlaying(false); } draw(); }, 250);
+    }
+    playBtn.addEventListener('click', function () { setPlaying(!playing); });
+    document.querySelector('.speed').addEventListener('click', function () { speed = speed === 1 ? 1.5 : speed === 1.5 ? 2 : 1; sp.textContent = speed + 'x'; });
+    wave.addEventListener('click', function (e) { var r = wave.getBoundingClientRect(); pos = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * total; draw(); });
+    wave.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') { pos = Math.min(total, pos + 5); draw(); } if (e.key === 'ArrowLeft') { pos = Math.max(0, pos - 5); draw(); } });
+    pos = 0; draw();
+  }
+
+  /* Tabs */
+  var tabs = [document.getElementById('tab-chatgpt'), document.getElementById('tab-claude')];
+  var panels = { 'tab-chatgpt': document.getElementById('p-chatgpt'), 'tab-claude': document.getElementById('p-claude') };
+  function select(tab, focus) { tabs.forEach(function (x) { var on = x === tab; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; panels[x.id].hidden = !on; }); if (focus) tab.focus(); }
+  tabs.forEach(function (x, i) {
+    x.addEventListener('click', function () { select(x); });
+    x.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); select(tabs[(i + 1) % 2], true); } });
+  });
+
+  /* Copy */
+  [].forEach.call(document.querySelectorAll('[data-copy]'), function (b) {
+    b.addEventListener('click', function () {
+      var src = document.getElementById(b.dataset.copy), toast = document.getElementById('toast'), txt = src.textContent.trim();
+      function fb() { var r = document.createRange(); r.selectNodeContents(src); var s = getSelection(); s.removeAllRanges(); s.addRange(r); toast.textContent = 'Selected. Press Ctrl+C or ⌘C to copy.'; }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast.textContent = 'Copied.'; }, fb); else fb();
+    });
+  });
+})();
+</script>
+</body>
+</html>

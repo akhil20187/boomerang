@@ -1,0 +1,65 @@
+{
+ "total": 56.1,
+ "lines": [
+  {
+   "who": "ai",
+   "text": "Hello, is this Aptronix, Kukatpally?",
+   "start": 0.0,
+   "end": 3.75
+  },
+  {
+   "who": "shop",
+   "text": "Yes, Aptronix. Tell me.",
+   "start": 4.2,
+   "end": 6.95
+  },
+  {
+   "who": "ai",
+   "text": "Hi, I'm an AI assistant calling on behalf of a customer. Do you have the iPhone 17, 256 GB, in lavender?",
+   "start": 7.4,
+   "end": 16.95
+  },
+  {
+   "who": "shop",
+   "text": "Yes sir, one piece is there.",
+   "start": 17.4,
+   "end": 19.9
+  },
+  {
+   "who": "ai",
+   "text": "Great. What's the final price? Is there any card offer?",
+   "start": 20.35,
+   "end": 25.45
+  },
+  {
+   "who": "shop",
+   "text": "It's seventy-nine nine hundred. With ICICI card, four thousand off. So seventy-five nine hundred final.",
+   "start": 25.9,
+   "end": 35.35
+  },
+  {
+   "who": "ai",
+   "text": "Seventy-five thousand nine hundred with an ICICI card. Can you hold it for this evening?",
+   "start": 35.8,
+   "end": 43.35
+  },
+  {
+   "who": "shop",
+   "text": "Hold I can't promise, sir. Better to come early.",
+   "start": 43.8,
+   "end": 48.45
+  },
+  {
+   "who": "ai",
+   "text": "Understood. Thank you, I'll pass this on to the customer.",
+   "start": 48.9,
+   "end": 53.05
+  },
+  {
+   "who": "shop",
+   "text": "Okay, thank you.",
+   "start": 53.5,
+   "end": 55.65
+  }
+ ]
+}

@@ -1,5 +1,5 @@
-# Tasks Human MCP can do: draft list
-For the landing page section styled like Monid's tool grid: "Human MCP" in the middle, lines branching out to a grid of task cards. Each card has a task name and a short tag. The last card is a call to action.
+# Tasks Boomerang can do: draft list
+For the landing page section styled like Monid's tool grid: "Boomerang" in the middle, lines branching out to a grid of task cards. Each card has a task name and a short tag. The last card is a call to action.
 
 **Honesty rule:** only one task works today. Everything else is marked "Coming soon" on the page, the same way as the human hand-off (D94). Remove anything you don't want to promise.
 ## Live now

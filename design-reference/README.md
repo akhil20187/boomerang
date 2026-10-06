@@ -1,6 +1,6 @@
 # Design reference
 
-Visual references for the Human MCP website: screenshots, links and notes.
+Visual references for the Boomerang website: screenshots, links and notes.
 
 Drop screenshots and images straight into this folder.
 

@@ -36,7 +36,7 @@ export const claim = internalMutation({
         args.type === "started"
           ? "Your shop calls are starting"
           : "Your shop call results are ready",
-      text: `${task.product.name}\n\n${args.type === "started" ? "Follow your shop calls" : "Read every shop answer"}: ${url}\n\nSign in to your Human MCP account to view this task.`,
+      text: `${task.product.name}\n\n${args.type === "started" ? "Follow your shop calls" : "Read every shop answer"}: ${url}\n\nSign in to your Boomerang account to view this task.`,
     };
     const patch = {
       status: "pending" as const,

@@ -1,5 +1,5 @@
 {
-  "name": "human-mcp-call-bridge-runtime",
+  "name": "boomerang-call-bridge-runtime",
   "version": "1.0.0",
   "private": true,
   "description": "Minimal runtime dependencies for the isolated call bridge container",

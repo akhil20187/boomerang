@@ -17,7 +17,7 @@ assert.equal(unauth.status,401);
 assert.ok(unauth.headers.get('www-authenticate')?.includes('resource_metadata'));
 console.log('Public OAuth discovery and authentication gate verified.');
 if(!process.env.MCP_TEST_TOKEN){console.log('Authenticated protocol verification requires MCP_TEST_TOKEN. No shop calls made.');process.exit(0);}
-const client=new Client({name:'Human MCP controlled verification',version:'1.0.0'});
+const client=new Client({name:'Boomerang controlled verification',version:'1.0.0'});
 try{
  await client.connect(new StreamableHTTPClientTransport(endpoint,{requestInit:{headers:{Authorization:`Bearer ${process.env.MCP_TEST_TOKEN}`}}}));
  const {tools}=await client.listTools();
@@ -25,7 +25,7 @@ try{
  const {resources}=await client.listResources();
  assert.equal(resources.length,1);
  const widget=await client.readResource({uri:resources[0].uri});
- assert.ok(widget.contents[0].text.includes('__HUMAN_MCP_WIDGET__'));
+ assert.ok(widget.contents[0].text.includes('__BOOMERANG_WIDGET__'));
  assert.ok(widget.contents[0].text.length>10000);
  const html=widget.contents[0].text;
  const scripts=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)];

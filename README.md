@@ -1,4 +1,4 @@
-# Human MCP — GrowthX Build Sprint
+# Boomerang — GrowthX Build Sprint
 
 ## Application
 

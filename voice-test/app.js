@@ -93,6 +93,6 @@ $('text-form').onsubmit = e => {
 };
 $('download').onclick = () => {
   const blob = new Blob([JSON.stringify({ rehearsal: true, product: $('product').value, comments: $('comments').value, language: $('language').value, startedAt, result, conversation }, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'human-mcp-voice-rehearsal.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'boomerang-voice-rehearsal.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 window.addEventListener('beforeunload', () => { mic?.getTracks().forEach(t => t.stop()); pc?.close(); });

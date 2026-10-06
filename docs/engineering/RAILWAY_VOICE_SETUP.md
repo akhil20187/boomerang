@@ -4,7 +4,7 @@ The user authorised a small Railway server to make calling functional (D91) and 
 
 ## Created infrastructure
 
-- Private project: Human MCP Voice (`3f9f23df-6a17-449c-aeaf-4a0f76e0e7bb`).
+- Private project: Boomerang Voice (`3f9f23df-6a17-449c-aeaf-4a0f76e0e7bb`).
 - Development environment: `de43205b-a2b2-42e8-92a0-55cdcf55e941`.
 - Service: voice-bridge (`d9eec7c9-7f94-4f4c-aa9f-bd0b14f8f492`).
 - Limit: 0.5 GB memory, 0.5 vCPU, one process; 500 MB persistent call journal mounted at `/var/lib/human-mcp`.

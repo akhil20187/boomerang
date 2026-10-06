@@ -14,7 +14,7 @@ Covers: the cards inside ChatGPT and Claude (now), and the landing page and webs
 - **The final price, not the sticker price:** the price after offers is shown first when a shop gives one. Comparing takes a glance.
   
 ## 2. References, one per component
-Reference list and files: [design-reference/](./design-reference/README.md). Live setup page: [Connect Human MCP](https://claude.ai/artifact/JtHpB48ydhSQGZNGzEy1Bz) (private), copy in [design/pages/](design/pages/connect-human-mcp.html).
+Reference list and files: [design-reference/](./design-reference/README.md). Live setup page: [Connect Boomerang](https://claude.ai/artifact/JtHpB48ydhSQGZNGzEy1Bz) (private), copy in [design/pages/](design/pages/connect-boomerang.html).
 
 **The card:** [OpenAI apps-sdk-ui](https://openai.github.io/apps-sdk-ui/)
 
@@ -113,6 +113,13 @@ Reference list and files: [design-reference/](./design-reference/README.md). Liv
   
 - Icon buttons are square-ish outlines at 34px, inside 44px tap areas.
   
+**Logo (D108):** the "returning b": a lowercase b, tilted as if mid-throw, whose stroke curves back toward a green dot. Files: [design/brand/final/](design/brand/final/).
+
+- On the website: mark + lowercase "boomerang" in the system font, bold, tight, in the text colour (`.site-brand` on the landing and setup pages, `.brand` in the app's top bar). Favicon and app icon are the white b on a green tile.
+- The logo's green `#16A34A` lives **only** in the logo. It never marks a status; "the shop has it" stays `#17573A`.
+- Never put the b white-on-black in a square: that is Cartoon Network Boomerang's mark.
+- Chat cards still carry no logo (section 6).
+
 ## 4. Screens
 V1 is one card that changes (D70). It starts as the shop picker and becomes the call card after "Call N shops". This goes against OpenAI's "no multiple views in a card" guideline, so if app review objects, the fallback is a new call card under the picker, with the same screens.
 ### Shop picker
@@ -259,7 +266,7 @@ The shop picker card (D66). Numbers, product and pincode fill in from the search
 - **Fit inside the host app:** the phone's own font, the host's colours, and our accent only on the main button. No logo; trust comes from showing how the work was done.
   
 ## 7. Approved designs (Claude Design canvas)
-Canvas: [Human MCP ChatGPT Cards](https://claude.ai/artifact/AwqGeQkT8MDxeKkwCArYkQ). It's private until you share it from the canvas's Share menu. Every screen is clickable: press Play on a screen to try it.
+Canvas: [Boomerang ChatGPT Cards](https://claude.ai/artifact/AwqGeQkT8MDxeKkwCArYkQ). It's private until you share it from the canvas's Share menu. Every screen is clickable: press Play on a screen to try it.
 
 Copies of each screen's source are in [design/canvas/](./design/canvas/), taken on 5 October 2026. They only display on the canvas, which supplies the code they run on. Treat the canvas as the live version and these files as a backup.
 

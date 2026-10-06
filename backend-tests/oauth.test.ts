@@ -10,6 +10,18 @@ afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
+it("serves the skill as readable text and rejects a missing-asset SPA fallback", async () => {
+  vi.stubEnv("CONVEX_SITE_URL", "https://app.convex.site");
+  const t = convexTest(schema, modules);
+  const fetchAsset = vi.fn(async () => new Response("---\nname: boomerang\n---\n# Boomerang"));
+  vi.stubGlobal("fetch", fetchAsset);
+  const response = await t.fetch("/SKILL.md");
+  expect(response.status).toBe(200);
+  expect(response.headers.get("content-type")).toBe("text/plain; charset=utf-8");
+  expect(await response.text()).toContain("name: boomerang");
+  fetchAsset.mockImplementation(async () => new Response("<html>App fallback</html>"));
+  expect((await t.fetch("/SKILL.md")).status).toBe(503);
+});
 it('saved shop discovery explains unavailable service pricing and disabled calling without guessing a price',async()=>{
   const t=convexTest(schema,modules);
   const {userId,draftId}=await t.run(async ctx=>{
@@ -37,11 +49,19 @@ it("accepts exact Claude redirect registration and rejects lookalike hosts or ca
   expect(
     (await register("https://claude.ai/api/mcp/auth_callback")).status,
   ).toBe(201);
+  expect((await register("http://127.0.0.1:54321/callback")).status).toBe(201);
+  expect((await register("http://localhost:54321/oauth/callback")).status).toBe(201);
   for (const uri of [
     "https://claude.ai.attacker.example/api/mcp/auth_callback",
     "https://claude.ai/api/mcp/auth_callback/extra",
     "https://claude.ai/api/mcp/auth_callback?next=attacker",
     "https://claude.ai/api/mcp/auth_callback-malicious",
+    "http://localhost.attacker.example:54321/callback",
+    "http://127.0.0.2:54321/callback",
+    "http://127.0.0.1:54321/callback?next=attacker",
+    "http://user@localhost:54321/callback",
+    "http://localhost:65536/callback",
+    "http://localhost:54321/other",
   ])
     expect((await register(uri)).body.error).toBe("invalid_redirect_uri");
 });
@@ -75,6 +95,7 @@ it("serves OAuth discovery and stateless MCP tools behind account bearer authent
   });
   const result = await response.json();
   expect(result.result.tools.map((x: any) => x.name)).toEqual([
+    "account_status",
     "find_shops",
     "more_shops",
     "start_calls",
@@ -95,6 +116,11 @@ it("serves OAuth discovery and stateless MCP tools behind account bearer authent
     });
     return response.json();
   };
+  const account = await rpc("tools/call", { name: "account_status", arguments: {} });
+  expect(account.result.structuredContent.email).toBe("test@example.com");
+  expect(account.result.structuredContent.availableBalance).toBe(0);
+  expect(account.result.structuredContent.currency).toBe("USD");
+  expect(account.result.structuredContent).not.toHaveProperty("id");
   expect((await rpc("resources/read", { uri: "ui://wrong" })).error.code).toBe(
     -32002,
   );
@@ -121,7 +147,7 @@ it("serves OAuth discovery and stateless MCP tools behind account bearer authent
     "This request could not be completed. Try again.",
   );
 });
-it("binds approval to account, resource, redirect and PKCE, consumes codes, rotates refresh and revokes replay", async () => {
+it.each(["https://chatgpt.com/connector_platform_oauth_redirect", "http://127.0.0.1:54321/callback", "http://localhost:54321/oauth/callback"])("binds approval to account and exact redirect %s, consumes codes, rotates refresh and revokes replay", async (callback) => {
   vi.stubEnv("CONVEX_SITE_URL", "https://app.convex.site");
   vi.stubEnv("SITE_URL", "https://app.convex.site");
   const t = convexTest(schema, modules);
@@ -132,7 +158,7 @@ it("binds approval to account, resource, redirect and PKCE, consumes codes, rota
   const call = (op: string, data: any) =>
     t.mutation(internal.oauth.operate, { op, data });
   const registered = await call("register", {
-    redirect_uris: ["https://chatgpt.com/connector_platform_oauth_redirect"],
+    redirect_uris: [callback],
     client_name: "Test assistant",
   });
   expect(registered.status).toBe(201);
@@ -145,7 +171,7 @@ it("binds approval to account, resource, redirect and PKCE, consumes codes, rota
   const challenge = Buffer.from(digest).toString("base64url");
   const request = await call("authorize", {
     client_id: clientId,
-    redirect_uri: "https://chatgpt.com/connector_platform_oauth_redirect",
+    redirect_uri: callback,
     response_type: "code",
     code_challenge: challenge,
     code_challenge_method: "S256",
@@ -169,7 +195,7 @@ it("binds approval to account, resource, redirect and PKCE, consumes codes, rota
   const exchange = {
     grant_type: "authorization_code",
     client_id: clientId,
-    redirect_uri: "https://chatgpt.com/connector_platform_oauth_redirect",
+    redirect_uri: callback,
     resource: "https://app.convex.site/mcp",
     code,
     code_verifier: verifier,

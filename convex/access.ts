@@ -49,7 +49,7 @@ export async function requireUser(
     const authId = await getAuthUserId(ctx);
     if (authId) return authId;
   }
-  throw new ConvexError("Sign in to use your Human MCP account.");
+  throw new ConvexError("Sign in to use your Boomerang account.");
 }
 export async function requireEligible(ctx: MutationCtx, userId: any) {
   const user = await ctx.db.get(userId);

@@ -1,0 +1,46 @@
+{
+ "ai_style": "Polite, calm, clear AI phone assistant. Neutral Indian English accent. Natural pace, brief.",
+ "shop_style": "A busy electronics shopkeeper in Hyderabad answering the shop phone. Indian English accent, casual, friendly, slightly hurried, natural.",
+ "lines": [
+  {
+   "who": "ai",
+   "text": "Hello, is this Aptronix, Kukatpally?"
+  },
+  {
+   "who": "shop",
+   "text": "Yes, Aptronix. Tell me."
+  },
+  {
+   "who": "ai",
+   "text": "Hi, I'm an AI assistant calling on behalf of a customer. Do you have the iPhone 17, 256 GB, in lavender?"
+  },
+  {
+   "who": "shop",
+   "text": "Yes sir, one piece is there."
+  },
+  {
+   "who": "ai",
+   "text": "Great. What's the final price? Is there any card offer?"
+  },
+  {
+   "who": "shop",
+   "text": "It's seventy-nine nine hundred. With ICICI card, four thousand off. So seventy-five nine hundred final."
+  },
+  {
+   "who": "ai",
+   "text": "Seventy-five thousand nine hundred with an ICICI card. Can you hold it for this evening?"
+  },
+  {
+   "who": "shop",
+   "text": "Hold I can't promise, sir. Better to come early."
+  },
+  {
+   "who": "ai",
+   "text": "Understood. Thank you, I'll pass this on to the customer."
+  },
+  {
+   "who": "shop",
+   "text": "Okay, thank you."
+  }
+ ]
+}

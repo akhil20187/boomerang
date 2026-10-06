@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>Connect Human MCP</title>
+<title>Connect Boomerang</title>
 <style>
 /* Layout: a sticky scroll scene (real lavender phone + glass price tag; the Amazon price gets cut, the green nearby-shop tag swings in), then the story in one reading column.
    Type: the system font only. Two weights: 800 for display and headings, 400 for everything you read. 600 is used sparingly for labels inside the demo card.
@@ -217,9 +217,16 @@ footer a { color: var(--muted); }
   .copy-one { padding: var(--s4); }
 }
 @media (prefers-reduced-motion: reduce) { .pill.live i { animation: none; } .said p { transition: none; } }
+
+/* Brand lockup: mark + lowercase name; the green dot lives only in the logo, never as a status colour. */
+.site-brand { display: inline-flex; align-items: center; gap: 7px; color: #1A1A19; text-decoration: none; font-size: 20px; font-weight: 800; letter-spacing: -0.045em; line-height: 1; }
+.site-brand svg { width: 26px; height: 26px; flex-shrink: 0; }
+body > .site-brand { display: flex; width: max-content; margin: calc(env(safe-area-inset-top, 0px) + 18px) 20px 6px; }
 </style>
 
-<h1 class="sr-only">₹79,900 on Amazon. ₹75,900 at a shop 4 km away. Human MCP calls nearby shops for you from ChatGPT or Claude.</h1>
+<a class="site-brand" href="/" aria-label="Boomerang home"><svg viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-12 50 50)"><path d="M30 12 V60" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/><path d="M30 56 Q32 38 53 38 Q75 38 75 61 Q75 84 55 84" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/><circle cx="32" cy="82" r="8.5" fill="#16A34A"/></g></svg><span>boomerang</span></a>
+
+<h1 class="sr-only">₹79,900 on Amazon. ₹75,900 at a shop 4 km away. Boomerang calls nearby shops for you from ChatGPT or Claude.</h1>
 
 <div class="scrolly" id="scrolly">
   <div class="stage">
@@ -308,7 +315,7 @@ footer a { color: var(--muted); }
       </div>
       <p class="toast" id="toast-url" role="status" aria-live="polite"></p>
       <p class="lead">Paste it into ChatGPT or Claude, and sign in once.</p>
-      <p class="plan">You need a Human MCP account. Sign up on our website first. Calls in ChatGPT and Claude use your account credit.</p>
+      <p class="plan">You need a Boomerang account. Sign up on our website first. Calls in ChatGPT and Claude use your account credit.</p>
       <p class="notice">Not live yet. This address works once the app launches.</p>
     </div>
     <div class="tabs" role="tablist" aria-label="Choose your AI app">
@@ -319,18 +326,18 @@ footer a { color: var(--muted); }
       <p class="plan">Where to paste it in ChatGPT, on the web. Developer mode can depend on your plan and workspace settings.</p>
       <ol class="steps">
         <li><div class="step-body"><h3>Turn on Developer mode</h3><p>Open <span class="path">Settings → Security and login</span> and switch on <strong>Developer mode</strong>.</p></div></li>
-        <li><div class="step-body"><h3>Add a new plugin</h3><p>Go to <a href="https://chatgpt.com/plugins">chatgpt.com/plugins</a> and select <strong>+</strong>. Name it <strong>Human MCP</strong>.</p></div></li>
+        <li><div class="step-body"><h3>Add a new plugin</h3><p>Go to <a href="https://chatgpt.com/plugins">chatgpt.com/plugins</a> and select <strong>+</strong>. Name it <strong>Boomerang</strong>.</p></div></li>
         <li><div class="step-body"><h3>Paste the address</h3><p>Under <strong>Connection</strong>, paste the address and select <strong>Create</strong>.</p></div></li>
-        <li><div class="step-body"><h3>Sign in, then use it</h3><p>Sign in with your Human MCP account when asked. In a new chat, add <strong>Human MCP</strong> from the <strong>+</strong> menu.</p></div></li>
+        <li><div class="step-body"><h3>Sign in, then use it</h3><p>Sign in with your Boomerang account when asked. In a new chat, add <strong>Boomerang</strong> from the <strong>+</strong> menu.</p></div></li>
       </ol>
     </div>
     <div class="panel" role="tabpanel" id="panel-claude" aria-labelledby="tab-claude" hidden>
       <p class="plan">Where to paste it in Claude, on the web or Claude Desktop. Free plans can add one custom connector. On Team and Enterprise, an owner adds it first in <span class="path">Organization settings → Connectors</span>.</p>
       <ol class="steps">
         <li><div class="step-body"><h3>Open Connectors</h3><p>Go to <a href="https://claude.ai/customize/connectors">Customize → Connectors</a>, select <strong>+ Add</strong>, then <strong>Add custom connector</strong>.</p></div></li>
-        <li><div class="step-body"><h3>Paste the address</h3><p>Name it <strong>Human MCP</strong>, paste the address, and select <strong>Continue</strong>. Leave the sign-in settings as Claude shows them, then select <strong>Add</strong>.</p></div></li>
-        <li><div class="step-body"><h3>Sign in once</h3><p>Sign in with your Human MCP account when Claude asks.</p></div></li>
-        <li><div class="step-body"><h3>Turn it on in a chat</h3><p>Select <strong>+</strong> at the bottom left, open <strong>Connectors</strong>, and switch on <strong>Human MCP</strong>.</p></div></li>
+        <li><div class="step-body"><h3>Paste the address</h3><p>Name it <strong>Boomerang</strong>, paste the address, and select <strong>Continue</strong>. Leave the sign-in settings as Claude shows them, then select <strong>Add</strong>.</p></div></li>
+        <li><div class="step-body"><h3>Sign in once</h3><p>Sign in with your Boomerang account when Claude asks.</p></div></li>
+        <li><div class="step-body"><h3>Turn it on in a chat</h3><p>Select <strong>+</strong> at the bottom left, open <strong>Connectors</strong>, and switch on <strong>Boomerang</strong>.</p></div></li>
       </ol>
     </div>
   </section>
@@ -350,7 +357,7 @@ footer a { color: var(--muted); }
     <h2 id="help" class="h-small">If something’s off</h2>
     <dl class="faq">
       <div><dt>“Couldn't connect”</dt><dd>Check that the address ends in /mcp and has no spaces. Until launch, the address isn't live, so this is expected.</dd></div>
-      <div><dt>Human MCP doesn't show up in my chat</dt><dd>Turn it on for that chat: the + menu in ChatGPT, or + → Connectors in Claude.</dd></div>
+      <div><dt>Boomerang doesn't show up in my chat</dt><dd>Turn it on for that chat: the + menu in ChatGPT, or + → Connectors in Claude.</dd></div>
       <div><dt>I can't find Developer mode in ChatGPT</dt><dd>It depends on your plan and workspace. Use Claude for now, or ask your workspace admin.</dd></div>
     </dl>
   </section>

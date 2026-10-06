@@ -51,7 +51,7 @@ if (mode === 'configure') {
     'call-bridge/bridge.cjs', 'call-bridge/answer.cjs', 'call-bridge/reconcile.cjs',
     'voice-test/phone-agent.cjs', 'voice-test/phone-core.cjs'];
   for (const file of files) if (!existsSync(join(root, file))) throw new Error(`Missing production file ${file}`);
-  const folder = mkdtempSync(join(tmpdir(), 'human-mcp-voice-'));
+  const folder = mkdtempSync(join(tmpdir(), 'boomerang-voice-'));
   for (const file of files) {
     mkdirSync(dirname(join(folder, file)), { recursive: true });
     copyFileSync(join(root, file), join(folder, file));

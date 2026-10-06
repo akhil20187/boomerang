@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boomerang · Out and back</title>
+<meta name="description" content="Boomerang calls nearby shops for you from ChatGPT or Claude and comes back with who has it, the final price after offers, and each call's recording.">
+<style>
+/* Hallmark · macrostructure: Narrative Workflow ("Out and back") · tone: plain, confident · anchor hue: green (has it) · system: DESIGN.md */
+:root {
+  --bg: #FFFFFF;
+  --fg: #1A1A19;
+  --muted: #64625D;
+  --faint: #9C9992;
+  --line: #E4E2DC;
+  --card-line: #DAD7D0;
+  --soft: #F5F4F1;
+  --accent: #1A1A19;
+  --on-accent: #FFFFFF;
+  --win: #17573A;
+  --win-soft: #E5F2EA;
+  --blue: #2341B5;
+  --blue-soft: #EAEEFB;
+  --amber: #7A4A00;
+  --amber-soft: #FBF0DF;
+  --grey: #55544F;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px; --s10: 144px;
+  --rail: 156px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121211; --fg: #F2F1ED; --muted: #A8A6A0; --faint: #77756F; --line: #2E2D2A; --card-line: #3A3935; --soft: #1C1B19;
+    --accent: #F2F1ED; --on-accent: #121211; --win: #6FD19B; --win-soft: #16291E; --blue: #9DB0F5; --blue-soft: #1A2033;
+    --amber: #E7B567; --amber-soft: #2E2416; --grey: #BDBBB5; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121211; --fg: #F2F1ED; --muted: #A8A6A0; --faint: #77756F; --line: #2E2D2A; --card-line: #3A3935; --soft: #1C1B19;
+  --accent: #F2F1ED; --on-accent: #121211; --win: #6FD19B; --win-soft: #16291E; --blue: #9DB0F5; --blue-soft: #1A2033;
+  --amber: #E7B567; --amber-soft: #2E2416; --grey: #BDBBB5; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { overflow-x: clip; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { margin: 0; font-style: normal; text-wrap: balance; }
+p, ul, ol { margin: 0; }
+a { color: var(--fg); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; border-radius: 4px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; }
+.small { font-size: 13px; color: var(--muted); }
+.unconf { color: var(--muted); font-weight: 600; }
+
+/* Top bar: brand lockup only */
+.top { padding-block: 24px 0; }
+.site-brand { display: inline-flex; align-items: center; gap: 7px; color: var(--fg); text-decoration: none; font-size: 20px; font-weight: 800; letter-spacing: -0.045em; line-height: 1; }
+.site-brand svg { width: 26px; height: 26px; flex-shrink: 0; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 24px; border-radius: 8px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 16px; text-decoration: none; white-space: nowrap; border: 0; transition: opacity .15s ease; }
+.btn:hover { opacity: .86; color: var(--on-accent); }
+.btn span { transition: transform .15s ease; }
+.btn:hover span { transform: translateX(3px); }
+.btn-quiet { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.btn-quiet:hover { background: var(--soft); }
+
+/* ---------- The flight: one evening, as tracked steps ---------- */
+.flight { position: relative; padding-top: var(--s8); }
+.stage { position: relative; display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); column-gap: var(--s6); padding-bottom: var(--s10); }
+.stage::before { content: ""; position: absolute; left: 7px; top: 22px; bottom: 0; border-left: 2px dashed var(--line); }
+.stage.leg-back::before, .stage.leg-home::before { border-left-style: solid; border-left-color: var(--fg); }
+.stage:last-child::before { display: none; }
+.stamp { position: sticky; top: 28px; align-self: start; padding-left: 30px; display: flex; flex-direction: column; gap: 2px; z-index: 1; }
+.stamp .dot { position: absolute; left: 0; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); border: 2px solid var(--fg); }
+.stamp time { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.stamp .leg { font-size: 13px; color: var(--muted); }
+.leg-out .stamp .dot { border-style: dashed; }
+.stamp.mark .dot { width: 30px; height: 30px; left: -7px; top: -4px; border: 0; background: var(--bg); display: grid; place-items: center; }
+.stamp.mark .dot svg { width: 28px; height: 28px; }
+.stage-body { min-width: 0; }
+
+.eyebrow { font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: var(--s3); }
+h1.need { font-size: clamp(44px, 8.2vw, 104px); line-height: 0.98; font-weight: 800; letter-spacing: -0.048em; max-width: 9.5em; }
+.pain { list-style: none; padding: 0; margin-top: var(--s6); display: flex; flex-direction: column; gap: 4px; }
+.pain li { font-size: clamp(20px, 2.4vw, 28px); line-height: 1.25; font-weight: 700; letter-spacing: -0.02em; color: var(--muted); }
+.lede { margin-top: var(--s6); font-size: clamp(17px, 1.6vw, 20px); line-height: 1.55; max-width: 32em; }
+.cta-row { margin-top: var(--s6); display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3) var(--s4); }
+.cta-row .small { max-width: 26em; }
+
+h2.step { font-size: clamp(32px, 5vw, 60px); line-height: 1.02; font-weight: 800; letter-spacing: -0.04em; max-width: 12em; }
+.step-text { margin-top: var(--s4); font-size: 18px; color: var(--muted); max-width: 30em; }
+.split { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: var(--s7); align-items: start; }
+.split > .copy { padding-top: var(--s1); }
+
+/* Chat + shop picker (the throw) */
+.chat { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--bg); max-width: 460px; width: 100%; justify-self: end; }
+.chat-top { height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--line); color: var(--muted); }
+.chat-body { padding: var(--s4); display: flex; flex-direction: column; gap: var(--s3); }
+.bubble { align-self: flex-end; max-width: 86%; background: var(--soft); border-radius: 18px; padding: 10px 14px; font-size: 15px; line-height: 21px; }
+.reply { font-size: 15px; line-height: 22px; }
+.card { border: 1px solid var(--card-line); border-radius: 8px; overflow: hidden; background: var(--bg); }
+.mc-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+.mc-photo { width: 52px; height: 52px; flex-shrink: 0; border-radius: 8px; background: #F4F2F8; display: grid; place-items: center; }
+.mc-title { font-size: 16px; font-weight: 600; line-height: 21px; }
+.mc-sub { font-size: 13px; line-height: 18px; color: var(--muted); margin-top: 3px; }
+.mc-list-head { display: flex; justify-content: space-between; gap: 8px; padding: 10px 16px 6px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.mc-list-head b { font-size: 13px; color: var(--fg); }
+.mc-row { display: flex; align-items: center; gap: 12px; margin: 0 6px; padding: 8px 10px; min-height: 52px; border-radius: 6px; }
+.mc-tick { width: 20px; height: 20px; flex-shrink: 0; border-radius: 4px; border: 1.5px solid var(--faint); display: grid; place-items: center; }
+.mc-row.on .mc-tick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.mc-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.mc-text b { font-size: 15px; font-weight: 500; }
+.mc-text span { font-size: 12px; color: var(--muted); }
+.rate { font-size: 12px; font-weight: 500; white-space: nowrap; }
+.rate i { font-style: normal; font-weight: 400; color: var(--muted); }
+.mc-more { margin: 4px 16px 0; font-size: 13px; font-weight: 600; color: var(--fg); padding: 6px 0; }
+.mc-foot { padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 8px; }
+.mc-btn { height: 44px; border-radius: 8px; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-size: 15px; font-weight: 600; white-space: nowrap; }
+.mc-small { font-size: 12px; color: var(--muted); text-align: center; }
+@media (max-width: 380px) { .mc-row { gap: 10px; padding-inline: 8px; } .mc-row .rate { font-size: 11px; } }
+
+/* Tracking panel (out) */
+.track { border: 1px solid var(--card-line); border-radius: 8px; background: var(--bg); overflow: hidden; max-width: 520px; width: 100%; justify-self: end; }
+.track-head { padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--line); }
+.track-head .row1 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.track-head b { font-size: 16px; font-weight: 600; }
+.track-head .row1 span { font-size: 12px; color: var(--muted); }
+.bar { height: 4px; border-radius: 2px; background: var(--soft); overflow: hidden; }
+.bar i { display: block; height: 100%; width: var(--p, 100%); background: var(--fg); transition: width .5s ease; }
+.tl { list-style: none; padding: 8px 16px 12px; position: relative; }
+.tl li { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px; padding: 9px 0 9px 0; font-size: 13px; line-height: 1.4; transition: opacity .4s ease, transform .4s ease; }
+.tl li + li { border-top: 1px solid var(--line); }
+.tl .t { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; padding-top: 1px; }
+.tl .what b { font-weight: 600; font-size: 13px; }
+.tl .st { display: block; font-weight: 600; }
+.st.call { color: var(--blue); }
+.st.win { color: var(--win); }
+.st.amber { color: var(--amber); }
+.st.grey { color: var(--grey); }
+.st.plain { color: var(--fg); font-weight: 500; }
+.pulse { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); margin-right: 6px; vertical-align: 1px; }
+@media (prefers-reduced-motion: no-preference) { .tl li.now .pulse { animation: pulse 1.4s ease-out infinite; } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(35,65,181,.45); } 70% { box-shadow: 0 0 0 7px rgba(35,65,181,0); } 100% { box-shadow: 0 0 0 0 rgba(35,65,181,0); } }
+.tl.playing li.hide { opacity: 0; transform: translateY(6px); }
+.tl.playing li.gone { display: none; }
+.track-foot { padding: 0 16px 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.replay { border: 0; background: none; padding: 6px 0; font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; color: var(--muted); min-height: 32px; }
+
+/* ---------- Back: the climax ---------- */
+.back-title { font-size: clamp(48px, 9.4vw, 128px); line-height: 0.95; font-weight: 800; letter-spacing: -0.052em; display: flex; align-items: center; gap: 0.18em; flex-wrap: wrap; }
+.back-title svg { width: 0.78em; height: 0.78em; flex-shrink: 0; }
+.compare { margin-top: var(--s6); display: flex; flex-direction: column; gap: 6px; }
+.compare p { font-size: clamp(26px, 4vw, 48px); line-height: 1.08; font-weight: 800; letter-spacing: -0.035em; }
+.compare .was { color: var(--faint); text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--faint); }
+.compare .now .price { color: var(--win); }
+.back-sub { margin-top: var(--s4); font-size: 18px; color: var(--muted); max-width: 34em; }
+
+.results { margin-top: var(--s7); border: 1px solid var(--card-line); border-radius: 8px; background: var(--bg); max-width: 880px; }
+.res-head { padding: 18px 20px 14px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--line); }
+.res-head .row1 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px 16px; flex-wrap: wrap; }
+.res-head h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+.res-head .row1 span { font-size: 12px; color: var(--muted); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-size: 12px; font-weight: 600; border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
+.tag.win { background: var(--win-soft); color: var(--win); }
+.tag.amber { background: var(--amber-soft); color: var(--amber); }
+.picked { font-size: 12px; color: var(--muted); }
+
+.res { padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 24px; }
+.res + .res { border-top: 1px solid var(--line); }
+.res-name { font-size: 16px; font-weight: 600; }
+.res-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.res-status { margin-top: 8px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.res-status.win { color: var(--win); }
+.res-status.amber { color: var(--amber); }
+.who-tag { font-size: 11px; font-weight: 700; color: var(--muted); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; }
+.res-price { grid-column: 2; grid-row: 1 / span 3; text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.res-price strong { font-size: clamp(26px, 3vw, 34px); line-height: 1; font-weight: 800; letter-spacing: -0.035em; font-variant-numeric: tabular-nums; }
+.res-price span { font-size: 12px; color: var(--muted); }
+.res-detail { grid-column: 1 / -1; margin-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 28px; }
+.said { font-size: 14px; line-height: 1.5; }
+.said q { quotes: "\201C" "\201D"; }
+.said .lbl, .facts .lbl { display: block; font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; font-size: 13px; margin-top: 10px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; font-weight: 500; }
+.mini-tl { list-style: none; padding: 0; font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+.mini-tl li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px; }
+.mini-tl .t { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; padding-top: 1px; }
+.person-note { grid-column: 1 / -1; margin-top: 4px; border-left: 2px solid var(--amber); padding: 2px 0 2px 14px; font-size: 14px; line-height: 1.5; max-width: 46em; }
+.person-note b { display: block; }
+.person-note .soon { display: inline-block; font-size: 11px; font-weight: 700; color: var(--amber); background: var(--amber-soft); border-radius: 5px; padding: 1px 7px; margin-left: 4px; vertical-align: 1px; white-space: nowrap; }
+.res-foot { padding: 14px 20px 18px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.res-foot p:first-child { font-size: 14px; font-weight: 600; }
+
+/* Recording player (WhatsApp voice-note shape, no bubble) */
+.player { display: flex; flex-direction: column; gap: 4px; }
+.player .lbl { font-size: 12px; color: var(--muted); }
+.pl-row { display: flex; align-items: center; gap: 10px; }
+.speed { min-width: 40px; height: 26px; padding: 0 8px; border-radius: 13px; border: 0; background: var(--soft); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.playbtn { width: 32px; height: 32px; border: 0; background: none; padding: 0; display: grid; place-items: center; flex-shrink: 0; margin: -6px; box-sizing: content-box; padding: 6px; }
+.playbtn svg { width: 20px; height: 20px; }
+.wave { position: relative; flex: 1; min-width: 0; height: 28px; display: flex; align-items: center; gap: 2px; cursor: pointer; }
+.wave i { flex: 1; min-width: 1.5px; max-width: 3px; border-radius: 2px; background: var(--faint); opacity: .55; }
+.wave i.on { background: var(--fg); opacity: 1; }
+.wave .knob { position: absolute; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--fg); left: var(--k, 0%); pointer-events: none; }
+.pl-under { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; padding-left: 82px; }
+
+/* ---------- Home: the walk-in ---------- */
+h2.home { font-size: clamp(36px, 6vw, 76px); line-height: 1.0; font-weight: 800; letter-spacing: -0.045em; max-width: 11em; }
+.home-text { margin-top: var(--s4); font-size: clamp(18px, 1.8vw, 22px); line-height: 1.45; max-width: 28em; }
+.next { margin-top: var(--s6); padding-top: var(--s4); border-top: 1px solid var(--line); font-size: 15px; color: var(--muted); max-width: 44em; }
+.next b { color: var(--fg); font-weight: 600; }
+
+/* ---------- Setup ---------- */
+.setup { padding-block: var(--s9) var(--s8); border-top: 1px solid var(--line); scroll-margin-top: 16px; }
+.setup-head { display: flex; flex-direction: column; gap: var(--s3); margin-bottom: var(--s6); }
+.setup-head h2 { font-size: clamp(30px, 4.4vw, 52px); line-height: 1.02; font-weight: 800; letter-spacing: -0.04em; max-width: 14em; }
+.setup-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s6) var(--s7); align-items: start; }
+.copy-box { border: 1px solid var(--card-line); border-radius: 8px; padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+.copy-box .lead { font-size: 16px; font-weight: 700; }
+.copy-line { display: flex; gap: 8px; }
+.copy-line code { flex: 1; min-width: 0; font-family: var(--mono); font-size: 13.5px; background: var(--soft); border-radius: 8px; padding: 13px 14px; overflow-x: auto; white-space: nowrap; user-select: all; }
+.btn-copy { flex-shrink: 0; min-height: 46px; padding: 0 20px; border: 0; border-radius: 8px; background: var(--accent); color: var(--on-accent); font-weight: 700; white-space: nowrap; }
+.toast { font-size: 13px; color: var(--muted); min-height: 1.2em; margin-top: -4px; }
+.signup { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 16px; }
+.signup b { display: block; font-size: 15px; }
+.notice { background: var(--amber-soft); color: var(--amber); border-radius: 8px; padding: 10px 14px; font-size: 13px; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tab { min-height: 44px; padding: 0 14px; border: 0; background: transparent; font-weight: 700; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.tabpanel[hidden] { display: none; }
+ol.steps { list-style: none; padding: 0; counter-reset: s; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+ol.steps li:last-child { border-bottom: 0; }
+ol.steps li::before { content: counter(s); width: 24px; height: 24px; border: 1px solid var(--line); border-radius: 6px; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+ol.steps b { display: block; font-weight: 600; }
+ol.steps span { color: var(--muted); font-size: 14px; }
+.path { font-family: var(--mono); font-size: 12.5px; background: var(--soft); border-radius: 4px; padding: 1px 5px; }
+.plan-note { font-size: 13px; color: var(--muted); padding-top: 10px; }
+footer { padding-block: 20px 40px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1000px) {
+  :root { --rail: 120px; }
+  .split { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
+  .chat, .track { justify-self: start; }
+}
+@media (max-width: 760px) {
+  .flight { padding-top: var(--s7); }
+  .stage { grid-template-columns: minmax(0, 1fr); padding-bottom: var(--s9); padding-left: 30px; }
+  .stage::before { top: 22px; }
+  .stamp { position: relative; top: 0; flex-direction: row; align-items: baseline; gap: 8px; padding-left: 0; margin-bottom: var(--s4); }
+  .stamp .dot { left: -30px; }
+  .stamp.mark .dot { left: -37px; }
+  .stamp .leg::before { content: "· "; }
+  .res { padding: 18px 16px; grid-template-columns: minmax(0, 1fr); }
+  .res-price { grid-column: 1; grid-row: auto; align-items: flex-start; text-align: left; flex-direction: row; align-items: baseline; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .res-detail { grid-template-columns: minmax(0, 1fr); }
+  .res-head, .res-foot { padding-inline: 16px; }
+  .setup-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .cta-row .btn { width: 100%; }
+  .signup .btn-quiet { width: 100%; }
+  .back-title svg { display: none; }
+}
+@media (max-width: 400px) {
+  .wrap { padding-inline: 16px; }
+  .stage { padding-left: 26px; }
+  .stamp .dot { left: -26px; }
+  .stamp.mark .dot { left: -33px; }
+  .chat-body { padding: 10px; }
+  .mc-photo, .mc-list-head span { display: none; }
+  .mc-head { padding: 12px 14px; }
+  .mc-row { margin: 0 2px; }
+  .mc-list-head { padding-inline: 14px; }
+  .copy-line { flex-direction: column; }
+  .btn-copy { width: 100%; }
+  .copy-box { padding: 16px; }
+  .pl-under { padding-left: 0; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <a class="site-brand" href="/" aria-label="Boomerang home"><svg viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-12 50 50)"><path d="M30 12 V60" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/><path d="M30 56 Q32 38 53 38 Q75 38 75 61 Q75 84 55 84" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/><circle cx="32" cy="82" r="8.5" fill="#16A34A"/></g></svg><span>boomerang</span></a>
+  </header>
+
+  <main class="flight">
+
+    <!-- 1. The need -->
+    <section class="stage leg-out" aria-labelledby="need-title">
+      <div class="stamp"><span class="dot" aria-hidden="true"></span><time>6:40 pm</time><span class="leg">The need</span></div>
+      <div class="stage-body">
+        <h1 class="need" id="need-title">You need an iPhone 17 today.</h1>
+        <ul class="pain">
+          <li>Calling shops you don’t know.</li>
+          <li>Hold music, then “come and check, sir.”</li>
+          <li>And still no idea if it was the best price.</li>
+        </ul>
+        <p class="lede">Boomerang’s AI agents make those calls for you, then come back with who has it, the final price after offers, and a recording of every call.</p>
+        <div class="cta-row">
+          <a class="btn" href="#setup">Add to ChatGPT or Claude <span aria-hidden="true">→</span></a>
+          <p class="small">Takes about 3 minutes. $1 free credit to try.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. The throw -->
+    <section class="stage leg-out" aria-labelledby="ask-title">
+      <div class="stamp"><span class="dot" aria-hidden="true"></span><time>6:41 pm</time><span class="leg">You ask</span></div>
+      <div class="stage-body split">
+        <div class="copy">
+          <h2 class="step" id="ask-title">You ask ChatGPT or Claude.</h2>
+          <p class="step-text">Say what you need and your pincode. Boomerang lists shops near you, highest rated first. You tick the ones worth a call.</p>
+        </div>
+        <div class="chat" aria-label="Example chat">
+          <div class="chat-top">New chat</div>
+          <div class="chat-body">
+            <p class="bubble">Need an iPhone 17, 256GB, lavender today near 500037. I’ll pay with my ICICI card.</p>
+            <p class="reply">Here’s what I found near 500037. Pick the shops and I’ll have them called.</p>
+            <section class="card" aria-label="Example shop picker">
+              <div class="mc-head">
+                <div class="mc-photo" aria-hidden="true"><svg width="36" height="44" viewBox="0 0 64 76" fill="none"><rect x="14" y="2" width="36" height="72" rx="8" fill="#CFC4E6" stroke="#B3A5D3" stroke-width="1.5"/><rect x="18" y="7" width="17" height="21" rx="6" fill="#BDB0DA"/><circle cx="23" cy="13" r="3.4" fill="#2E2A38"/><circle cx="23" cy="22" r="3.4" fill="#2E2A38"/></svg></div>
+                <div><p class="mc-title">5 shops near 500037 may have your iPhone 17</p><p class="mc-sub">Pick the shops. Our AI calls them for stock and the final price after offers.</p></div>
+              </div>
+              <div class="mc-list-head"><b>Highest rated first</b><span>50+ Google ratings</span></div>
+              <div class="mc-row on"><span class="mc-tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.5l4.5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="mc-text"><b>Aptronix · Kukatpally</b><span>3.8 km · Open till 9:30 pm</span></span><span class="rate">★ 4.6 <i>(1,240)</i></span></div>
+              <div class="mc-row on"><span class="mc-tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.5l4.5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="mc-text"><b>Vijay Sales · Kukatpally</b><span>4.1 km · Open till 10 pm</span></span><span class="rate">★ 4.4 <i>(3,105)</i></span></div>
+              <div class="mc-row on"><span class="mc-tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.5l4.5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="mc-text"><b>Croma · JNTU</b><span>6.4 km · Open till 10 pm</span></span><span class="rate">★ 4.1 <i>(1,120)</i></span></div>
+              <p class="mc-more">Show 2 more shops</p>
+              <div class="mc-foot"><span class="mc-btn">Call 3 shops</span><span class="mc-small">Calls use your account credit. A listing doesn’t confirm stock.</span></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Out -->
+    <section class="stage leg-out" aria-labelledby="out-title">
+      <div class="stamp"><span class="dot" aria-hidden="true"></span><time>6:42 pm</time><span class="leg">Out</span></div>
+      <div class="stage-body split">
+        <div class="copy">
+          <h2 class="step" id="out-title">Out go the calls.</h2>
+          <p class="step-text">Our AI agents phone every shop you picked. They ask for stock and the final price after offers, and note what happened. No answer? They try again five minutes later.</p>
+          <p class="step-text" style="margin-top:12px">You don’t need to watch. Go make tea.</p>
+        </div>
+        <div class="track" id="track" aria-label="Example call progress">
+          <div class="track-head">
+            <div class="row1"><b id="track-title">3 shops called · 2 have it</b><span>iPhone 17 · 256GB · near 500037</span></div>
+            <div class="bar" aria-hidden="true"><i id="track-bar"></i></div>
+          </div>
+          <ol class="tl" id="tl">
+            <li><span class="t">6:42 pm</span><span class="what"><span class="st plain">Calls started to 3 shops</span></span></li>
+            <li data-call><span class="t">6:42 pm</span><span class="what"><b>Aptronix · Kukatpally</b><span class="st call"><span class="pulse" aria-hidden="true"></span>AI agent calling</span></span></li>
+            <li data-call><span class="t">6:42 pm</span><span class="what"><b>Vijay Sales · Kukatpally</b><span class="st call"><span class="pulse" aria-hidden="true"></span>AI agent calling</span></span></li>
+            <li data-call><span class="t">6:43 pm</span><span class="what"><b>Croma · JNTU</b><span class="st call"><span class="pulse" aria-hidden="true"></span>AI agent calling</span></span></li>
+            <li><span class="t">6:44 pm</span><span class="what"><b>Croma · JNTU</b><span class="st amber">No answer · retry at 6:49 pm</span></span></li>
+            <li data-done="1"><span class="t">6:44 pm</span><span class="what"><b>Aptronix · Kukatpally</b><span class="st win">In stock · ₹75,900 with ICICI card</span></span></li>
+            <li data-done="2"><span class="t">6:46 pm</span><span class="what"><b>Vijay Sales · Kukatpally</b><span class="st win">In stock · ₹79,900</span></span></li>
+            <li data-call><span class="t">6:49 pm</span><span class="what"><b>Croma · JNTU</b><span class="st call"><span class="pulse" aria-hidden="true"></span>AI agent calling · try 2</span></span></li>
+            <li data-done="3"><span class="t">6:50 pm</span><span class="what"><b>Croma · JNTU</b><span class="st amber">Prefers a personal call · no charge</span></span></li>
+          </ol>
+          <div class="track-foot"><p class="small">Newest last. Sample data.</p><button type="button" class="replay" id="replay">Replay</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Back: the climax -->
+    <section class="stage leg-back" aria-labelledby="back-title">
+      <div class="stamp mark"><span class="dot" aria-hidden="true"><svg viewBox="0 0 100 100"><g transform="rotate(-12 50 50)"><path d="M30 12 V60" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/><path d="M30 56 Q32 38 53 38 Q75 38 75 61 Q75 84 55 84" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/><circle cx="32" cy="82" r="8.5" fill="#16A34A"/></g></svg></span><time>6:51 pm</time><span class="leg">Back in your chat</span></div>
+      <div class="stage-body">
+        <h2 class="back-title" id="back-title">It comes back.<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M40 10 C40 30 30 38 12 38" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M20 28 L11 38 L21 46" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></h2>
+        <div class="compare">
+          <p class="was">₹79,900 on Amazon.</p>
+          <p class="now"><span class="price">₹75,900</span> at a shop 4 km away.</p>
+        </div>
+        <p class="back-sub">Every shop you picked, with what happened. The final price first. The recording right beside it, so you can hear the shop say it.</p>
+
+        <section class="results" aria-label="Example results">
+          <div class="res-head">
+            <div class="row1"><h3>3 shops called · 2 have it</h3><span>iPhone 17 · 256GB · Lavender · near 500037</span></div>
+            <div class="tags"><span class="tag win">2 in stock</span><span class="tag amber">1 prefers a personal call</span></div>
+            <p class="picked">3 shops picked: Aptronix, Vijay Sales, Croma</p>
+          </div>
+
+          <article class="res">
+            <div>
+              <p class="res-name">Aptronix · Kukatpally</p>
+              <p class="res-meta"><span class="rate">★ 4.6 <i>(1,240)</i></span> · 3.8 km · Open till 9:30 pm</p>
+              <p class="res-status win">In stock · 1 piece <span class="who-tag">AI</span></p>
+            </div>
+            <div class="res-price"><strong>₹75,900</strong><span>final price, with ICICI card</span></div>
+            <div class="res-detail">
+              <div>
+                <p class="said"><span class="lbl">Offer, in the shop’s words</span><q>Seventy-nine nine hundred. ICICI card gets four thousand off.</q></p>
+                <dl class="facts"><dt>Hold it for you</dt><dd class="unconf">Unconfirmed</dd></dl>
+              </div>
+              <div class="player" data-dur="102" data-called="Called 6:44 pm">
+                <span class="lbl">Called on your behalf by our AI agent</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="res">
+            <div>
+              <p class="res-name">Vijay Sales · Kukatpally</p>
+              <p class="res-meta"><span class="rate">★ 4.4 <i>(3,105)</i></span> · 4.1 km · Open till 10 pm</p>
+              <p class="res-status win">In stock <span class="who-tag">AI</span></p>
+            </div>
+            <div class="res-price"><strong>₹79,900</strong><span>final price, no card offer</span></div>
+            <div class="res-detail">
+              <div>
+                <p class="said"><span class="lbl">Offer, in the shop’s words</span><q>Full price only, sir. No bank offer on this model right now.</q></p>
+                <dl class="facts"><dt>Colours in stock</dt><dd class="unconf">Unconfirmed</dd></dl>
+              </div>
+              <div class="player" data-dur="58" data-called="Called 6:45 pm">
+                <span class="lbl">Called on your behalf by our AI agent</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="res">
+            <div>
+              <p class="res-name">Croma · JNTU</p>
+              <p class="res-meta"><span class="rate">★ 4.1 <i>(1,120)</i></span> · 6.4 km · Open till 10 pm</p>
+              <p class="res-status amber">Prefers a personal call <span class="who-tag">2 tries</span></p>
+            </div>
+            <div class="res-price"><strong class="unconf" style="font-size:20px;letter-spacing:-0.01em">Unconfirmed</strong><span>no charge for this shop</span></div>
+            <div class="res-detail">
+              <ol class="mini-tl" aria-label="What happened">
+                <li><span class="t">6:44 pm</span><span>No answer</span></li>
+                <li><span class="t">6:49 pm</span><span>AI agent called again · try 2</span></li>
+                <li><span class="t">6:50 pm</span><span>Shop asked to speak to a person</span></li>
+              </ol>
+              <div class="player" data-dur="21" data-called="Called 6:49 pm">
+                <span class="lbl">Called on your behalf by our AI agent</span>
+              </div>
+              <div class="person-note">
+                <b>Some shops want a person. That’s fine.</b>
+                Today we tell you which ones, and you aren’t charged for them. Best to call them directly. Next, a person from our team calls them for you.<span class="soon">Coming soon</span>
+              </div>
+            </div>
+          </article>
+
+          <div class="res-foot">
+            <p>You pay for the 2 shops that answered. Croma: no charge.</p>
+            <p class="small">Example search. Shop names are real listings; answers, prices and recordings are sample data.</p>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- 5. Home -->
+    <section class="stage leg-home" aria-labelledby="home-title">
+      <div class="stamp"><span class="dot" aria-hidden="true"></span><time>7:20 pm</time><span class="leg">In the shop</span></div>
+      <div class="stage-body">
+        <h2 class="home" id="home-title">You walk into the right shop.</h2>
+        <p class="home-text">You know it’s there, what you’ll pay, and that you didn’t miss a better deal. You never picked up the phone.</p>
+        <div class="cta-row"><a class="btn" href="#setup">Add to ChatGPT or Claude <span aria-hidden="true">→</span></a></div>
+        <p class="next"><b>Today, Boomerang calls shops.</b> Next: medicine stock, repair quotes, table bookings and more, through the same assistant.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Setup -->
+  <section class="setup" id="setup" aria-labelledby="setup-title">
+    <div class="setup-head">
+      <p class="eyebrow" style="margin:0">Set it up in about 3 minutes</p>
+      <h2 id="setup-title">Copy one address. Paste it. Ask.</h2>
+    </div>
+    <div class="setup-grid">
+      <div class="copy-box">
+        <p class="lead">Your Boomerang address</p>
+        <div class="copy-line"><code id="server-url">https://little-kangaroo-718.convex.site/mcp</code><button type="button" class="btn-copy" data-copy="server-url">Copy</button></div>
+        <p class="toast" id="toast" role="status" aria-live="polite"></p>
+        <p class="small" style="font-size:14px">Paste it into ChatGPT or Claude and sign in once with your Boomerang account. Calls use your account credit, and you pay only for shops that give an answer.</p>
+        <div class="signup"><div><b>New here? Sign up and get $1 free credit.</b><span class="small">Verify your email and you can start testing right away.</span></div><a class="btn-quiet" href="https://little-kangaroo-718.convex.site/account">Sign up</a></div>
+        <p class="notice">Live for testing. Shop calling is in early testing, so some calls may not go through yet.</p>
+      </div>
+      <div>
+        <div class="tabs" role="tablist" aria-label="Choose your AI app">
+          <button type="button" class="tab" role="tab" id="tab-chatgpt" aria-controls="p-chatgpt" aria-selected="true">ChatGPT</button>
+          <button type="button" class="tab" role="tab" id="tab-claude" aria-controls="p-claude" aria-selected="false" tabindex="-1">Claude</button>
+        </div>
+        <div class="tabpanel" role="tabpanel" id="p-chatgpt" aria-labelledby="tab-chatgpt">
+          <ol class="steps">
+            <li><div><b>Turn on Developer mode</b><span><span class="path">Settings → Security and login</span> → Developer mode.</span></div></li>
+            <li><div><b>Add a new plugin</b><span>At <a href="https://chatgpt.com/plugins">chatgpt.com/plugins</a>, select +, name it Boomerang.</span></div></li>
+            <li><div><b>Paste the address</b><span>Under Connection, paste it and select Create.</span></div></li>
+            <li><div><b>Sign in, then ask</b><span>In a new chat, add Boomerang from the tools menu.</span></div></li>
+          </ol>
+          <p class="plan-note">Needs Developer mode: ChatGPT Business, Enterprise and Edu. On Business, your admin may need to turn it on.</p>
+        </div>
+        <div class="tabpanel" role="tabpanel" id="p-claude" aria-labelledby="tab-claude" hidden>
+          <ol class="steps">
+            <li><div><b>Open Connectors</b><span>Go to <a href="https://claude.ai/customize/connectors">Customize → Connectors</a>, then + Add → Add custom connector.</span></div></li>
+            <li><div><b>Paste the address</b><span>Name it Boomerang, paste the address, select Continue twice.</span></div></li>
+            <li><div><b>Sign in, then Add</b><span>Choose Sign in now and Register automatically. Select Add and sign in with your Boomerang account.</span></div></li>
+            <li><div><b>Turn it on in a chat</b><span>+ → Connectors → switch on Boomerang.</span></div></li>
+          </ol>
+          <p class="plan-note">Works on Free, Pro, Max, Team and Enterprise. On Team and Enterprise, an owner adds it under Organization settings → Connectors.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer><p>Boomerang · Setup steps checked against OpenAI’s and Anthropic’s help pages on 5 October 2026 · Prices on this page are sample data.</p></footer>
+</div>
+
+<script>
+(function () {
+  var reduce = false;
+  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  /* Out: tracking steps arrive one at a time, newest last. Final state is the default. */
+  var tl = document.getElementById('tl'), items = [].slice.call(tl.children);
+  var title = document.getElementById('track-title'), bar = document.getElementById('track-bar');
+  var timers = [];
+  function setDone(n, total) {
+    title.textContent = n === total ? '3 shops called · 2 have it' : (n === 0 ? 'Calling 3 shops…' : n + ' of 3 shops done');
+    bar.style.setProperty('--p', Math.round(n / 3 * 100) + '%');
+  }
+  function showFinal() {
+    timers.forEach(clearTimeout); timers = [];
+    tl.classList.remove('playing');
+    items.forEach(function (li) { li.classList.remove('hide', 'gone', 'now'); });
+    setDone(3, 3);
+  }
+  function play() {
+    timers.forEach(clearTimeout); timers = [];
+    tl.classList.add('playing');
+    items.forEach(function (li) { li.classList.add('hide', 'gone'); li.classList.remove('now'); });
+    setDone(0, 3);
+    var t = 300;
+    items.forEach(function (li, i) {
+      timers.push(setTimeout(function () {
+        items.forEach(function (x) { x.classList.remove('now'); });
+        li.classList.remove('gone');
+        requestAnimationFrame(function () { li.classList.remove('hide'); });
+        if (li.hasAttribute('data-call')) li.classList.add('now');
+        if (li.dataset.done) setDone(+li.dataset.done, 3);
+        if (i === items.length - 1) timers.push(setTimeout(showFinal, 600));
+      }, t));
+      t += i === 0 ? 700 : 1100;
+    });
+  }
+  showFinal();
+  var replay = document.getElementById('replay');
+  if (reduce) { replay.hidden = true; }
+  else {
+    replay.addEventListener('click', play);
+    if ('IntersectionObserver' in window) {
+      var started = false;
+      new IntersectionObserver(function (es, o) {
+        es.forEach(function (e) { if (e.isIntersecting && !started) { started = true; o.disconnect(); play(); } });
+      }, { threshold: 0.45 }).observe(document.getElementById('track'));
+    }
+  }
+
+  /* Recording players: WhatsApp-voice-note shape. Sample only, no audio on this page. */
+  var PLAY = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.2v13.6c0 .6.7 1 1.2.7l10.6-6.8c.5-.3.5-1 0-1.4L6.2 2.5C5.7 2.2 5 2.6 5 3.2Z" fill="currentColor"/></svg>';
+  var PAUSE = '<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4.5" y="3" width="4" height="14" rx="1" fill="currentColor"/><rect x="11.5" y="3" width="4" height="14" rx="1" fill="currentColor"/></svg>';
+  function fmt(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+  [].forEach.call(document.querySelectorAll('.player'), function (p, idx) {
+    var dur = +p.dataset.dur, N = 38, seed = 7 + idx * 13, bars = '';
+    for (var i = 0; i < N; i++) {
+      seed = (seed * 9301 + 49297) % 233280;
+      var h = 5 + Math.round((seed / 233280) * 18 * (0.55 + 0.45 * Math.sin(i / 3.1 + idx)));
+      bars += '<i style="height:' + Math.max(4, Math.abs(h)) + 'px"></i>';
+    }
+    p.insertAdjacentHTML('beforeend',
+      '<div class="pl-row"><button type="button" class="speed" aria-label="Playback speed">1x</button>' +
+      '<button type="button" class="playbtn" aria-label="Play sample recording">' + PLAY + '</button>' +
+      '<div class="wave" role="slider" tabindex="0" aria-label="Recording position" aria-valuemin="0" aria-valuemax="' + dur + '" aria-valuenow="0">' + bars + '<span class="knob"></span></div></div>' +
+      '<div class="pl-under"><span class="el">' + fmt(dur) + '</span><span>' + p.dataset.called + '</span></div>');
+    var speedB = p.querySelector('.speed'), playB = p.querySelector('.playbtn'), wave = p.querySelector('.wave'), el = p.querySelector('.el');
+    var barsEls = [].slice.call(wave.querySelectorAll('i'));
+    var pos = 0, rate = 1, playing = false, last = 0, raf = 0;
+    function draw() {
+      var f = pos / dur;
+      wave.style.setProperty('--k', (f * 100).toFixed(2) + '%');
+      barsEls.forEach(function (b, i) { b.classList.toggle('on', (i + 0.5) / N <= f); });
+      el.textContent = playing || pos > 0 ? fmt(pos) : fmt(dur);
+      wave.setAttribute('aria-valuenow', Math.round(pos));
+    }
+    function tick(now) {
+      if (!playing) return;
+      pos += (now - last) / 1000 * rate; last = now;
+      if (pos >= dur) { pos = 0; stop(); draw(); return; }
+      draw(); raf = requestAnimationFrame(tick);
+    }
+    function stop() { playing = false; cancelAnimationFrame(raf); playB.innerHTML = PLAY; playB.setAttribute('aria-label', 'Play sample recording'); }
+    playB.addEventListener('click', function () {
+      if (playing) { stop(); draw(); return; }
+      playing = true; last = performance.now(); playB.innerHTML = PAUSE; playB.setAttribute('aria-label', 'Pause sample recording');
+      raf = requestAnimationFrame(tick);
+    });
+    speedB.addEventListener('click', function () { rate = rate === 1 ? 1.5 : rate === 1.5 ? 2 : 1; speedB.textContent = rate + 'x'; });
+    wave.addEventListener('click', function (e) { var r = wave.getBoundingClientRect(); pos = Math.min(dur, Math.max(0, (e.clientX - r.left) / r.width * dur)); draw(); });
+    wave.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { pos = Math.min(dur, pos + 5); draw(); e.preventDefault(); }
+      if (e.key === 'ArrowLeft') { pos = Math.max(0, pos - 5); draw(); e.preventDefault(); }
+    });
+    draw();
+  });
+
+  /* Setup tabs and copy */
+  var tabs = [document.getElementById('tab-chatgpt'), document.getElementById('tab-claude')];
+  var panels = { 'tab-chatgpt': document.getElementById('p-chatgpt'), 'tab-claude': document.getElementById('p-claude') };
+  function select(tab, focus) { tabs.forEach(function (x) { var on = x === tab; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; panels[x.id].hidden = !on; }); if (focus) tab.focus(); }
+  tabs.forEach(function (x, i) {
+    x.addEventListener('click', function () { select(x); });
+    x.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); select(tabs[(i + 1) % 2], true); } });
+  });
+  [].forEach.call(document.querySelectorAll('[data-copy]'), function (b) {
+    b.addEventListener('click', function () {
+      var src = document.getElementById(b.dataset.copy), toast = document.getElementById('toast'), txt = src.textContent.trim();
+      function fb() { var r = document.createRange(); r.selectNodeContents(src); var s = getSelection(); s.removeAllRanges(); s.addRange(r); toast.textContent = 'Selected. Press Ctrl+C or ⌘C to copy.'; }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast.textContent = 'Copied.'; }, fb); else fb();
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -154,7 +154,7 @@
       "kind": "title1",
       "maxW": 1400,
       "page": "overview",
-      "text": "Human MCP · ChatGPT flow",
+      "text": "Boomerang · ChatGPT flow",
       "w": 240,
       "x": 0,
       "y": 0
@@ -186,5 +186,5 @@
       "name": "Compare: one card vs two"
     }
   ],
-  "title": "Human MCP ChatGPT Cards"
+  "title": "Boomerang ChatGPT Cards"
 }

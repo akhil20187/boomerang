@@ -1,4 +1,4 @@
-# Prompt: Human MCP setup page
+# Prompt: Boomerang setup page
 
 Written 5 October 2026. It adapts two sources to our product:
 - the prompt formula and review loop from [Muzli: Opus 5.5 builds Muzli Picks-level websites](https://muz.li/blog/claude-opus-5-5-for-designers/)
@@ -9,7 +9,7 @@ The content and rules come from [DESIGN.md](../../DESIGN.md) and the agreed deci
 ## 1. Build prompt
 
 ```
-Build the setup page for Human MCP, a service where your AI
+Build the setup page for Boomerang, a service where your AI
 (ChatGPT or Claude) gets an AI agent to phone the shops near
 you and come back with who has the product, the final price
 after offers, and the call recording.
@@ -17,7 +17,7 @@ after offers, and the call recording.
 Visitors are urgent buyers in India who'd rather not call shops.
 They hate talking to strangers and being put on hold, they lose
 an evening dialling shop after shop, and they're never sure they
-got the best deal. They want to connect Human MCP to ChatGPT or
+got the best deal. They want to connect Boomerang to ChatGPT or
 Claude in 3 minutes and trust it will work.
 
 Mood: calm, exact, quietly confident. Like a good receipt:
@@ -90,7 +90,7 @@ calling it done, remove one accessory. Do not touch anything I
 have not mentioned, and do not change any wording.
 ```
 
-## Why these choices fit Human MCP
+## Why these choices fit Boomerang
 
 - **The one memorable thing is the price cut,** because it's the outcome the buyer wants: what they'd really pay. A generic "AI magic" visual wouldn't say that.
 - **Glass only where it means something:** the tags sit on top of the scene like real price stickers. Glass everywhere would turn the page into decoration.

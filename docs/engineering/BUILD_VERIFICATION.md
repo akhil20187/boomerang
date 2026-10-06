@@ -1,4 +1,4 @@
-# Human MCP build and verification
+# Boomerang build and verification
 
 5 October 2026. Work in progress; this is not a completion claim.
 
@@ -17,7 +17,7 @@ Convex database/functions and static website are deployed to the existing develo
 - Calling availability now accompanies search results. Missing service price returns an explicit unavailable reason, not a request for the customer to provide internal cents or a product price. Configured quotes still require exact consent. The card also disables calling when the backend reports unavailable, even with a sample configured quote. Current checks: 68 local tests and 33 backend tests (101 total), type checks and production build pass. No price or live-calling configuration was changed.
 
 - Approved protected MCP/OAuth routes deployed on 5 October. Public discovery returns OAuth JSON; unauthenticated requests are rejected. An authenticated SDK client discovered all five tools, loaded the self-contained widget, read the saved simulated task and was rejected after its temporary token was revoked. Actual rendering inside ChatGPT/Claude remains unverified.
-- Controlled task `ks75ebwjk9ce20vexzvpp8wxnx8fpmwp` finished without dialing. Its private synthetic WAV returned 32,044 bytes; unauthorised playback was rejected. Replaying the same task left exactly two notification records, each sent in one attempt. AgentMail received both started/completed emails from Human MCP with the correct protected status link and sign-in instruction. The signed-in website displayed the marked simulated result.
+- Controlled task `ks75ebwjk9ce20vexzvpp8wxnx8fpmwp` finished without dialing. Its private synthetic WAV returned 32,044 bytes; unauthorised playback was rejected. Replaying the same task left exactly two notification records, each sent in one attempt. AgentMail received both started/completed emails from Boomerang with the correct protected status link and sign-in instruction. The signed-in website displayed the marked simulated result.
 - Credit accounting, shop relevance corrections and the controlled fixture are now deployed. No price was selected; live shop calling remains disabled.
 
 - Production build succeeds. Type checks passed on frontend and backend.

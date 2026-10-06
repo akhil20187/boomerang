@@ -5,7 +5,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [
     Email({
       id: "resend",
-      name: "Human MCP",
+      name: "Boomerang",
       authorize: undefined,
       maxAge: 15 * 60,
       async sendVerificationRequest({ identifier, url }) {
@@ -24,8 +24,8 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           body: JSON.stringify({
             from,
             to: identifier,
-            subject: "Sign in to Human MCP",
-            text: `Sign in to Human MCP using this link. It expires in 15 minutes.\n\n${url}\n\nIf you did not request this link, ignore this email.`,
+            subject: "Sign in to Boomerang",
+            text: `Sign in to Boomerang using this link. It expires in 15 minutes.\n\n${url}\n\nIf you did not request this link, ignore this email.`,
           }),
         });
         if (!response.ok)

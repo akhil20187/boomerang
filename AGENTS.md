@@ -37,7 +37,7 @@ Before building or changing any screen (chat cards, website, emails), read `DESI
 
 ## Project context
 
-We are building **Human MCP** for the GrowthX Build Sprint: a service through which a customer's AI assistant can request work from a human and receive the result back. MCP is the connection standard that lets an agent request that service. The broader vision covers both completing work AI could not finish and getting an expert second opinion.
+We are building **Boomerang** for the GrowthX Build Sprint: a service through which a customer's AI assistant can request work from a human and receive the result back. MCP is the connection standard that lets an agent request that service. The broader vision covers both completing work AI could not finish and getting an expert second opinion.
 
 ### First use case and customer benefit
 

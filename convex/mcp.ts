@@ -2,10 +2,17 @@ import { httpAction } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import { ConvexError } from "convex/values";
 import { metadata } from "./oauth";
-const uiUri = "ui://human-mcp/shops-v3.html";
+import { callingQuote } from "./credits";
+const uiUri = "ui://boomerang/shops-v3.html";
 const textSchema = { type: "string" },
   idSchema = { type: "string", minLength: 1 };
 export const tools = [
+  {
+    name: "account_status",
+    description: "Verify the signed-in Boomerang account, available credit and calling availability without starting calls.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+  },
   {
     name: "find_shops",
     description:
@@ -207,7 +214,7 @@ export const endpoint = httpAction(async (ctx, request) => {
     request.headers.get("Authorization") ?? "",
   )?.[1];
   if (!token)
-    return json({ error: "Link your Human MCP account." }, 401, {
+    return json({ error: "Link your Boomerang account." }, 401, {
       "WWW-Authenticate": www,
     });
   try {
@@ -267,7 +274,7 @@ export const endpoint = httpAction(async (ctx, request) => {
         ? body.params.protocolVersion
         : "2025-06-18",
       capabilities: { tools: {}, resources: {} },
-      serverInfo: { name: "human-mcp", version: "1.0.0" },
+      serverInfo: { name: "boomerang", version: "1.0.0" },
       instructions:
         "Find potential nearby shops, let the customer confirm the product and select shops, then call only after explicit approval. Never infer stock from a listing. Sign in and link the customer account first.",
     });
@@ -278,7 +285,7 @@ export const endpoint = httpAction(async (ctx, request) => {
       resources: [
         {
           uri: uiUri,
-          name: "Human MCP shop card",
+          name: "Boomerang shop card",
           mimeType: "text/html;profile=mcp-app",
           description: "Choose shops, follow calls and read each answer.",
         },
@@ -345,7 +352,15 @@ export const endpoint = httpAction(async (ctx, request) => {
         requiredScope: name === "start_calls" ? "calls:write" : "shops:read",
       });
       let result: any;
-      if (name === "find_shops")
+      if (name === "account_status") {
+        if (Object.keys(args).length) throw new Error("No arguments expected");
+        const account = await ctx.runQuery(api.users.me, { accessToken: token });
+        if (!account) throw new Error("Sign in required");
+        result = { email: account.email, eligible: account.eligible,
+          availableBalance: account.availableBalance, creditBalance: account.creditBalance,
+          reservedBalance: account.reservedBalance, currency: account.currency,
+          ...callingQuote() };
+      } else if (name === "find_shops")
         result = await ctx.runAction(api.discovery.search, {
           ...args,
           accessToken: token,

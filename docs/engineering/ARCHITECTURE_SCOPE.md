@@ -1,4 +1,4 @@
-# Human MCP architecture scope
+# Boomerang architecture scope
 
 5 October 2026. Proposal for discussion, not an approved implementation specification. No application code changed.
 

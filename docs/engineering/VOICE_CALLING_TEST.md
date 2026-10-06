@@ -1,6 +1,6 @@
 # Reusable voice calling: implementation and test record
 
-Recorded 4 October 2026 for Human MCP. Two real calls to the founder established that Vobiz can connect our OpenAI voice agent to a telephone conversation. This is a reusable development building block, not the complete product calling service.
+Recorded 4 October 2026 for Boomerang. Two real calls to the founder established that Vobiz can connect our OpenAI voice agent to a telephone conversation. This is a reusable development building block, not the complete product calling service.
 
 ## What we built
 

@@ -103,6 +103,14 @@ export const operate = internalMutation({
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
+      // Native assistants receive OAuth responses on a local HTTP listener.
+      // Match literal hosts and paths, then bind the exact URI to the client.
+      const redirectAllowed = (uri: unknown) => {
+        if (typeof uri !== "string") return false;
+        if (allowed.includes(uri)) return true;
+        return /^http:\/\/(?:127\.0\.0\.1|localhost):[1-9][0-9]{0,4}\/(?:callback|oauth\/callback)$/.test(uri)
+          && Number(uri.match(/:([0-9]+)\//)?.[1]) <= 65535;
+      };
       const clientFor = async (id: string) => {
         if (typeof id !== "string") throw new OAuthError("invalid_client");
         const client = await ctx.db
@@ -118,7 +126,7 @@ export const operate = internalMutation({
           !data.redirect_uris.length ||
           data.redirect_uris.length > 5 ||
           data.redirect_uris.some(
-            (s: any) => typeof s !== "string" || !allowed.includes(s),
+            (s: any) => !redirectAllowed(s),
           )
         )
           throw new OAuthError("invalid_redirect_uri");
@@ -166,7 +174,7 @@ export const operate = internalMutation({
         if (
           data.response_type !== "code" ||
           !client.redirectUris.includes(data.redirect_uri) ||
-          !allowed.includes(data.redirect_uri) ||
+          !redirectAllowed(data.redirect_uri) ||
           data.code_challenge_method !== "S256" ||
           !/^[-_a-zA-Z0-9]{43}$/.test(data.code_challenge ?? "") ||
           data.resource !== resource ||
