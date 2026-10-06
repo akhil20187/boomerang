@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Select shops and show more</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1A1A19}a:hover{color:#55544F}
+button{font:inherit;color:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1360px; box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1A1A19">
+<div style="height: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #EFEDE8">
+<span style="font-size: 15px; font-weight: 500">New chat</span>
+</div>
+<div style="flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<p style="margin: 0; font-size: 15px; line-height: 22px">Here’s what I found near 500037.</p>
+<section aria-label="Shops to call" style="border: 1px solid #DAD7D0; border-radius: 8px; overflow: hidden; background: #FFFFFF; box-shadow: none">
+<div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px">
+<div role="img" aria-label="Product photo: iPhone 17 in lavender" style="width: 72px; height: 72px; flex-shrink: 0; border-radius: 8px; background: #F4F2F8; display: grid; place-items: center"><svg width="44" height="54" viewBox="0 0 64 76" fill="none"><rect x="14" y="2" width="36" height="72" rx="8" fill="#CFC4E6" stroke="#B3A5D3" stroke-width="1.5"></rect><rect x="18" y="7" width="17" height="21" rx="6" fill="#BDB0DA"></rect><circle cx="23" cy="13" r="3.4" fill="#2E2A38"></circle><circle cx="23" cy="22" r="3.4" fill="#2E2A38"></circle></svg></div>
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+<span style="font-size: 16px; font-weight: 600; line-height: 21px">5 shops near 500037 may have your iPhone 17</span>
+<span style="font-size: 13px; line-height: 18px; color: #6B6A66">Pick the shops. Our AI calls them for stock and the final price after offers.</span>
+<span style="font-size: 12px; color: #6B6A66">256GB · Lavender · ₹79,900 on Amazon</span>
+</div>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; padding: 10px 16px 6px; border-top: 1px solid #EFEDE8">
+<span style="font-size: 13px; font-weight: 600">{{countTitle}}</span>
+<span style="font-size: 12px; color: #6B6A66">{{radiusLabel}}</span>
+</div>
+<div style="display: flex; flex-direction: column; padding: 0 6px">
+<sc-for list="{{stores}}" as="item" hint-placeholder-count="5">
+<div style="display: flex; flex-direction: column">
+<sc-if value="{{item.divider}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; align-items: center; gap: 8px; padding: 10px 10px 6px; font-size: 12px; color: #6B6A66"><span style="flex: 1; height: 1px; background: #EFEDE8"></span>{{item.dividerLabel}}<span style="flex: 1; height: 1px; background: #EFEDE8"></span></div>
+</sc-if>
+<button type="button" aria-pressed="{{item.selected}}" onClick="{{item.toggle}}" style="display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 10px; border: 0; border-radius: 6px; text-align: left; background: {{item.rowBg}}">
+<span style="width: 22px; height: 22px; flex-shrink: 0; box-sizing: border-box; border-radius: 4px; border: 1.5px solid {{item.boxBorder}}; background: {{item.boxBg}}; display: grid; place-items: center; color: #FFFFFF">
+<sc-if value="{{item.selected}}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7"></path></svg></sc-if>
+</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 15px; font-weight: 500">{{item.name}} · {{item.area}}</span>
+<span style="font-size: 13px; color: {{item.metaColor}}">{{item.dist}} · {{item.hours}}</span>
+</span>
+<span style="font-size: 13px; font-weight: 500">★ {{item.rating}} <span style="font-weight: 400; color: #6B6A66">({{item.reviews}})</span></span>
+</button>
+</div>
+</sc-for>
+</div>
+<div style="padding: 6px 16px 0">
+<sc-if value="{{hasMore}}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{loadMore}}" style="width: 100%; height: 44px; border: 1px dashed #A8A59D; border-radius: 8px; background: #FFFFFF; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>{{moreLabel}}</button>
+</sc-if>
+<sc-if value="{{noMore}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 8px; align-items: center; padding: 6px 0">
+<span style="font-size: 13px; color: #6B6A66; text-align: center">No more shops within 10 km.<br>Shops with fewer than 50 Google ratings are hidden.</span>
+<button type="button" onClick="{{reset}}" style="height: 36px; padding: 0 14px; border: 1px solid #E7E5E0; border-radius: 10px; background: #FFFFFF; font-size: 13px; font-weight: 500">Reset demo</button>
+</div>
+</sc-if>
+</div>
+<div style="padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 8px">
+<button type="button" style="height: 48px; border: 0; border-radius: 8px; background: {{btnBg}}; color: #FFFFFF; font-size: 15px; font-weight: 600">{{startLabel}}</button>
+<span style="font-size: 12px; line-height: 16px; color: #6B6A66; text-align: center">Calls use your account credit. A listing doesn't confirm stock.</span>
+</div>
+</section>
+<p style="margin: 0; font-size: 13px; line-height: 19px; color: #6B6A66">The user can also type “show 3 more” in the chat. ChatGPT asks our server again and this same card grows.</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#1A1A19","options":["#1F6F4A","#2B4FD8","#1A1A19","#B4532A"]},"batch":{"editor":"int","default":5,"min":3,"max":10},"$preview":{"width":390,"height":1360}}'>
+const ALL = [
+  { id: 'apt', name: 'Aptronix', area: 'Kukatpally', dist: '3.8 km', rating: '4.6', reviews: '1,240', hours: 'Open · closes 9:30 pm', known: true },
+  { id: 'vsk', name: 'Vijay Sales', area: 'Kukatpally', dist: '4.1 km', rating: '4.4', reviews: '3,105', hours: 'Open · closes 10 pm', known: true },
+  { id: 'vsv', name: 'Vijay Sales', area: 'Vivekananda Ngr', dist: '5.0 km', rating: '4.3', reviews: '860', hours: 'Open · closes 9:30 pm', known: true },
+  { id: 'rd', name: 'Reliance Digital', area: 'Kukatpally', dist: '4.0 km', rating: '4.2', reviews: '2,410', hours: 'Open · closes 10 pm', known: true },
+  { id: 'cro', name: 'Croma', area: 'Kukatpally', dist: '4.6 km', rating: '4.1', reviews: '1,870', hours: 'Hours unknown', known: false },
+  { id: 'poo', name: 'Poorvika', area: 'KPHB', dist: '5.6 km', rating: '4.3', reviews: '640', hours: 'Open · closes 9:30 pm', known: true },
+  { id: 'san', name: 'Sangeetha Mobiles', area: 'KPHB', dist: '5.9 km', rating: '4.2', reviews: '410', hours: 'Open · closes 10 pm', known: true },
+  { id: 'cjn', name: 'Croma', area: 'JNTU', dist: '6.4 km', rating: '4.1', reviews: '1,120', hours: 'Open · closes 10 pm', known: true },
+  { id: 'lot', name: 'Lot Mobiles', area: 'Ameerpet', dist: '8.8 km', rating: '3.9', reviews: '95', hours: 'Open · closes 9 pm', known: true },
+  { id: 'rda', name: 'Reliance Digital', area: 'Ameerpet', dist: '9.1 km', rating: '4.2', reviews: '1,530', hours: 'Open · closes 10 pm', known: true },
+  { id: 'imz', name: 'Imagine', area: 'Banjara Hills', dist: '9.8 km', rating: '4.5', reviews: '2,260', hours: 'Open · closes 9 pm', known: true }
+];
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: { apt: true, vsk: true }, shown: 5 };
+  }
+  toggle(id) {
+    const sel = Object.assign({}, this.state.sel);
+    sel[id] = !sel[id];
+    this.setState({ sel: sel });
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#1A1A19';
+    const batch = this.props.batch ?? 5;
+    const shown = Math.min(this.state.shown, ALL.length);
+    const sel = this.state.sel;
+    const stores = ALL.slice(0, shown).map((s, i) => {
+      const on = !!sel[s.id];
+      const isBatchStart = i >= 5 && (i - 5) % batch === 0;
+      return Object.assign({}, s, {
+        selected: on,
+        toggle: () => this.toggle(s.id),
+        divider: isBatchStart,
+        dividerLabel: i + 1 + '–' + Math.min(i + batch, shown) + ' · a bit farther',
+        rowBg: on ? '#F5F4F1' : '#FFFFFF',
+        boxBg: on ? accent : '#FFFFFF',
+        boxBorder: on ? accent : '#A8A59D',
+        metaColor: s.known ? '#6B6A66' : '#7A4A00'
+      });
+    });
+    const left = ALL.length - shown;
+    const next = Math.min(batch, left);
+    const n = stores.filter((s) => s.selected).length;
+    return {
+      stores: stores,
+      countTitle: shown + ' shops',
+      radiusLabel: shown <= 5 ? 'Highest rated · 50+ Google ratings' : 'Within ' + (shown >= ALL.length ? '10' : '8') + ' km',
+      hasMore: left > 0,
+      noMore: left === 0,
+      moreLabel: 'Show ' + next + ' more shops',
+      loadMore: () => this.setState({ shown: shown + next }),
+      reset: () => this.setState({ shown: 5 }),
+      startLabel: n ? 'Call ' + n + (n === 1 ? ' shop' : ' shops') : 'Pick shops to call',
+      btnBg: n ? accent : '#8F8C85'
+    };
+  }
+}
+</script>
+</body>
+</html>

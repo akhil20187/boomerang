@@ -2,7 +2,7 @@ import { httpAction } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import { ConvexError } from "convex/values";
 import { metadata } from "./oauth";
-const uiUri = "ui://human-mcp/shops-v2.html";
+const uiUri = "ui://human-mcp/shops-v3.html";
 const textSchema = { type: "string" },
   idSchema = { type: "string", minLength: 1 };
 export const tools = [

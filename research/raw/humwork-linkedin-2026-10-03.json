@@ -1,0 +1,43 @@
+{
+  "runId": "01M3ZVA44G6W66FAG9ZSAHYJ02",
+  "provider": "ploid",
+  "endpoint": "/linkedin/company-posts",
+  "status": "COMPLETED",
+  "output": {
+    "data": {
+      "pagination": {
+        "totalElements": 1,
+        "totalPages": 1,
+        "pageNumber": 1,
+        "previousElements": 0,
+        "pageSize": 50,
+        "paginationToken": "1549364901-1790996453171-98b87ca1f4e39fae34476fc6912788ae"
+      },
+      "elements": []
+    }
+  },
+  "providerResponse": {
+    "httpStatus": 200
+  },
+  "price": {
+    "type": "PER_CALL",
+    "amount": {
+      "value": 0.01,
+      "currency": "USD"
+    }
+  },
+  "billing": {
+    "reportedCost": {
+      "currency": "USD",
+      "value": 10000,
+      "unit": "MICRO_DOLLAR"
+    }
+  },
+  "resultCount": 1,
+  "billedUnits": 1,
+  "createdAt": "2026-10-03T03:00:51.746Z",
+  "completedAt": "2026-10-03T03:00:54.173Z",
+  "hints": {
+    "retrieve the response later": "Call monid_get_run with {\"runId\":\"01M3ZVA44G6W66FAG9ZSAHYJ02\"}"
+  }
+}

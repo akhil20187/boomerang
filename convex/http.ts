@@ -6,6 +6,10 @@ import { auth } from "./auth";
 import { endpoint, oauthHttp } from "./mcp";
 const http = httpRouter();
 auth.addHttpRoutes(http);
+// Keep old setup bookmarks from exposing the withdrawn guide.
+for (const path of ["/setup", "/setup.html"])
+  http.route({ path, method: "GET", handler: httpAction(async () =>
+    new Response(null, { status: 302, headers: { Location: "/", "Cache-Control": "no-store" } })) });
 for (const path of [
   "/.well-known/oauth-protected-resource",
   "/.well-known/oauth-protected-resource/mcp",
@@ -94,6 +98,25 @@ http.route({
       );
       return new Response("Invalid callback", { status: 400 });
     }
+  }),
+});
+// The landing page owns "/"; the shop-search app lives at /app (SPA fallback).
+http.route({
+  path: "/",
+  method: "GET",
+  handler: httpAction(async () => {
+    const response = await fetch(
+      `${process.env.CONVEX_SITE_URL}/landing.html`,
+      { signal: AbortSignal.timeout(15000) },
+    );
+    if (!response.ok)
+      return Response.redirect(`${process.env.CONVEX_SITE_URL}/app`, 302);
+    return new Response(await response.text(), {
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-cache",
+      },
+    });
   }),
 });
 registerStaticRoutes(http, components.staticHosting);

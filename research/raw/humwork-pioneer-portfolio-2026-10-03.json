@@ -1,0 +1,60 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"runId\":\"01M3ZVFQ6VD2P9SGY166YWS0R2\",\"provider\":\"tinyfish\",\"endpoint\":\"/fetch\",\"status\":\"COMPLETED\",\"output\":{\"results\":[{\"url\":\"https://www.pioneerfund.vc/portfolio\",\"final_url\":\"https://www.pioneerfund.vc/portfolio\",\"title\":\"Portfolio - Pioneer Fund\",\"description\":\"500+ YC alumni investing in the top YC startups.\",\"language\":\"en\",\"text\":\"# Companies we've backed\",\"author\":null,\"published_date\":null,\"links\":[],\"latency_ms\":8913.809409999885,\"format\":\"markdown\"}],\"errors\":[]},\"providerResponse\":{\"httpStatus\":200},\"price\":{\"type\":\"PER_CALL\",\"amount\":{\"value\":0,\"currency\":\"USD\"}},\"billing\":{\"reportedCost\":{\"currency\":\"USD\",\"value\":0,\"unit\":\"MICRO_DOLLAR\"}},\"resultCount\":0,\"billedUnits\":0,\"createdAt\":\"2026-10-03T03:03:55.147Z\",\"completedAt\":\"2026-10-03T03:04:05.083Z\",\"hints\":{\"retrieve the response later\":\"Call monid_get_run with {\\\"runId\\\":\\\"01M3ZVFQ6VD2P9SGY166YWS0R2\\\"}\",\"extract a whole website, not just these URLs\":\"Call monid_discover with {\\\"query\\\":\\\"crawl an entire website to markdown\\\"}  # crawlers differ on depth limits and pricing\",\"find URLs worth fetching\":\"Call monid_inspect with {\\\"provider\\\":\\\"tinyfish\\\",\\\"endpoint\\\":\\\"/search\\\"}  # also free\",\"this page is blocked by anti-bot protection\":\"Call monid_inspect with {\\\"provider\\\":\\\"context.dev\\\",\\\"endpoint\\\":\\\"/web/scrape/markdown\\\"}  # bundles stealth and residential proxies\"}}"
+    }
+  ],
+  "structuredContent": {
+    "runId": "01M3ZVFQ6VD2P9SGY166YWS0R2",
+    "provider": "tinyfish",
+    "endpoint": "/fetch",
+    "status": "COMPLETED",
+    "output": {
+      "results": [
+        {
+          "url": "https://www.pioneerfund.vc/portfolio",
+          "final_url": "https://www.pioneerfund.vc/portfolio",
+          "title": "Portfolio - Pioneer Fund",
+          "description": "500+ YC alumni investing in the top YC startups.",
+          "language": "en",
+          "text": "# Companies we've backed",
+          "author": null,
+          "published_date": null,
+          "links": [],
+          "latency_ms": 8913.809409999885,
+          "format": "markdown"
+        }
+      ],
+      "errors": []
+    },
+    "providerResponse": {
+      "httpStatus": 200
+    },
+    "price": {
+      "type": "PER_CALL",
+      "amount": {
+        "value": 0,
+        "currency": "USD"
+      }
+    },
+    "billing": {
+      "reportedCost": {
+        "currency": "USD",
+        "value": 0,
+        "unit": "MICRO_DOLLAR"
+      }
+    },
+    "resultCount": 0,
+    "billedUnits": 0,
+    "createdAt": "2026-10-03T03:03:55.147Z",
+    "completedAt": "2026-10-03T03:04:05.083Z",
+    "hints": {
+      "retrieve the response later": "Call monid_get_run with {\"runId\":\"01M3ZVFQ6VD2P9SGY166YWS0R2\"}",
+      "extract a whole website, not just these URLs": "Call monid_discover with {\"query\":\"crawl an entire website to markdown\"}  # crawlers differ on depth limits and pricing",
+      "find URLs worth fetching": "Call monid_inspect with {\"provider\":\"tinyfish\",\"endpoint\":\"/search\"}  # also free",
+      "this page is blocked by anti-bot protection": "Call monid_inspect with {\"provider\":\"context.dev\",\"endpoint\":\"/web/scrape/markdown\"}  # bundles stealth and residential proxies"
+    }
+  },
+  "isError": false
+}

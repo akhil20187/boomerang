@@ -1,0 +1,53 @@
+{
+  "runId": "01M3ZTKR3V6NZ17WTQNPS8HE1E",
+  "provider": "tinyfish",
+  "endpoint": "/fetch",
+  "status": "COMPLETED",
+  "output": {
+    "results": [
+      {
+        "url": "https://rentahuman.ai/signs",
+        "final_url": "https://rentahuman.ai/signs",
+        "title": "rentahuman - AI Agents Hire Humans for Physical Tasks",
+        "description": "The marketplace where AI agents rent humans. MCP integration, REST API, flexible payments. Book humans for real-world tasks your AI can't do.",
+        "language": "en",
+        "text": "Pier 39peak visitor traffic\n\nUnion Squareweekend shopping crowds\n\nFisherman's Wharfpeak visitor traffic\n\nFerry Buildingfarmers market crowds\n\nPowell & Marketsteady all-day transit flow\n\nDolores Parkweekend crowds on the hill\n\nChinatown Gatepeak visitor traffic\n\nGG Park Bandshellfestival and museum crowds\n\nHaight & Ashburyweekend shopping crowds\n\nChase Centerarena and Thrive City crowds\n\n16th & Missionsteady all-day transit flow\n\nOracle Parkballpark crowds before first pitch\n\n24th & Missionsteady all-day transit flow\n\nHayes & Octaviaweekend shopping crowds\n\nCrissy Fieldweekend park crowds\n\nCivic Center Plazaplaza events and markets\n\nPowell & Market\n\n16th & Mission\n\nFerry Building\n\n3 × 5h × 3d\n\nrate\n\nHourly rate in dollars$/hr\n\n$20/hr min · pay more for better sign holders\n\nlabor45h$1,062\n\npickup9h$212.40\n\nprinting3 × 18″×24″$208.86\n\nprinted and paid by us, collected prepaid\n\ntotal\n\n$1,483.26\n\nincludes 18% platform fee\n\ntwo-day · from 2026-10-04\n\nfoot traffic· sat, busiest\n\nthe green shows how busy the streets are, darker is busier. pick a day to see its foot traffic at your hours.",
+        "author": "rentahuman",
+        "published_date": null,
+        "links": [
+          "https://rentahuman.ai/"
+        ],
+        "latency_ms": 798.3600359984848,
+        "format": "markdown"
+      }
+    ],
+    "errors": []
+  },
+  "providerResponse": {
+    "httpStatus": 200
+  },
+  "price": {
+    "type": "PER_CALL",
+    "amount": {
+      "value": 0,
+      "currency": "USD"
+    }
+  },
+  "billing": {
+    "reportedCost": {
+      "currency": "USD",
+      "value": 0,
+      "unit": "MICRO_DOLLAR"
+    }
+  },
+  "resultCount": 0,
+  "billedUnits": 0,
+  "createdAt": "2026-10-03T02:48:38.521Z",
+  "completedAt": "2026-10-03T02:48:40.549Z",
+  "hints": {
+    "retrieve the response later": "Call monid_get_run with {\"runId\":\"01M3ZTKR3V6NZ17WTQNPS8HE1E\"}",
+    "extract a whole website, not just these URLs": "Call monid_discover with {\"query\":\"crawl an entire website to markdown\"}  # crawlers differ on depth limits and pricing",
+    "find URLs worth fetching": "Call monid_inspect with {\"provider\":\"tinyfish\",\"endpoint\":\"/search\"}  # also free",
+    "this page is blocked by anti-bot protection": "Call monid_inspect with {\"provider\":\"context.dev\",\"endpoint\":\"/web/scrape/markdown\"}  # bundles stealth and residential proxies"
+  }
+}

@@ -1,0 +1,332 @@
+{
+  "note": "Fresh repeat of the original search; original raw response was not retained. This response is unfiltered and in Google order. API key redacted.",
+  "request": {
+    "method": "POST",
+    "url": "https://places.googleapis.com/v1/places:searchText",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": "[REDACTED]",
+      "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.location,places.nationalPhoneNumber,places.rating,places.userRatingCount,places.googleMapsUri,nextPageToken"
+    },
+    "body": {
+      "textQuery": "iPhone retailers",
+      "locationBias": {
+        "circle": {
+          "center": {
+            "latitude": 17.4899635,
+            "longitude": 78.4352235
+          },
+          "radius": 10000
+        }
+      },
+      "regionCode": "IN",
+      "languageCode": "en",
+      "pageSize": 20
+    }
+  },
+  "response": {
+    "places": [
+      {
+        "nationalPhoneNumber": "096183 40061",
+        "formattedAddress": "Phase 9, Road+Number 11, 5-1765, Vasanth Nagar, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085",
+        "location": {
+          "latitude": 17.4851871,
+          "longitude": 78.38134579999999
+        },
+        "rating": 4.5,
+        "googleMapsUri": "https://maps.google.com/?cid=16004415278429199860&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 500,
+        "displayName": {
+          "text": "Apple World",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "08071 963 941",
+        "formattedAddress": "Unit No L2/14/SF, Survey No, Lakeshore Mall, 414 to 418, IDA Kukatpally, Kukatpally, Hyderabad, Telangana 500072",
+        "location": {
+          "latitude": 17.476998899999998,
+          "longitude": 78.4239869
+        },
+        "rating": 4.8,
+        "googleMapsUri": "https://maps.google.com/?cid=5901838106281193308&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 475,
+        "displayName": {
+          "text": "Reliance Digital",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "080 4699 9888",
+        "formattedAddress": "UG 01, Nexus Mall, Upper Ground, opposite Starbucks, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085",
+        "location": {
+          "latitude": 17.484246,
+          "longitude": 78.3890048
+        },
+        "rating": 4.9,
+        "googleMapsUri": "https://maps.google.com/?cid=10915285000270412881&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 5157,
+        "displayName": {
+          "text": "iMagine (Apple Authorised Reseller)",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "040 4753 5555",
+        "formattedAddress": "5-1-64/3/1, 5-1-64/3/A and 5-1-64/3/B, opposite Metro Pillar Number 823, Shanthi Nagar, Kukatpally, Hyderabad, Telangana 500072",
+        "location": {
+          "latitude": 17.4825374,
+          "longitude": 78.41533
+        },
+        "rating": 4.9,
+        "googleMapsUri": "https://maps.google.com/?cid=1320450606619443949&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 1651,
+        "displayName": {
+          "text": "VIJAY SALES - KUKATPALLY",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "080 4495 3822",
+        "formattedAddress": "H No s. 5, 1-63/3 5-1-62/1, 5-1-63/4, 5-1-63, 5-1-64/1, opp. Reliance Digital, beside BJP office, Shanthi Nagar, Kukatpally, Hyderabad, Telangana 500072",
+        "location": {
+          "latitude": 17.4830899,
+          "longitude": 78.4142973
+        },
+        "rating": 4.4,
+        "googleMapsUri": "https://maps.google.com/?cid=8976621862295255194&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 813,
+        "displayName": {
+          "text": "Apple Premium Reseller - Aptronix - Kukatpally, Hyderabad",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "099590 53456",
+        "formattedAddress": "Shop No.2, 41/14/A, Kondapur 'X' Road, opp. RATNADEEP SUPER MARKET, Kondapur, Hanuman Nagar, Prashanth Nagar Colony, Gachibowli, Hyderabad, Telangana 500084",
+        "location": {
+          "latitude": 17.463977,
+          "longitude": 78.367166
+        },
+        "rating": 4,
+        "googleMapsUri": "https://maps.google.com/?cid=12832517891243973954&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 481,
+        "displayName": {
+          "text": "MI STORE APPLE MOBILES",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "088850 42378",
+        "formattedAddress": "UG Floor, Lulu Mall, JNTU - Hitech City Rd, Kukatpally Housing Board Colony, K P H B Phase 3, Kukatpally, Hyderabad, Telangana 500072",
+        "location": {
+          "latitude": 17.489929999999998,
+          "longitude": 78.3931018
+        },
+        "rating": 4.9,
+        "googleMapsUri": "https://maps.google.com/?cid=17131010321748716960&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 682,
+        "displayName": {
+          "text": "TRiBE by Croma - Apple Authorised Reseller",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "077807 08876",
+        "formattedAddress": "shop No.1,1St floor, in block 16, lig flats, 15-21-16/9, Kukatpally Housing Board Colony, 3rd phase, Kukatpally, Hyderabad, Telangana 500072",
+        "location": {
+          "latitude": 17.4876692,
+          "longitude": 78.39165720000001
+        },
+        "rating": 4.5,
+        "googleMapsUri": "https://maps.google.com/?cid=4927910362428285660&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 26,
+        "displayName": {
+          "text": "Apple Zone",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "073374 97772",
+        "formattedAddress": "Ground Floor Survey No, Plot no, 40 & 41, Road, near Jubilee Ridge Hotel, Guttala_Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500033",
+        "location": {
+          "latitude": 17.441757499999998,
+          "longitude": 78.39711969999999
+        },
+        "rating": 4.9,
+        "googleMapsUri": "https://maps.google.com/?cid=9706834177458416070&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 255,
+        "displayName": {
+          "text": "Accord Apple Store Madhapur | Apple Authorised Reseller",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "08071 889 683",
+        "formattedAddress": "Sy No 30, Ground &, 1st Floor, Adjeetpura Nagar, Idpl Colony, Indiragandhi Nagar, Balanagar, Hyderabad, Telangana 500037",
+        "location": {
+          "latitude": 17.482055499999998,
+          "longitude": 78.44876409999999
+        },
+        "rating": 4.7,
+        "googleMapsUri": "https://maps.google.com/?cid=9917852666496770042&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 2387,
+        "displayName": {
+          "text": "Reliance Digital - Balanagar",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "087126 12144",
+        "formattedAddress": "No 22261/262, Sy No 166, Gr & 1st Floor, PN 6A & 6B, near Vivekananda Nagar Colony, A.S.Raju Nagar, Vivekananda Nagar, Kukatpally, Hyderabad, Telangana 500072",
+        "location": {
+          "latitude": 17.4920601,
+          "longitude": 78.4065205
+        },
+        "rating": 4.7,
+        "googleMapsUri": "https://maps.google.com/?cid=17943840884832820652&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 3926,
+        "displayName": {
+          "text": "VIJAY SALES - KUKATPALLY (VIVEKANANDA NAGAR)",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "089789 99773",
+        "formattedAddress": "Near Chintal CMR shopping mall Hyderabad, Chinthal, Telangana 500055, FFV2+PR9, Dee Nagar, Quthbullapur, Hyderabad, Telangana 500054",
+        "location": {
+          "latitude": 17.4942586,
+          "longitude": 78.4521455
+        },
+        "rating": 4.8,
+        "googleMapsUri": "https://maps.google.com/?cid=12133115776855318790&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 7172,
+        "displayName": {
+          "text": "Pai International - Chintal",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "080 4495 3820",
+        "formattedAddress": "Ground Floor, Ravi Complex, No. 3, Gachibowli - Miyapur Rd, Hanuman Nagar, Kothaguda, Hyderabad, Telangana 500084",
+        "location": {
+          "latitude": 17.4628348,
+          "longitude": 78.36728910000001
+        },
+        "rating": 4,
+        "googleMapsUri": "https://maps.google.com/?cid=4356374936713796087&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 594,
+        "displayName": {
+          "text": "Apple Authorised Reseller - Aptronix, Kondapur, Hyderabad",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "073966 73462",
+        "formattedAddress": "No 5/1/63, NH 65, near BJP Office, Shanthi Nagar, Kukatpally, Hyderabad, Telangana 500072",
+        "location": {
+          "latitude": 17.4830248,
+          "longitude": 78.4145257
+        },
+        "rating": 4.1,
+        "googleMapsUri": "https://maps.google.com/?cid=15799616286655866336&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 4157,
+        "displayName": {
+          "text": "Croma - Kukatpally",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "08071 889 813",
+        "formattedAddress": "H No 6/11, Vijay Sai Towers, opposite BJP Office, Vivek Nagar, Kukatpally, Hyderabad, Telangana 500072",
+        "location": {
+          "latitude": 17.4819122,
+          "longitude": 78.4144353
+        },
+        "rating": 3.9,
+        "googleMapsUri": "https://maps.google.com/?cid=12528858721011079553&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 5174,
+        "displayName": {
+          "text": "Reliance Digital - Kukatpally",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "080 4495 3816",
+        "formattedAddress": "G-2, White House, No. 6-3-1192/13, Begumpet Rd, Kundanbagh Colony, Begumpet, Hyderabad, Telangana 500016",
+        "location": {
+          "latitude": 17.435965799999998,
+          "longitude": 78.4562696
+        },
+        "rating": 4.2,
+        "googleMapsUri": "https://maps.google.com/?cid=3426835607475410876&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 1867,
+        "displayName": {
+          "text": "Aptronix - Apple Premium Partner & Authorised Service Provider - Begumpet",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "08071 889 968",
+        "formattedAddress": "Sy No 1009, LGF, Nexus Hyderabad Mall, beside Spar Hyper Market, Kukatpally Housing Board Colony, K P H B Phase 9, Balanagar, Hyderabad, Telangana 500085",
+        "location": {
+          "latitude": 17.4842861,
+          "longitude": 78.3888917
+        },
+        "rating": 4.7,
+        "googleMapsUri": "https://maps.google.com/?cid=17575054069720865949&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 1479,
+        "displayName": {
+          "text": "Reliance Digital - KPHB",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "080 4495 3824",
+        "formattedAddress": "R.P. Business Park, Old Mumbai Hwy, beside Max, Al-Hamra Colony, AP Animal Husbandry Employees Colony, Shaikpet, Hyderabad, Telangana 500104",
+        "location": {
+          "latitude": 17.4095616,
+          "longitude": 78.3984299
+        },
+        "rating": 4.4,
+        "googleMapsUri": "https://maps.google.com/?cid=4433733374359212188&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 476,
+        "displayName": {
+          "text": "Apple Authorised Reseller - Aptronix, Shaikpet, Hyderabad",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "099590 53456",
+        "formattedAddress": "Shop No2,Piller No 42, Piller No 42, X road, Kondapur, Hanuman Nagar, Prashanth Nagar Colony, Gachibowli, Hyderabad, Telangana 500084",
+        "location": {
+          "latitude": 17.4638855,
+          "longitude": 78.36701579999999
+        },
+        "rating": 4.9,
+        "googleMapsUri": "https://maps.google.com/?cid=6733601740667402352&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 20,
+        "displayName": {
+          "text": "Apple Mobiles",
+          "languageCode": "en"
+        }
+      },
+      {
+        "nationalPhoneNumber": "080 4495 3893",
+        "formattedAddress": "No. G1, Inorbit Mall, 07/64, Inorbit Mall Driveway, Cyberabad, Madhapur, Hyderabad, Telangana 500081",
+        "location": {
+          "latitude": 17.434212499999997,
+          "longitude": 78.3864818
+        },
+        "rating": 4.1,
+        "googleMapsUri": "https://maps.google.com/?cid=9850553684050813459&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "userRatingCount": 1436,
+        "displayName": {
+          "text": "Aptronix - Apple Premium Partner, Inorbit Mall, Hyderabad",
+          "languageCode": "en"
+        }
+      }
+    ],
+    "nextPageToken": "Aa-ngMb9LQEBGsRQ0ttB-Nb5NXO5S6LiBpQaDdeWoJpQykoTp2EnhSTBUH00RxenJ69j_de7wBmrco0GCbYjSil9HwGFY3GhftwEuEdmW8ZDuRNdlPl0mkmwR_Kil9JFXUY_dTaaGv-UfH145gI-N99EISu_oovxiKg5EWWft_NaAzKMURpnC-gRHvmJNb60Vm2utnaAHGQ4vLh8n7IPXwPw4SF0oFkjP4oU0lmpyUTxqxOIRWvCCRKSj0Yy-58wuYAmCmeqXq0n2p37YqEjiei5z6-Yx75tC-2AiMMLOFsJ80YoLzg3khMoDPmcX94CKWR0j-eS6aJjFWRKg4PRCXH0OyaKHUYeQrgRU-5LBJNeE1KAXdjgV2yh2Eux_9j6u0MOzprL500BctkC2Ze6AI5Had6JRRh0XYGzCn4pgTpCMJG0mJTpQLKwdC2to3N00h59ocVGmO7E5ONkq7xyqZwvC1wjUyl3Lrz4D-CfCnvO6IJJyYOOyqsCFIpIDVta0qS2S5-9sYxxIAOu0oKGYRoEZ0E777ks3Vz2Wyd734W4A-Me2MToPzM_mg_Ok-oJNBJC7saxO0D3lN_H-bqkfYehBfTBvPx1KAp-hZhworZp8PfT97otoStZwoV3SZ0TngFiQ9Ninv-5NxsRcmQ5wSgMDaHdMx9K7oO9lfhvN6JAdGxtuIXO9iaLkdhivNxQE-MJ50Smj5LYK6BZ-zZGwhoqKW7P0w9vfkAzs3pnP_U6nZqVMlRkrlD9EEL-LSLCp0y0dEGwG21m-kT_GQhxcqqAejIyqHNvmixzwuuudxgWgPO16-iG6jLl0AOJbt2iJMHCy5bqrVpHMyI"
+  }
+}

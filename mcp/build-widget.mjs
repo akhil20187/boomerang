@@ -29,8 +29,19 @@ const setup=setupSource
  .replace('Leave the sign-in settings as Claude shows them, then select <strong>Add</strong>.','Keep sign-in enabled. Under <strong>OAuth client</strong>, choose <strong>Register automatically</strong>, then select <strong>Add</strong>.')
  .replace('https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp','https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp')
  .replace('A product link works too, from Amazon, Flipkart or any shop.','Paste an Amazon product link, or describe the product, model and colour. If we cannot read a link, use a description.');
-const previewNotice='<p style="margin:0;padding:14px 20px;font:14px/1.5 system-ui,sans-serif;color:#1a1a19;background:#fff;text-align:center">Preview: shop search and the connection server are available for testing. Shop calling remains disabled. <a href="/">Search shops</a> · <a href="/demo">Try the demo</a></p>';
+const previewNotice='<p style="margin:0;padding:14px 20px;font:14px/1.5 system-ui,sans-serif;color:#1a1a19;background:#fff;text-align:center">Preview: shop search and the connection server are available for testing. Shop calling remains disabled. <a href="/app">Search shops</a> · <a href="/demo">Try the demo</a></p>';
 const setupHtml=`<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width, initial-scale=1">${setup.slice(0,styleEnd)}</head><body>${previewNotice}${setup.slice(styleEnd)}</body></html>`;
 await fs.writeFile(path.join(directory,'setup.html'),setupHtml);
 await fs.copyFile(path.resolve('design/pages/phone-lavender.webp'),path.join(directory,'phone-lavender.webp'));
 console.log('Built approved setup guide; connection availability notice retained.');
+
+// Publish the approved landing story as the home page (served at "/" by convex/http.ts).
+const landingSource=await fs.readFile(path.resolve('design/pages/landing-story.html'),'utf8');
+const landingStyleEnd=landingSource.indexOf('</style>')+'</style>'.length;
+if(landingStyleEnd<'</style>'.length)throw new Error('Landing page style boundary is missing.');
+const landing=landingSource
+ .replace('<title>Human MCP Landing Story</title>','<title>Human MCP · We call shops for you</title>')
+ .replaceAll('https://little-kangaroo-718.convex.site/account','/account')
+ .replace('https://little-kangaroo-718.convex.site/mcp',new URL('/mcp',publicSite).href);
+await fs.writeFile(path.join(directory,'landing.html'),`<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width, initial-scale=1">${landing.slice(0,landingStyleEnd)}</head><body>${landing.slice(landingStyleEnd)}</body></html>`);
+console.log('Built landing page.');

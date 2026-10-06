@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shop list</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1A1A19}a:hover{color:#55544F}
+button{font:inherit;color:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1A1A19">
+<div style="height: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; border-bottom: 1px solid #EFEDE8">
+<button type="button" aria-label="Menu" style="width: 44px; height: 44px; border: 0; background: transparent; display: grid; place-items: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg></button>
+<span style="font-size: 15px; font-weight: 500">New chat</span>
+<button type="button" aria-label="New chat" style="width: 44px; height: 44px; border: 0; background: transparent; display: grid; place-items: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></button>
+</div>
+<div style="flex: 1; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+<div style="align-self: flex-end; max-width: 80%; background: #F2F1EE; border-radius: 20px; padding: 10px 14px; font-size: 15px; line-height: 21px">Need this today near 500037<br>amazon.in/dp/B0F…</div>
+<p style="margin: 0; font-size: 15px; line-height: 22px">Here’s what I found near 500037.</p>
+<section aria-label="Shops to call" style="border: 1px solid #DAD7D0; border-radius: 8px; overflow: hidden; background: #FFFFFF; box-shadow: none">
+<div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px">
+<div role="img" aria-label="Product photo: iPhone 17 in lavender" style="width: 72px; height: 72px; flex-shrink: 0; border-radius: 8px; background: #F4F2F8; display: grid; place-items: center; overflow: hidden"><svg width="64" height="76" viewBox="0 0 64 76" fill="none"><rect x="14" y="2" width="36" height="72" rx="8" fill="#CFC4E6" stroke="#B3A5D3" stroke-width="1.5"></rect><rect x="18" y="7" width="17" height="21" rx="6" fill="#BDB0DA"></rect><circle cx="23" cy="13" r="3.4" fill="#2E2A38"></circle><circle cx="23" cy="22" r="3.4" fill="#2E2A38"></circle><circle cx="30.5" cy="17.5" r="1.4" fill="#F4F2F8"></circle><path d="M29 46c0-2.6 2-3.6 2.1-3.7-1.2-1.7-3-1.9-3.6-1.9-1.5-.2-3 .9-3.7.9-.8 0-2-.9-3.2-.8-1.6 0-3.2 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.5 0 1.9.8 3.2.8 1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.4-1-2.4-3.9z" fill="#B3A5D3" transform="translate(9 0)"></path></svg></div>
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+<span style="font-size: 16px; font-weight: 600; line-height: 21px">5 shops near 500037 may have your iPhone 17</span>
+<span style="font-size: 13px; line-height: 18px; color: #6B6A66">Pick the shops. Our AI calls them for stock and the final price after offers.</span>
+<span style="font-size: 12px; color: #6B6A66">256GB · Lavender · ₹79,900 on Amazon</span>
+</div>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; padding: 10px 16px 6px; border-top: 1px solid #EFEDE8">
+<span style="font-size: 13px; font-weight: 600">5 shops</span>
+<span style="font-size: 12px; color: #6B6A66">Highest rated · 50+ Google ratings</span>
+</div>
+<div style="display: flex; flex-direction: column; padding: 0 6px">
+<sc-for list="{{stores}}" as="item" hint-placeholder-count="5">
+<button type="button" aria-pressed="{{item.selected}}" onClick="{{item.toggle}}" style="display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 10px; border: 0; border-radius: 6px; text-align: left; background: {{item.rowBg}}">
+<span style="width: 22px; height: 22px; flex-shrink: 0; box-sizing: border-box; border-radius: 4px; border: 1.5px solid {{item.boxBorder}}; background: {{item.boxBg}}; display: grid; place-items: center; color: #FFFFFF">
+<sc-if value="{{item.selected}}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7"></path></svg></sc-if>
+</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 15px; font-weight: 500">{{item.name}} · {{item.area}}</span>
+<span style="font-size: 13px; color: {{item.metaColor}}">{{item.dist}} · {{item.hours}}</span>
+</span>
+<span style="font-size: 13px; font-weight: 500; color: #1A1A19">★ {{item.rating}} <span style="font-weight: 400; color: #6B6A66">({{item.reviews}})</span></span>
+</button>
+</sc-for>
+</div>
+<div style="padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 8px">
+<button type="button" style="height: 48px; border: 0; border-radius: 8px; background: {{btnBg}}; color: #FFFFFF; font-size: 15px; font-weight: 600">{{startLabel}}</button>
+<span style="font-size: 12px; line-height: 16px; color: #6B6A66; text-align: center">Calls use your account credit. A listing doesn't confirm stock.</span>
+</div>
+</section>
+</div>
+<div style="flex-shrink: 0; padding: 8px 16px 16px">
+<div style="height: 48px; border: 1px solid #E7E5E0; border-radius: 24px; display: flex; align-items: center; padding: 0 18px; font-size: 15px; color: #6B6A66">Ask anything</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#1A1A19","options":["#1F6F4A","#2B4FD8","#1A1A19","#B4532A"]},"$preview":{"width":390,"height":844}}'>
+const STORES = [
+  { id: 'apt', name: 'Aptronix', area: 'Kukatpally', dist: '3.8 km', rating: '4.6', reviews: '1,240', hours: 'Open · closes 9:30 pm', known: true },
+  { id: 'vsk', name: 'Vijay Sales', area: 'Kukatpally', dist: '4.1 km', rating: '4.4', reviews: '3,105', hours: 'Open · closes 10 pm', known: true },
+  { id: 'vsv', name: 'Vijay Sales', area: 'Vivekananda Ngr', dist: '5.0 km', rating: '4.3', reviews: '860', hours: 'Open · closes 9:30 pm', known: true },
+  { id: 'rd', name: 'Reliance Digital', area: 'Kukatpally', dist: '4.0 km', rating: '4.2', reviews: '2,410', hours: 'Open · closes 10 pm', known: true },
+  { id: 'cro', name: 'Croma', area: 'Kukatpally', dist: '4.6 km', rating: '4.1', reviews: '1,870', hours: 'Hours unknown', known: false }
+];
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: { apt: true, vsk: true } };
+  }
+  toggle(id) {
+    const sel = Object.assign({}, this.state.sel);
+    sel[id] = !sel[id];
+    this.setState({ sel: sel });
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#1A1A19';
+    const sel = this.state.sel;
+    const stores = STORES.map((s) => {
+      const on = !!sel[s.id];
+      return Object.assign({}, s, {
+        selected: on,
+        toggle: () => this.toggle(s.id),
+        rowBg: on ? '#F5F4F1' : '#FFFFFF',
+        boxBg: on ? accent : '#FFFFFF',
+        boxBorder: on ? accent : '#A8A59D',
+        metaColor: s.known ? '#6B6A66' : '#7A4A00'
+      });
+    });
+    const n = stores.filter((s) => s.selected).length;
+    return {
+      accent: accent,
+      stores: stores,
+      startLabel: n ? 'Call ' + n + (n === 1 ? ' shop' : ' shops') : 'Pick shops to call',
+      btnBg: n ? accent : '#8F8C85'
+    };
+  }
+}
+</script>
+</body>
+</html>

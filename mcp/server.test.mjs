@@ -32,7 +32,7 @@ test('assistant discovers tools, renders resource and reads saved task through M
   try {
     const list=await client.listTools();assert.equal(list.tools.length,5);
     assert.equal(list.tools.find(t=>t.name==='start_calls').annotations.readOnlyHint,false);
-    const resource=await client.readResource({uri:'ui://human-mcp/shops-v2.html'});
+    const resource=await client.readResource({uri:'ui://human-mcp/shops-v3.html'});
     assert.match(resource.contents[0].text,/Shops/);
     const result=await client.callTool({name:'task_status',arguments:{taskId:'task1'}});
     assert.equal(result.structuredContent.task.status,'finished');

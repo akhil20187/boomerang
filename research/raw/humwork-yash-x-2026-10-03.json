@@ -1,0 +1,2081 @@
+{
+  "runId": "01M3ZV7M9HKMSP1ZWCYT5SSCS8",
+  "caller": "USER#user_3IXuwaK4rfU1sJRo3ZyjD67zD4s",
+  "owner": "user_3IXuwaK4rfU1sJRo3ZyjD67zD4s",
+  "provider": "tikhub",
+  "providerName": "TikHub",
+  "endpoint": "/api/v1/twitter/web/fetch_user_post_tweet",
+  "status": "COMPLETED",
+  "input": {
+    "queryParams": {
+      "screen_name": "theyashgoenka"
+    }
+  },
+  "providerResponse": {
+    "httpStatus": 200
+  },
+  "price": {
+    "type": "PER_CALL",
+    "amount": {
+      "value": 0.0015,
+      "currency": "USD"
+    }
+  },
+  "cost": {
+    "value": 0.0015,
+    "currency": "USD"
+  },
+  "resultCount": 1,
+  "billedUnits": 1,
+  "createdAt": "2026-10-03T02:59:29.969Z",
+  "startedAt": "2026-10-03T02:59:30.138Z",
+  "completedAt": "2026-10-03T02:59:32.556Z",
+  "hints": {
+    "retrieve the response later": "Call monid_get_run with {\"runId\":\"01M3ZV7M9HKMSP1ZWCYT5SSCS8\"}"
+  },
+  "output": {
+    "timeline": [
+      {
+        "tweet_id": "2047507306473222490",
+        "bookmarks": 0,
+        "created_at": "Fri Apr 24 02:45:57 +0000 2026",
+        "favorites": 11,
+        "text": "this is sick lol, thanks for the mention https://t.co/uYyGD6tZo1",
+        "lang": "en",
+        "sensitive": false,
+        "source": null,
+        "views": "503",
+        "quotes": 0,
+        "entities": [],
+        "replies": 1,
+        "retweets": 0,
+        "conversation_id": "2047507306473222490",
+        "media": {
+          "photo": [
+            {
+              "media_url_https": "https://pbs.twimg.com/media/HGovOKUaIAAR4l4.jpg",
+              "id": "2047500900927938560",
+              "sizes": {
+                "h": 681,
+                "w": 1200
+              }
+            }
+          ]
+        },
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        },
+        "quoted": {
+          "tweet_id": "2047113267068248156",
+          "bookmarks": 1711,
+          "created_at": "Thu Apr 23 00:40:11 +0000 2026",
+          "favorites": 5196,
+          "text": "last week in tech was based. https://t.co/N49xfobL4c",
+          "lang": "en",
+          "views": "1263606",
+          "sensitive": false,
+          "quotes": 195,
+          "replies": 151,
+          "retweets": 443,
+          "conversation_id": "2047113267068248156",
+          "author": {
+            "rest_id": "1972725253257482240",
+            "name": "Silicon Mania",
+            "screen_name": "siliconmania",
+            "avatar": "https://pbs.twimg.com/profile_images/2068169926725234688/KbNcpRLh_normal.jpg",
+            "followers_count": 23774,
+            "blue_verified": false
+          },
+          "media": {
+            "video": [
+              {
+                "media_url_https": "https://pbs.twimg.com/amplify_video_thumb/2047112258229030912/img/dUZ0livb1sT-4QRi.jpg",
+                "variants": [
+                  {
+                    "content_type": "application/x-mpegURL",
+                    "url": "https://video.twimg.com/amplify_video/2047112258229030912/pl/WfVpKttUUSCTukak.m3u8?tag=21&v=678"
+                  },
+                  {
+                    "bitrate": 256000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2047112258229030912/vid/avc1/476x270/81BUMR0idWP1yGvY.mp4?tag=21"
+                  },
+                  {
+                    "bitrate": 832000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2047112258229030912/vid/avc1/634x360/m9uqpG8JZafe24Pe.mp4?tag=21"
+                  },
+                  {
+                    "bitrate": 2176000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2047112258229030912/vid/avc1/1270x720/HdviVJfyBU4wjh9-.mp4?tag=21"
+                  },
+                  {
+                    "bitrate": 10368000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2047112258229030912/vid/avc1/1906x1080/ouWZOU2LvRl8z0lo.mp4?tag=21"
+                  }
+                ],
+                "aspect_ratio": [
+                  953,
+                  540
+                ],
+                "duration": 49800,
+                "original_info": {
+                  "focus_rects": [],
+                  "height": 1080,
+                  "width": 1906
+                },
+                "id": "2047112258229030912"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "tweet_id": "2044502423717511396",
+        "bookmarks": 4,
+        "created_at": "Wed Apr 15 19:45:37 +0000 2026",
+        "favorites": 43,
+        "text": "We just launched and I just got paid to solve a quick MercadoLibre API problem that an AI agent couldn't figure out\n\n5 minutes of work. earned ~$7.\n\nthis IS the future lol https://t.co/CQI72smVRM",
+        "lang": "en",
+        "sensitive": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": "4626",
+        "quotes": 0,
+        "entities": [],
+        "replies": 15,
+        "retweets": 1,
+        "conversation_id": "2044502423717511396",
+        "media": {
+          "photo": [
+            {
+              "media_url_https": "https://pbs.twimg.com/media/HF-H2haacAANLOR.jpg",
+              "id": "2044502126601334784",
+              "sizes": {
+                "h": 988,
+                "w": 1200
+              }
+            }
+          ]
+        },
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        },
+        "quoted": {
+          "tweet_id": "2044445649538809985",
+          "bookmarks": 1480,
+          "created_at": "Wed Apr 15 16:00:01 +0000 2026",
+          "favorites": 2185,
+          "text": "AI agents will pay you to chat with them.\n\nWhen AI agents hit a wall, Humwork's (@humworkai) MCP server connects them to a verified domain expert in 30 seconds. Their experts include senior engineers, marketers, designers, and more.\n\nCongrats on the launch, @theyashgoenka and https://t.co/aAImHZ2pdx",
+          "lang": "en",
+          "views": "1788125",
+          "sensitive": false,
+          "quotes": 320,
+          "replies": 354,
+          "retweets": 243,
+          "conversation_id": "2044445649538809985",
+          "author": {
+            "rest_id": "113130846",
+            "name": "Y Combinator",
+            "screen_name": "ycombinator",
+            "avatar": "https://pbs.twimg.com/profile_images/1623777064821358592/9CApQWXe_normal.png",
+            "followers_count": 1654493,
+            "blue_verified": true
+          },
+          "media": {
+            "video": [
+              {
+                "media_url_https": "https://pbs.twimg.com/amplify_video_thumb/2044440397632720896/img/1ohBDRQK4V7_HzgV.jpg",
+                "variants": [
+                  {
+                    "content_type": "application/x-mpegURL",
+                    "url": "https://video.twimg.com/amplify_video/2044440397632720896/pl/9oW3F06-77rZ81r6.m3u8?tag=21&v=90a"
+                  },
+                  {
+                    "bitrate": 256000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/480x270/1bSQrQb7OTK9YYZR.mp4?tag=21"
+                  },
+                  {
+                    "bitrate": 832000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/640x360/yC3tEAibm5oNqZPg.mp4?tag=21"
+                  },
+                  {
+                    "bitrate": 2176000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/1280x720/HeTKDDZLr2d-Vonk.mp4?tag=21"
+                  },
+                  {
+                    "bitrate": 10368000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/1920x1080/1d3vL_YrHvlFqiJt.mp4?tag=21"
+                  },
+                  {
+                    "bitrate": 25128000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/3840x2160/Qn6YSufl59nEiKey.mp4?tag=21"
+                  }
+                ],
+                "aspect_ratio": [
+                  16,
+                  9
+                ],
+                "duration": 85780,
+                "original_info": {
+                  "focus_rects": [],
+                  "height": 2160,
+                  "width": 3840
+                },
+                "id": "2044440397632720896"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "tweet_id": "2044449048019845620",
+        "bookmarks": 0,
+        "created_at": "Wed Apr 15 16:13:31 +0000 2026",
+        "favorites": 0,
+        "text": "RT @ycombinator: AI agents will pay you to chat with them.\n\nWhen AI agents hit a wall, Humwork's (@humworkai) MCP server connects them to a…",
+        "lang": "en",
+        "sensitive": null,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "113130846",
+              "name": "Y Combinator",
+              "screen_name": "ycombinator"
+            },
+            {
+              "id_str": "2044073219104063488",
+              "name": "Humwork",
+              "screen_name": "humworkai"
+            }
+          ]
+        },
+        "replies": 0,
+        "retweets": 243,
+        "conversation_id": "2044449048019845620",
+        "media": [],
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        },
+        "retweeted": {
+          "id": "2044445649538809985"
+        },
+        "retweeted_tweet": {
+          "tweet_id": "2044445649538809985",
+          "bookmarks": 1480,
+          "created_at": "Wed Apr 15 16:00:01 +0000 2026",
+          "favorites": 2185,
+          "text": "AI agents will pay you to chat with them.\n\nWhen AI agents hit a wall, Humwork's (@humworkai) MCP server connects them to a verified domain expert in 30 seconds. Their experts include senior engineers, marketers, designers, and more.\n\nCongrats on the launch, @theyashgoenka and @OneRohanDatta!\n\nhttps://t.co/HTb5KrjpAi",
+          "lang": "en",
+          "sensitive": false,
+          "views": "1788125",
+          "quotes": 320,
+          "entities": {
+            "media": [
+              {
+                "additional_media_info": {
+                  "monetizable": false
+                },
+                "display_url": "pic.x.com/aAImHZ2pdx",
+                "expanded_url": "https://x.com/ycombinator/status/2044445649538809985/video/1",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "id_str": "2044440397632720896",
+                "indices": [
+                  277,
+                  300
+                ],
+                "media_key": "13_2044440397632720896",
+                "media_results": {
+                  "result": {
+                    "media_key": "13_2044440397632720896"
+                  }
+                },
+                "media_url_https": "https://pbs.twimg.com/amplify_video_thumb/2044440397632720896/img/1ohBDRQK4V7_HzgV.jpg",
+                "original_info": {
+                  "focus_rects": [],
+                  "height": 2160,
+                  "width": 3840
+                },
+                "sizes": {
+                  "large": {
+                    "h": 1152,
+                    "resize": "fit",
+                    "w": 2048
+                  },
+                  "medium": {
+                    "h": 675,
+                    "resize": "fit",
+                    "w": 1200
+                  },
+                  "small": {
+                    "h": 383,
+                    "resize": "fit",
+                    "w": 680
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "resize": "crop",
+                    "w": 150
+                  }
+                },
+                "type": "video",
+                "url": "https://t.co/aAImHZ2pdx",
+                "video_info": {
+                  "aspect_ratio": [
+                    16,
+                    9
+                  ],
+                  "duration_millis": 85780,
+                  "variants": [
+                    {
+                      "content_type": "application/x-mpegURL",
+                      "url": "https://video.twimg.com/amplify_video/2044440397632720896/pl/9oW3F06-77rZ81r6.m3u8?tag=21&v=90a"
+                    },
+                    {
+                      "bitrate": 256000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/480x270/1bSQrQb7OTK9YYZR.mp4?tag=21"
+                    },
+                    {
+                      "bitrate": 832000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/640x360/yC3tEAibm5oNqZPg.mp4?tag=21"
+                    },
+                    {
+                      "bitrate": 2176000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/1280x720/HeTKDDZLr2d-Vonk.mp4?tag=21"
+                    },
+                    {
+                      "bitrate": 10368000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/1920x1080/1d3vL_YrHvlFqiJt.mp4?tag=21"
+                    },
+                    {
+                      "bitrate": 25128000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/3840x2160/Qn6YSufl59nEiKey.mp4?tag=21"
+                    }
+                  ]
+                }
+              }
+            ],
+            "user_mentions": [
+              {
+                "id_str": "2044073219104063488",
+                "indices": [
+                  81,
+                  91
+                ],
+                "name": "Humwork",
+                "screen_name": "humworkai"
+              },
+              {
+                "id_str": "1710390259",
+                "indices": [
+                  258,
+                  272
+                ],
+                "name": "Yash Goenka",
+                "screen_name": "theyashgoenka"
+              }
+            ]
+          },
+          "replies": 354,
+          "retweets": 243,
+          "conversation_id": "2044445649538809985",
+          "author": {
+            "rest_id": "113130846",
+            "name": "Y Combinator",
+            "screen_name": "ycombinator",
+            "avatar": "https://pbs.twimg.com/profile_images/1623777064821358592/9CApQWXe_normal.png",
+            "blue_verified": true
+          },
+          "media": {
+            "video": [
+              {
+                "media_url_https": "https://pbs.twimg.com/amplify_video_thumb/2044440397632720896/img/1ohBDRQK4V7_HzgV.jpg",
+                "variants": [
+                  {
+                    "content_type": "application/x-mpegURL",
+                    "url": "https://video.twimg.com/amplify_video/2044440397632720896/pl/9oW3F06-77rZ81r6.m3u8?tag=21&v=90a"
+                  },
+                  {
+                    "bitrate": 256000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/480x270/1bSQrQb7OTK9YYZR.mp4?tag=21"
+                  },
+                  {
+                    "bitrate": 832000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/640x360/yC3tEAibm5oNqZPg.mp4?tag=21"
+                  },
+                  {
+                    "bitrate": 2176000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/1280x720/HeTKDDZLr2d-Vonk.mp4?tag=21"
+                  },
+                  {
+                    "bitrate": 10368000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/1920x1080/1d3vL_YrHvlFqiJt.mp4?tag=21"
+                  },
+                  {
+                    "bitrate": 25128000,
+                    "content_type": "video/mp4",
+                    "url": "https://video.twimg.com/amplify_video/2044440397632720896/vid/avc1/3840x2160/Qn6YSufl59nEiKey.mp4?tag=21"
+                  }
+                ],
+                "aspect_ratio": [
+                  16,
+                  9
+                ],
+                "duration": 85780,
+                "original_info": {
+                  "focus_rects": [],
+                  "height": 2160,
+                  "width": 3840
+                },
+                "id": "2044440397632720896"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "tweet_id": "2029808926875865456",
+        "bookmarks": 0,
+        "created_at": "Fri Mar 06 06:38:54 +0000 2026",
+        "favorites": 8,
+        "text": "My least favorite AI UX pattern is when the app quietly switches me from the good model to the cheaper one and hopes I won’t notice.",
+        "lang": "en",
+        "sensitive": null,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": "822",
+        "quotes": 0,
+        "entities": [],
+        "replies": 0,
+        "retweets": 1,
+        "conversation_id": "2029808926875865456",
+        "media": [],
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        }
+      },
+      {
+        "tweet_id": "1626294182196420608",
+        "bookmarks": 10,
+        "created_at": "Thu Feb 16 18:55:22 +0000 2023",
+        "favorites": 39,
+        "text": "Tony Stark's JARVIS is now yours! 🤖\n\nIntroducing @JarvysAI - a work assistant powered by @OpenAI \n\nThe next era of computing - natural language interfaces that let you automate your computer using words.\n\nSign up: https://t.co/BQvnxLG3ho\nMore demos bellow. ⬇️ (1/4)\n#ChatGPT https://t.co/5xLulnaIgl",
+        "lang": "en",
+        "views": "5982",
+        "sensitive": false,
+        "quotes": 1,
+        "replies": 7,
+        "retweets": 22,
+        "conversation_id": "1626294182196420608",
+        "media": {
+          "video": [
+            {
+              "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1626272414731763712/pu/img/eF0aIC_JbVkoSCBt.jpg",
+              "variants": [
+                {
+                  "content_type": "application/x-mpegURL",
+                  "url": "https://video.twimg.com/ext_tw_video/1626272414731763712/pu/pl/TkYOA-V3m9n6I8BK.m3u8?tag=14"
+                },
+                {
+                  "bitrate": 432000,
+                  "content_type": "video/mp4",
+                  "url": "https://video.twimg.com/ext_tw_video/1626272414731763712/pu/vid/320x320/fgDScpU5rEylh2Ao.mp4?tag=14"
+                },
+                {
+                  "bitrate": 832000,
+                  "content_type": "video/mp4",
+                  "url": "https://video.twimg.com/ext_tw_video/1626272414731763712/pu/vid/540x540/Y8FqEImsJofjBUw1.mp4?tag=14"
+                },
+                {
+                  "bitrate": 1280000,
+                  "content_type": "video/mp4",
+                  "url": "https://video.twimg.com/ext_tw_video/1626272414731763712/pu/vid/720x720/iwQFaNzJLMpRk0jr.mp4?tag=14"
+                },
+                {
+                  "bitrate": 8768000,
+                  "content_type": "video/mp4",
+                  "url": "https://video.twimg.com/ext_tw_video/1626272414731763712/pu/vid/1080x1080/Bd3U2pEJHvASBgrp.mp4?tag=14"
+                }
+              ],
+              "aspect_ratio": [
+                1,
+                1
+              ],
+              "duration": 41883,
+              "original_info": {
+                "focus_rects": [],
+                "height": 1080,
+                "width": 1080
+              },
+              "id": "1626272414731763712"
+            }
+          ]
+        },
+        "entities": {
+          "hashtags": [
+            {
+              "text": "ChatGPT"
+            }
+          ],
+          "urls": [
+            {
+              "display_url": "Jarvys.ai",
+              "expanded_url": "http://Jarvys.ai",
+              "url": "https://t.co/BQvnxLG3ho"
+            }
+          ],
+          "user_mentions": [
+            {
+              "id_str": "1623448499609309184",
+              "name": "Jarvys",
+              "screen_name": "JarvysAI"
+            },
+            {
+              "id_str": "4398626122",
+              "name": "OpenAI",
+              "screen_name": "OpenAI"
+            }
+          ]
+        },
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        }
+      },
+      {
+        "tweet_id": "1626294184629129216",
+        "bookmarks": 3,
+        "created_at": "Thu Feb 16 18:55:23 +0000 2023",
+        "favorites": 7,
+        "text": "Jarvys is powered by GPT-3.5 - the same model behind ChatGPT.\n\nJarvys parses your webpage and performs actions like clicking and typing to reach your goal.\n\nBellow, Jarvys starts from Google in order to find an apartment to rent. (3/4) https://t.co/Z9g29BWh6k",
+        "lang": "en",
+        "views": "809",
+        "sensitive": false,
+        "quotes": 0,
+        "replies": 2,
+        "retweets": 1,
+        "conversation_id": "1626294182196420608",
+        "media": {
+          "video": [
+            {
+              "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1626280183673278464/pu/img/wZpJDhhOQbcG1xJ_.jpg",
+              "variants": [
+                {
+                  "content_type": "application/x-mpegURL",
+                  "url": "https://video.twimg.com/ext_tw_video/1626280183673278464/pu/pl/jLzTa5wMDxe4Hdqr.m3u8?tag=14"
+                },
+                {
+                  "bitrate": 432000,
+                  "content_type": "video/mp4",
+                  "url": "https://video.twimg.com/ext_tw_video/1626280183673278464/pu/vid/320x320/DVV7BFByx-fnZkYx.mp4?tag=14"
+                },
+                {
+                  "bitrate": 832000,
+                  "content_type": "video/mp4",
+                  "url": "https://video.twimg.com/ext_tw_video/1626280183673278464/pu/vid/540x540/FcMASnTR9qwri16j.mp4?tag=14"
+                },
+                {
+                  "bitrate": 1280000,
+                  "content_type": "video/mp4",
+                  "url": "https://video.twimg.com/ext_tw_video/1626280183673278464/pu/vid/720x720/GeWbWd8NWYTNnJHX.mp4?tag=14"
+                },
+                {
+                  "bitrate": 8768000,
+                  "content_type": "video/mp4",
+                  "url": "https://video.twimg.com/ext_tw_video/1626280183673278464/pu/vid/1080x1080/7fKSyxVIv2Clhg5C.mp4?tag=14"
+                }
+              ],
+              "aspect_ratio": [
+                1,
+                1
+              ],
+              "duration": 67216,
+              "original_info": {
+                "focus_rects": [],
+                "height": 1080,
+                "width": 1080
+              },
+              "id": "1626280183673278464"
+            }
+          ]
+        },
+        "reply_to": "1626294183429558273",
+        "entities": [],
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        }
+      },
+      {
+        "tweet_id": "1626294185690288128",
+        "bookmarks": 2,
+        "created_at": "Thu Feb 16 18:55:23 +0000 2023",
+        "favorites": 5,
+        "text": "We were inspired by @natfriedman's Natbot and @aidangomezzz's WebLM.\n\nWe have incorporated RLHF and expect Jarvys to improve as we get feedback.\n\nJarvys is coming to your browser soon. Sign up at https://t.co/BQvnxLG3ho for early access! (4/4)",
+        "lang": "en",
+        "views": "612",
+        "sensitive": false,
+        "quotes": 0,
+        "replies": 0,
+        "retweets": 1,
+        "conversation_id": "1626294182196420608",
+        "media": [],
+        "reply_to": "1626294184629129216",
+        "entities": {
+          "urls": [
+            {
+              "display_url": "Jarvys.ai",
+              "expanded_url": "http://Jarvys.ai",
+              "url": "https://t.co/BQvnxLG3ho"
+            }
+          ],
+          "user_mentions": [
+            {
+              "id_str": "13235832",
+              "name": "Nat Friedman",
+              "screen_name": "natfriedman"
+            },
+            {
+              "id_str": "1640422389329608735",
+              "name": "Aidan Gomez",
+              "screen_name": "aidangomezzz"
+            }
+          ]
+        },
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        }
+      },
+      {
+        "tweet_id": "1626286193456594944",
+        "bookmarks": 0,
+        "created_at": "Thu Feb 16 18:23:38 +0000 2023",
+        "favorites": 0,
+        "text": "RT @keshavrao_: At the @joincomet hackathon, I made Hall-E, an intelligent community assistant.\n\nHall-E helps you search info, gather engag…",
+        "lang": "en",
+        "sensitive": null,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "43044215",
+              "name": "Keshav",
+              "screen_name": "keshavrao_"
+            }
+          ]
+        },
+        "replies": 0,
+        "retweets": 168,
+        "conversation_id": "1626286193456594944",
+        "media": [],
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        },
+        "retweeted": {
+          "id": "1626283635996524547"
+        },
+        "retweeted_tweet": {
+          "tweet_id": "1626283635996524547",
+          "bookmarks": 4,
+          "created_at": "Thu Feb 16 18:13:28 +0000 2023",
+          "favorites": 202,
+          "text": "At the @joincomet hackathon, I made Hall-E, an intelligent community assistant.\n\nHall-E helps you search info, gather engagement insights, and automate actions in your community. https://t.co/rvoLQcJe0n",
+          "lang": "en",
+          "sensitive": false,
+          "views": "12054",
+          "quotes": 1,
+          "entities": {
+            "media": [
+              {
+                "display_url": "pic.x.com/rvoLQcJe0n",
+                "expanded_url": "https://x.com/keshavrao_/status/1626283635996524547/photo/1",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "large": {
+                    "faces": []
+                  },
+                  "medium": {
+                    "faces": []
+                  },
+                  "orig": {
+                    "faces": []
+                  },
+                  "small": {
+                    "faces": []
+                  }
+                },
+                "id_str": "1626281693589180416",
+                "indices": [
+                  179,
+                  202
+                ],
+                "media_key": "3_1626281693589180416",
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1626281693589180416"
+                  }
+                },
+                "media_url_https": "https://pbs.twimg.com/media/FpG2lXsakAAl0p-.jpg",
+                "original_info": {
+                  "focus_rects": [
+                    {
+                      "h": 672,
+                      "w": 1200,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "h": 675,
+                      "w": 675,
+                      "x": 293,
+                      "y": 0
+                    },
+                    {
+                      "h": 675,
+                      "w": 592,
+                      "x": 334,
+                      "y": 0
+                    },
+                    {
+                      "h": 675,
+                      "w": 338,
+                      "x": 461,
+                      "y": 0
+                    },
+                    {
+                      "h": 675,
+                      "w": 1200,
+                      "x": 0,
+                      "y": 0
+                    }
+                  ],
+                  "height": 675,
+                  "width": 1200
+                },
+                "sizes": {
+                  "large": {
+                    "h": 675,
+                    "resize": "fit",
+                    "w": 1200
+                  },
+                  "medium": {
+                    "h": 675,
+                    "resize": "fit",
+                    "w": 1200
+                  },
+                  "small": {
+                    "h": 383,
+                    "resize": "fit",
+                    "w": 680
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "resize": "crop",
+                    "w": 150
+                  }
+                },
+                "type": "photo",
+                "url": "https://t.co/rvoLQcJe0n"
+              }
+            ]
+          },
+          "replies": 269,
+          "retweets": 168,
+          "conversation_id": "1626283635996524547",
+          "author": {
+            "rest_id": "43044215",
+            "name": "Keshav",
+            "screen_name": "keshavrao_",
+            "avatar": "https://pbs.twimg.com/profile_images/2052934548586201088/8F9py7xC_normal.jpg",
+            "blue_verified": true
+          },
+          "media": {
+            "photo": [
+              {
+                "media_url_https": "https://pbs.twimg.com/media/FpG2lXsakAAl0p-.jpg",
+                "id": "1626281693589180416",
+                "sizes": {
+                  "h": 675,
+                  "w": 1200
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "tweet_id": "1623058805180493828",
+        "bookmarks": 0,
+        "created_at": "Tue Feb 07 20:39:08 +0000 2023",
+        "favorites": 0,
+        "text": "RT @alexandr_wang: RLHF is the \"UI/interface design\" of LLMs &amp; genAI.\n\nIt is how we will _design_ the interactions between users &amp; the mode…",
+        "lang": "en",
+        "sensitive": null,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "615818451",
+              "name": "Alexandr Wang",
+              "screen_name": "alexandr_wang"
+            }
+          ]
+        },
+        "replies": 0,
+        "retweets": 29,
+        "conversation_id": "1623058805180493828",
+        "media": [],
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        },
+        "retweeted": {
+          "id": "1622760302516355072"
+        },
+        "retweeted_tweet": {
+          "tweet_id": "1622760302516355072",
+          "bookmarks": 56,
+          "created_at": "Tue Feb 07 00:53:00 +0000 2023",
+          "favorites": 207,
+          "text": "RLHF is the \"UI/interface design\" of LLMs &amp; genAI.\n\nIt is how we will _design_ the interactions between users &amp; the model, and program it to mirror the desired behavior—helpful, playful, creative, factual\n\nLike design, it will be a fundamental way to differentiate in the next era",
+          "lang": "en",
+          "sensitive": null,
+          "views": "37532",
+          "quotes": 0,
+          "entities": [],
+          "replies": 9,
+          "retweets": 29,
+          "conversation_id": "1622760302516355072",
+          "author": {
+            "rest_id": "615818451",
+            "name": "Alexandr Wang",
+            "screen_name": "alexandr_wang",
+            "avatar": "https://pbs.twimg.com/profile_images/1631421210205749248/uohbT_40_normal.jpg",
+            "blue_verified": true
+          },
+          "media": []
+        }
+      },
+      {
+        "tweet_id": "1623057888725078022",
+        "bookmarks": 0,
+        "created_at": "Tue Feb 07 20:35:30 +0000 2023",
+        "favorites": 0,
+        "text": "RT @jeffclune: https://t.co/lDAw2l2cNz",
+        "lang": "zxx",
+        "sensitive": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "162293874",
+              "name": "Jeff Clune",
+              "screen_name": "jeffclune"
+            }
+          ]
+        },
+        "replies": 0,
+        "retweets": 12,
+        "conversation_id": "1623057888725078022",
+        "media": {
+          "photo": [
+            {
+              "media_url_https": "https://pbs.twimg.com/media/FoUFBikaUAEPg0E.jpg",
+              "id": "1622708764754464769",
+              "sizes": {
+                "h": 800,
+                "w": 1200
+              }
+            }
+          ]
+        },
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        },
+        "retweeted": {
+          "id": "1622708862699835393"
+        },
+        "retweeted_tweet": {
+          "tweet_id": "1622708862699835393",
+          "bookmarks": 3,
+          "created_at": "Mon Feb 06 21:28:35 +0000 2023",
+          "favorites": 71,
+          "text": "https://t.co/lDAw2l2cNz",
+          "lang": "zxx",
+          "sensitive": false,
+          "views": "12096",
+          "quotes": 0,
+          "entities": {
+            "media": [
+              {
+                "display_url": "pic.x.com/lDAw2l2cNz",
+                "expanded_url": "https://x.com/jeffclune/status/1622708862699835393/photo/1",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "large": {
+                    "faces": []
+                  },
+                  "medium": {
+                    "faces": []
+                  },
+                  "orig": {
+                    "faces": []
+                  },
+                  "small": {
+                    "faces": []
+                  }
+                },
+                "id_str": "1622708764754464769",
+                "indices": [
+                  0,
+                  23
+                ],
+                "media_key": "3_1622708764754464769",
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1622708764754464769"
+                  }
+                },
+                "media_url_https": "https://pbs.twimg.com/media/FoUFBikaUAEPg0E.jpg",
+                "original_info": {
+                  "focus_rects": [
+                    {
+                      "h": 672,
+                      "w": 1200,
+                      "x": 0,
+                      "y": 128
+                    },
+                    {
+                      "h": 800,
+                      "w": 800,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "h": 800,
+                      "w": 702,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "h": 800,
+                      "w": 400,
+                      "x": 10,
+                      "y": 0
+                    },
+                    {
+                      "h": 800,
+                      "w": 1200,
+                      "x": 0,
+                      "y": 0
+                    }
+                  ],
+                  "height": 800,
+                  "width": 1200
+                },
+                "sizes": {
+                  "large": {
+                    "h": 800,
+                    "resize": "fit",
+                    "w": 1200
+                  },
+                  "medium": {
+                    "h": 800,
+                    "resize": "fit",
+                    "w": 1200
+                  },
+                  "small": {
+                    "h": 453,
+                    "resize": "fit",
+                    "w": 680
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "resize": "crop",
+                    "w": 150
+                  }
+                },
+                "type": "photo",
+                "url": "https://t.co/lDAw2l2cNz"
+              }
+            ]
+          },
+          "replies": 5,
+          "retweets": 12,
+          "conversation_id": "1622708862699835393",
+          "author": {
+            "rest_id": "162293874",
+            "name": "Jeff Clune",
+            "screen_name": "jeffclune",
+            "avatar": "https://pbs.twimg.com/profile_images/1948765264436494337/wrBA-a0W_normal.jpg",
+            "blue_verified": true
+          },
+          "media": {
+            "photo": [
+              {
+                "media_url_https": "https://pbs.twimg.com/media/FoUFBikaUAEPg0E.jpg",
+                "id": "1622708764754464769",
+                "sizes": {
+                  "h": 800,
+                  "w": 1200
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "tweet_id": "1621990691302936577",
+        "bookmarks": 0,
+        "created_at": "Sat Feb 04 21:54:50 +0000 2023",
+        "favorites": 0,
+        "text": "RT @aidangomezzz: AI for  ̶g̶o̶o̶d̶ ̶ advantage https://t.co/GGOEGqRrwo",
+        "lang": "es",
+        "sensitive": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "1640422389329608735",
+              "name": "Aidan Gomez",
+              "screen_name": "aidangomezzz"
+            }
+          ]
+        },
+        "replies": 0,
+        "retweets": 8,
+        "conversation_id": "1621990691302936577",
+        "media": {
+          "photo": [
+            {
+              "media_url_https": "https://pbs.twimg.com/media/FoJTsCeX0AEPTpl.jpg",
+              "id": "1621950831850409985",
+              "sizes": {
+                "h": 440,
+                "w": 1158
+              }
+            }
+          ]
+        },
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        },
+        "retweeted": {
+          "id": "1621950835868553217"
+        },
+        "retweeted_tweet": {
+          "tweet_id": "1621950835868553217",
+          "bookmarks": 7,
+          "created_at": "Sat Feb 04 19:16:28 +0000 2023",
+          "favorites": 54,
+          "text": "AI for  ̶g̶o̶o̶d̶ ̶ advantage https://t.co/GGOEGqRrwo",
+          "lang": "es",
+          "sensitive": false,
+          "views": "21143",
+          "quotes": 0,
+          "entities": {
+            "media": [
+              {
+                "display_url": "pic.x.com/GGOEGqRrwo",
+                "expanded_url": "https://x.com/aidangomezzz/status/1621950835868553217/photo/1",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "large": {
+                    "faces": [
+                      {
+                        "h": 50,
+                        "w": 50,
+                        "x": 468,
+                        "y": 262
+                      }
+                    ]
+                  },
+                  "medium": {
+                    "faces": [
+                      {
+                        "h": 50,
+                        "w": 50,
+                        "x": 468,
+                        "y": 262
+                      }
+                    ]
+                  },
+                  "orig": {
+                    "faces": [
+                      {
+                        "h": 50,
+                        "w": 50,
+                        "x": 468,
+                        "y": 262
+                      }
+                    ]
+                  },
+                  "small": {
+                    "faces": [
+                      {
+                        "h": 29,
+                        "w": 29,
+                        "x": 274,
+                        "y": 153
+                      }
+                    ]
+                  }
+                },
+                "id_str": "1621950831850409985",
+                "indices": [
+                  30,
+                  53
+                ],
+                "media_key": "3_1621950831850409985",
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1621950831850409985"
+                  }
+                },
+                "media_url_https": "https://pbs.twimg.com/media/FoJTsCeX0AEPTpl.jpg",
+                "original_info": {
+                  "focus_rects": [
+                    {
+                      "h": 440,
+                      "w": 786,
+                      "x": 39,
+                      "y": 0
+                    },
+                    {
+                      "h": 440,
+                      "w": 440,
+                      "x": 212,
+                      "y": 0
+                    },
+                    {
+                      "h": 440,
+                      "w": 386,
+                      "x": 239,
+                      "y": 0
+                    },
+                    {
+                      "h": 440,
+                      "w": 220,
+                      "x": 322,
+                      "y": 0
+                    },
+                    {
+                      "h": 440,
+                      "w": 1158,
+                      "x": 0,
+                      "y": 0
+                    }
+                  ],
+                  "height": 440,
+                  "width": 1158
+                },
+                "sizes": {
+                  "large": {
+                    "h": 440,
+                    "resize": "fit",
+                    "w": 1158
+                  },
+                  "medium": {
+                    "h": 440,
+                    "resize": "fit",
+                    "w": 1158
+                  },
+                  "small": {
+                    "h": 258,
+                    "resize": "fit",
+                    "w": 680
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "resize": "crop",
+                    "w": 150
+                  }
+                },
+                "type": "photo",
+                "url": "https://t.co/GGOEGqRrwo"
+              }
+            ]
+          },
+          "replies": 2,
+          "retweets": 8,
+          "conversation_id": "1621950835868553217",
+          "author": {
+            "rest_id": "610552974",
+            "name": "Aidan Gomez",
+            "screen_name": "aidangomez",
+            "avatar": "https://pbs.twimg.com/profile_images/2103792787539779584/DI6dgoen_normal.jpg",
+            "blue_verified": true
+          },
+          "media": {
+            "photo": [
+              {
+                "media_url_https": "https://pbs.twimg.com/media/FoJTsCeX0AEPTpl.jpg",
+                "id": "1621950831850409985",
+                "sizes": {
+                  "h": 440,
+                  "w": 1158
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "tweet_id": "1620393508745138177",
+        "bookmarks": 0,
+        "created_at": "Tue Jan 31 12:08:12 +0000 2023",
+        "favorites": 0,
+        "text": "RT @gdb: 😅 https://t.co/3S5K9V0dzH",
+        "lang": "qme",
+        "sensitive": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "urls": [
+            {
+              "display_url": "theonion.com/chatgpt-forced…",
+              "expanded_url": "https://www.theonion.com/chatgpt-forced-to-take-bar-exam-even-though-dream-was-t-1850036337",
+              "url": "https://t.co/3S5K9V0dzH"
+            }
+          ],
+          "user_mentions": [
+            {
+              "id_str": "162124540",
+              "name": "Greg Brockman",
+              "screen_name": "gdb"
+            }
+          ]
+        },
+        "replies": 0,
+        "retweets": 82,
+        "conversation_id": "1620393508745138177",
+        "media": [],
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        },
+        "retweeted": {
+          "id": "1620131587122929664"
+        },
+        "retweeted_tweet": {
+          "tweet_id": "1620131587122929664",
+          "bookmarks": 36,
+          "created_at": "Mon Jan 30 18:47:25 +0000 2023",
+          "favorites": 709,
+          "text": "😅 https://t.co/3S5K9V0dzH",
+          "lang": "qme",
+          "sensitive": false,
+          "views": "103667",
+          "quotes": 3,
+          "entities": {
+            "urls": [
+              {
+                "display_url": "theonion.com/chatgpt-forced…",
+                "expanded_url": "https://www.theonion.com/chatgpt-forced-to-take-bar-exam-even-though-dream-was-t-1850036337",
+                "indices": [
+                  2,
+                  25
+                ],
+                "url": "https://t.co/3S5K9V0dzH"
+              }
+            ]
+          },
+          "replies": 19,
+          "retweets": 82,
+          "conversation_id": "1620131587122929664",
+          "author": {
+            "rest_id": "162124540",
+            "name": "Greg Brockman",
+            "screen_name": "gdb",
+            "avatar": "https://pbs.twimg.com/profile_images/1347621377503711233/bHg3ipfD_normal.jpg",
+            "blue_verified": true
+          },
+          "media": []
+        }
+      },
+      {
+        "tweet_id": "1615981149972754438",
+        "bookmarks": 0,
+        "created_at": "Thu Jan 19 07:55:04 +0000 2023",
+        "favorites": 0,
+        "text": "RT @emollick: The new AI policy in my syllabus.\n\nMore on how I am integrating AI into my classes: https://t.co/EsD3MPpyVT https://t.co/QfWR…",
+        "lang": "en",
+        "sensitive": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "urls": [
+            {
+              "display_url": "oneusefulthing.substack.com/p/all-my-class…",
+              "expanded_url": "https://oneusefulthing.substack.com/p/all-my-classes-suddenly-became-ai",
+              "url": "https://t.co/EsD3MPpyVT"
+            },
+            {
+              "display_url": "t.co/QfWR",
+              "url": "https://t.co/QfWR"
+            }
+          ],
+          "user_mentions": [
+            {
+              "id_str": "39125788",
+              "name": "Ethan Mollick",
+              "screen_name": "emollick"
+            }
+          ]
+        },
+        "replies": 0,
+        "retweets": 392,
+        "conversation_id": "1615981149972754438",
+        "media": [],
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        },
+        "retweeted": {
+          "id": "1615562253683548160"
+        },
+        "retweeted_tweet": {
+          "tweet_id": "1615562253683548160",
+          "bookmarks": 501,
+          "created_at": "Wed Jan 18 04:10:31 +0000 2023",
+          "favorites": 1965,
+          "text": "The new AI policy in my syllabus.\n\nMore on how I am integrating AI into my classes: https://t.co/EsD3MPpyVT https://t.co/QfWRvuNEA5",
+          "lang": "en",
+          "sensitive": false,
+          "views": "401819",
+          "quotes": 133,
+          "entities": {
+            "media": [
+              {
+                "display_url": "pic.x.com/QfWRvuNEA5",
+                "expanded_url": "https://x.com/emollick/status/1615562253683548160/photo/1",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "large": {
+                    "faces": []
+                  },
+                  "medium": {
+                    "faces": []
+                  },
+                  "orig": {
+                    "faces": []
+                  },
+                  "small": {
+                    "faces": []
+                  }
+                },
+                "id_str": "1615561527540555777",
+                "indices": [
+                  108,
+                  131
+                ],
+                "media_key": "3_1615561527540555777",
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1615561527540555777"
+                  }
+                },
+                "media_url_https": "https://pbs.twimg.com/media/FmugplHXoAE5wdb.png",
+                "original_info": {
+                  "focus_rects": [
+                    {
+                      "h": 561,
+                      "w": 1001,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "h": 644,
+                      "w": 644,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "h": 644,
+                      "w": 565,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "h": 644,
+                      "w": 322,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "h": 644,
+                      "w": 1001,
+                      "x": 0,
+                      "y": 0
+                    }
+                  ],
+                  "height": 644,
+                  "width": 1001
+                },
+                "sizes": {
+                  "large": {
+                    "h": 644,
+                    "resize": "fit",
+                    "w": 1001
+                  },
+                  "medium": {
+                    "h": 644,
+                    "resize": "fit",
+                    "w": 1001
+                  },
+                  "small": {
+                    "h": 437,
+                    "resize": "fit",
+                    "w": 680
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "resize": "crop",
+                    "w": 150
+                  }
+                },
+                "type": "photo",
+                "url": "https://t.co/QfWRvuNEA5"
+              }
+            ],
+            "urls": [
+              {
+                "display_url": "oneusefulthing.substack.com/p/all-my-class…",
+                "expanded_url": "https://oneusefulthing.substack.com/p/all-my-classes-suddenly-became-ai",
+                "indices": [
+                  84,
+                  107
+                ],
+                "url": "https://t.co/EsD3MPpyVT"
+              }
+            ]
+          },
+          "replies": 49,
+          "retweets": 392,
+          "conversation_id": "1615562253683548160",
+          "author": {
+            "rest_id": "39125788",
+            "name": "Ethan Mollick",
+            "screen_name": "emollick",
+            "avatar": "https://pbs.twimg.com/profile_images/1601382188712398850/3AAOlqrX_normal.jpg",
+            "blue_verified": true
+          },
+          "media": {
+            "photo": [
+              {
+                "media_url_https": "https://pbs.twimg.com/media/FmugplHXoAE5wdb.png",
+                "id": "1615561527540555777",
+                "sizes": {
+                  "h": 644,
+                  "w": 1001
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "tweet_id": "1548739603800043520",
+        "bookmarks": 0,
+        "created_at": "Sun Jul 17 18:41:10 +0000 2022",
+        "favorites": 0,
+        "text": "RT @FEhrsam: “Every time you Google something that your grandmother would have just resigned herself to simply never knowing, you are data-…",
+        "lang": "en",
+        "sensitive": null,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "315991624",
+              "name": "Fred Ehrsam",
+              "screen_name": "FEhrsam"
+            }
+          ]
+        },
+        "replies": 0,
+        "retweets": 4,
+        "conversation_id": "1548739603800043520",
+        "media": [],
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        },
+        "retweeted": {
+          "id": "1548534617988165633"
+        },
+        "retweeted_tweet": {
+          "tweet_id": "1548534617988165633",
+          "bookmarks": 1,
+          "created_at": "Sun Jul 17 05:06:37 +0000 2022",
+          "favorites": 20,
+          "text": "“Every time you Google something that your grandmother would have just resigned herself to simply never knowing, you are data-aging by minutes in seconds.” https://t.co/jiS2OohZt7",
+          "lang": "en",
+          "sensitive": false,
+          "views": null,
+          "quotes": 0,
+          "entities": {
+            "media": [
+              {
+                "display_url": "pic.x.com/jiS2OohZt7",
+                "expanded_url": "https://x.com/FEhrsam/status/1548534617988165633/photo/1",
+                "ext_media_availability": {
+                  "status": "Available"
+                },
+                "features": {
+                  "large": {
+                    "faces": []
+                  },
+                  "medium": {
+                    "faces": []
+                  },
+                  "orig": {
+                    "faces": []
+                  },
+                  "small": {
+                    "faces": []
+                  }
+                },
+                "id_str": "1548534614737575936",
+                "indices": [
+                  156,
+                  179
+                ],
+                "media_key": "3_1548534614737575936",
+                "media_results": {
+                  "result": {
+                    "media_key": "3_1548534614737575936"
+                  }
+                },
+                "media_url_https": "https://pbs.twimg.com/media/FX2ABxHUYAA9F33.jpg",
+                "original_info": {
+                  "focus_rects": [
+                    {
+                      "h": 413,
+                      "w": 738,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "h": 413,
+                      "w": 413,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "h": 413,
+                      "w": 362,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "h": 413,
+                      "w": 207,
+                      "x": 57,
+                      "y": 0
+                    },
+                    {
+                      "h": 413,
+                      "w": 1284,
+                      "x": 0,
+                      "y": 0
+                    }
+                  ],
+                  "height": 413,
+                  "width": 1284
+                },
+                "sizes": {
+                  "large": {
+                    "h": 413,
+                    "resize": "fit",
+                    "w": 1284
+                  },
+                  "medium": {
+                    "h": 386,
+                    "resize": "fit",
+                    "w": 1200
+                  },
+                  "small": {
+                    "h": 219,
+                    "resize": "fit",
+                    "w": 680
+                  },
+                  "thumb": {
+                    "h": 150,
+                    "resize": "crop",
+                    "w": 150
+                  }
+                },
+                "type": "photo",
+                "url": "https://t.co/jiS2OohZt7"
+              }
+            ]
+          },
+          "replies": 1,
+          "retweets": 4,
+          "conversation_id": "1548534564745650178",
+          "author": {
+            "rest_id": "315991624",
+            "name": "Fred Ehrsam",
+            "screen_name": "FEhrsam",
+            "avatar": "https://pbs.twimg.com/profile_images/1859783304792428544/nsMNLdjQ_normal.jpg",
+            "blue_verified": true
+          },
+          "media": {
+            "photo": [
+              {
+                "media_url_https": "https://pbs.twimg.com/media/FX2ABxHUYAA9F33.jpg",
+                "id": "1548534614737575936",
+                "sizes": {
+                  "h": 386,
+                  "w": 1200
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "tweet_id": "1542598156675735552",
+        "bookmarks": 0,
+        "created_at": "Thu Jun 30 19:57:15 +0000 2022",
+        "favorites": 2,
+        "text": "Just aabout year ago Professor Steinhardt predicted that this would happen in 2025. \nhttps://t.co/t4DaLlmmpj \nhttps://t.co/zahXUPpD0p",
+        "lang": "en",
+        "sensitive": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "urls": [
+            {
+              "display_url": "bounded-regret.ghost.io/ai-forecasting/",
+              "expanded_url": "https://bounded-regret.ghost.io/ai-forecasting/",
+              "url": "https://t.co/t4DaLlmmpj"
+            },
+            {
+              "display_url": "minerva-demo.github.io",
+              "expanded_url": "https://minerva-demo.github.io",
+              "url": "https://t.co/zahXUPpD0p"
+            }
+          ]
+        },
+        "replies": 1,
+        "retweets": 0,
+        "conversation_id": "1542598156675735552",
+        "media": [],
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        },
+        "quoted": {
+          "tweet_id": "1542559176483823622",
+          "bookmarks": 1413,
+          "created_at": "Thu Jun 30 17:22:21 +0000 2022",
+          "favorites": 7198,
+          "text": "Very excited to present Minerva🦉: a language model capable of solving mathematical questions using step-by-step natural language reasoning.\nCombining scale, data and others dramatically improves performance on the STEM benchmarks MATH and MMLU-STEM. https://t.co/bQJOyMSCD4 https://t.co/trN0y8hbAH",
+          "lang": "en",
+          "views": null,
+          "sensitive": false,
+          "quotes": 226,
+          "replies": 96,
+          "retweets": 1394,
+          "conversation_id": "1542559176483823622",
+          "author": {
+            "rest_id": "1354198150072786946",
+            "name": "aitor",
+            "screen_name": "alewkowycz",
+            "avatar": "https://pbs.twimg.com/profile_images/1542764033832542211/afcCCjx8_normal.jpg",
+            "followers_count": 2567,
+            "blue_verified": false
+          },
+          "media": {
+            "photo": [
+              {
+                "media_url_https": "https://pbs.twimg.com/media/FWhFY-cXEAQvpzH.jpg",
+                "id": "1542559167755522052",
+                "sizes": {
+                  "h": 1187,
+                  "w": 1200
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "tweet_id": "1539431217749143553",
+        "bookmarks": 0,
+        "created_at": "Wed Jun 22 02:12:58 +0000 2022",
+        "favorites": 1,
+        "text": "Codex-CLI. It's Natural Language CLI .\n\nShort term: helps coders automate the Google -&gt; stackoverflow step with PowerShell, Zshell, Bash commands\n\nLong Term: Natural Language User Interface for OS's? \n\n#gpt3 #AI #codex #GitHubCopilot https://t.co/r0vhelCf8t",
+        "lang": "en",
+        "sensitive": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "hashtags": [
+            {
+              "text": "gpt3"
+            },
+            {
+              "text": "AI"
+            },
+            {
+              "text": "codex"
+            },
+            {
+              "text": "GitHubCopilot"
+            }
+          ]
+        },
+        "replies": 0,
+        "retweets": 0,
+        "conversation_id": "1539431217749143553",
+        "media": {
+          "video": [
+            {
+              "media_url_https": "https://pbs.twimg.com/tweet_video_thumb/FV0klP6UEAAibTz.jpg",
+              "variants": [
+                {
+                  "bitrate": 0,
+                  "content_type": "video/mp4",
+                  "url": "https://video.twimg.com/tweet_video/FV0klP6UEAAibTz.mp4"
+                }
+              ],
+              "aspect_ratio": [
+                16,
+                9
+              ],
+              "duration": null,
+              "original_info": {
+                "focus_rects": [],
+                "height": 1080,
+                "width": 1920
+              },
+              "id": "1539426869975453696"
+            }
+          ]
+        },
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        }
+      },
+      {
+        "tweet_id": "1539345038190080000",
+        "bookmarks": 0,
+        "created_at": "Tue Jun 21 20:30:31 +0000 2022",
+        "favorites": 0,
+        "text": "⏳ #dalle #dalle2 #Bitcoin https://t.co/PVtXrFYakf",
+        "lang": "qme",
+        "sensitive": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "hashtags": [
+            {
+              "text": "dalle"
+            },
+            {
+              "text": "dalle2"
+            },
+            {
+              "text": "Bitcoin"
+            }
+          ]
+        },
+        "replies": 0,
+        "retweets": 0,
+        "conversation_id": "1539345038190080000",
+        "media": {
+          "photo": [
+            {
+              "media_url_https": "https://pbs.twimg.com/media/FVzZcX7VUAAgDws.jpg",
+              "id": "1539344254136307712",
+              "sizes": {
+                "h": 1024,
+                "w": 1024
+              }
+            }
+          ]
+        },
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        }
+      },
+      {
+        "tweet_id": "1539016093666254849",
+        "bookmarks": 0,
+        "created_at": "Mon Jun 20 22:43:24 +0000 2022",
+        "favorites": 0,
+        "text": "Evolution Through Large Models https://t.co/5ommZilYnc\nTldr: Randomly mutating programs is hard, most mutations break things. Instead, ask a giant language model to propose edits, in the form of diffs (like the ones you get with git)... 🤔 #openai #AI https://t.co/3tK2Gbz3t5",
+        "lang": "en",
+        "sensitive": false,
+        "source": "<a href=\"https://buffer.com\" rel=\"nofollow\">Buffer App</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "hashtags": [
+            {
+              "text": "openai"
+            },
+            {
+              "text": "AI"
+            }
+          ],
+          "urls": [
+            {
+              "display_url": "buff.ly/3O8XpAP",
+              "expanded_url": "https://buff.ly/3O8XpAP",
+              "url": "https://t.co/5ommZilYnc"
+            }
+          ]
+        },
+        "replies": 0,
+        "retweets": 1,
+        "conversation_id": "1539016093666254849",
+        "media": {
+          "photo": [
+            {
+              "media_url_https": "https://pbs.twimg.com/media/FVuu-wfWUAAv7TZ.jpg",
+              "id": "1539016090868666368",
+              "sizes": {
+                "h": 1024,
+                "w": 1024
+              }
+            }
+          ]
+        },
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        }
+      },
+      {
+        "tweet_id": "564569551111991297",
+        "bookmarks": 0,
+        "created_at": "Sun Feb 08 23:40:44 +0000 2015",
+        "favorites": 0,
+        "text": "RT @elonmusk: Prob good though. Will give us time to replace 1st stage video transmitter (not needed for launch, but nice to have).",
+        "lang": "en",
+        "sensitive": null,
+        "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+        "views": null,
+        "quotes": 0,
+        "entities": {
+          "user_mentions": [
+            {
+              "id_str": "44196397",
+              "name": "Elon Musk",
+              "screen_name": "elonmusk"
+            }
+          ]
+        },
+        "replies": 0,
+        "retweets": 362,
+        "conversation_id": "564569551111991297",
+        "media": [],
+        "author": {
+          "rest_id": "1710390259",
+          "name": "Yash Goenka",
+          "screen_name": "theyashgoenka",
+          "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+          "followers_count": 544,
+          "blue_verified": true
+        },
+        "retweeted": {
+          "id": "564563818022313984"
+        },
+        "retweeted_tweet": {
+          "tweet_id": "564563818022313984",
+          "bookmarks": 0,
+          "created_at": "Sun Feb 08 23:17:57 +0000 2015",
+          "favorites": 745,
+          "text": "Prob good though. Will give us time to replace 1st stage video transmitter (not needed for launch, but nice to have).",
+          "lang": "en",
+          "sensitive": null,
+          "views": null,
+          "quotes": 0,
+          "entities": [],
+          "replies": 85,
+          "retweets": 362,
+          "conversation_id": "564563818022313984",
+          "author": {
+            "rest_id": "44196397",
+            "name": "Elon Musk",
+            "screen_name": "elonmusk",
+            "avatar": "https://pbs.twimg.com/profile_images/2103567689515954176/aR-Kjpp4_normal.jpg",
+            "blue_verified": true
+          },
+          "media": []
+        }
+      }
+    ],
+    "next_cursor": "DAAHCgABHTrJtUX__-4LAAIAAAASNTY0NTY5NTUxMTExOTkxMjk3CAADAAAAAgAA",
+    "prev_cursor": "DAAHCgABHTrJtUYAJxELAAIAAAATMjA0NzUwNzMwNjQ3MzIyMjQ5MAgAAwAAAAEAAA",
+    "status": "ok",
+    "user": {
+      "status": "active",
+      "profile": "theyashgoenka",
+      "rest_id": "1710390259",
+      "blue_verified": true,
+      "verification_type": {
+        "is_identity_verified": false,
+        "reason": {
+          "description": {
+            "entities": [
+              {
+                "from_index": 25,
+                "ref": {
+                  "url": "https://help.twitter.com/managing-your-account/about-twitter-verified-accounts",
+                  "url_type": "ExternalUrl"
+                },
+                "to_index": 35
+              }
+            ],
+            "text": "This account is Premium. Learn more"
+          },
+          "verified_since_msec": "1712556663244"
+        }
+      },
+      "affiliates": [],
+      "business_account": [],
+      "avatar": "https://pbs.twimg.com/profile_images/1907649657821667328/vzVDfUQp_normal.jpg",
+      "header_image": "https://pbs.twimg.com/profile_banners/1710390259/1675021827",
+      "desc": "co-founder at https://t.co/Res1qPMfkP (yc p26)\nuc berkeley",
+      "name": "Yash Goenka",
+      "website": "humwork.ai",
+      "protected": false,
+      "location": "San Francisco, CA",
+      "friends": 410,
+      "sub_count": 544,
+      "statuses_count": 66,
+      "media_count": 10,
+      "created_at": "Thu Aug 29 15:52:16 +0000 2013",
+      "pinned_tweet_ids_str": null,
+      "id": "1710390259"
+    }
+  }
+}

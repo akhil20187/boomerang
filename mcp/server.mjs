@@ -13,7 +13,7 @@ import { bearerToken, createTools } from './core.mjs';
 import { createOAuth } from './oauth.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const uiUri = 'ui://human-mcp/shops-v2.html';
+const uiUri = 'ui://human-mcp/shops-v3.html';
 export function createMcpServer({client, token, widgetHtml, connectDomains=[]}) {
   const server = new McpServer({name:'human-mcp',version:'1.0.0'});
   const tools = createTools(client,token);

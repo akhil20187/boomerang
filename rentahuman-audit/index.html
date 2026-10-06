@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RentAHuman — screenshots and journey</title>
+<style>body{margin:0;background:#f3f4f5;color:#202124;font:16px/1.55 system-ui,sans-serif}main{max-width:1160px;margin:auto;padding:32px 24px}h1{font-size:32px;margin:0}h2{font-size:22px}a{color:#a73a00}header p{max-width:850px}.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}.path,figure{background:white;border:1px solid #ddd;border-radius:12px;padding:18px}.path h3{margin:0 0 12px}.step{padding:10px 12px;border:1px solid #ddd;border-radius:6px;margin:8px 0}.arrow{text-align:center;color:#777}.boundary{border-style:dashed;color:#666}nav{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}button{background:white;border:1px solid #aaa;border-radius:6px;padding:9px 14px;cursor:pointer;font:inherit}button[aria-pressed=true]{background:#202124;color:white}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}figure{margin:0;padding:12px}figure img{display:block;width:100%;height:280px;object-fit:contain;object-position:top;background:#f4f4f4}figcaption{padding:12px 4px}figcaption strong{display:block}.meta{font-size:13px;color:#666}footer{margin:30px 0}dialog{max-width:95vw;width:1000px;max-height:90vh;border:0;border-radius:10px;padding:16px}dialog::backdrop{background:#000b}dialog img{display:block;width:100%;height:auto}dialog button{position:sticky;top:0;float:right}dialog h2{margin:0 0 16px}[hidden]{display:none!important}
+.count{color:#666;font-size:14px}figure a:focus-visible,button:focus-visible{outline:3px solid #a73a00;outline-offset:4px}.note{display:block;margin-top:6px;color:#555;font-size:14px}dialog{box-sizing:border-box}dialog img{max-height:72vh;object-fit:contain}#imageNote{clear:both}.toplinks{display:flex;gap:16px;flex-wrap:wrap}
+</style></head>
+<body><main><header><h1>RentAHuman: screens and user journey</h1><p>22 supplied screenshots · Captured 2 October 2026 · Reviewed 3 October 2026. These captures show onboarding, profiles, task intake, marketplace listings, jobs, integrations and messaging. No hiring, payment or completed delivery was verified.</p><p class="toplinks"><a href="user-journey.md">Journey and screen inventory</a><a href="../research/competitors/rentahuman/RENTAHUMAN_SCREENSHOT_RESEARCH.md">Screenshot analysis</a><a href="../index.html">Project home</a><a href="../humwork-audit/index.html">Humwork gallery</a></p></header>
+<section aria-label="User journey overview"><h2>Captured paths</h2><div class="paths">
+<article class="path"><h3>Onboarding and profile</h3><div class="step">Role → name → work mode → categories</div><div class="arrow">↓</div><div class="step">Location → optional fields → language</div><div class="arrow">↓</div><div class="step boundary">Step 9: missing from supplied captures</div><div class="arrow">↓</div><div class="step">Generated profile → sharing card</div><p>The selected role is unknown. These later screens describe a worker profile.</p></article>
+<article class="path"><h3>Store-calling task</h3><div class="step">Task entry → Renta assistant</div><div class="arrow">↓</div><div class="step">Customer types “Call local stores”</div><div class="arrow">↓</div><div class="step">Goal → number of stores → location → deadline</div><div class="arrow">↓</div><div class="step boundary">Published task → worker acceptance → result: not captured</div><p>Direct overlap at intake; successful local calling is unverified.</p></article>
+<article class="path"><h3>Marketplace discovery</h3><div class="step">Browse bounty listings and rewards</div><div class="step">Browse humans → skill / city / country</div><div class="step">India-prioritised results</div><div class="step boundary">Hiring, actual availability and payment: unverified</div><p>Displayed supply and applicant counts are interface claims.</p></article>
+<article class="path"><h3>Jobs and agent connections</h3><div class="step">Create job → templates → wallet</div><div class="step">Schedules and runs: empty account states</div><div class="step">MCP / API / agent skill</div><div class="step">Worker preferences → messaging</div><div class="step boundary">Installed connection or delivered report: not captured</div></article>
+</div></section>
+<h2>Screenshot gallery</h2><p>Select a screenshot to enlarge it. Open the original for full detail.</p><nav aria-label="Filter screenshots" id="filters"></nav><p class="count" id="count" aria-live="polite"></p><section class="grid" id="gallery" aria-label="Screenshots"></section>
+<footer>Original Desktop screenshots were copied into this project without modification. Repeated states are retained. Read the linked analysis for evidence limits; these screenshots do not establish successful worker delivery.</footer></main>
+<dialog id="viewer" aria-labelledby="imageTitle"><button id="close" type="button">Close</button><h2 id="imageTitle"></h2><p id="imageNote"></p><p><a id="original" target="_blank" rel="noopener">Open original image</a></p><img id="large" alt=""></dialog>
+<script>
+const items=[
+  [
+    "Screenshot 2026-10-02 at 11.43.02 PM.png",
+    "S1 · Onboarding — hire, get hired or both",
+    "Onboarding",
+    "Choose a role; selected role is not established by this capture."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.43.06 PM.png",
+    "S2 · Onboarding — name and photo",
+    "Onboarding",
+    "Display name and optional profile photo."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.43.11 PM.png",
+    "S3 · Onboarding — work modes",
+    "Onboarding",
+    "In-person, digital or both."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.43.18 PM.png",
+    "S4 · Onboarding — work categories",
+    "Onboarding",
+    "Categories guide task notifications; they do not verify skills."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.43.42 PM.png",
+    "S5 · Onboarding — location and radius",
+    "Onboarding",
+    "Initial location and travel settings."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.43.57 PM.png",
+    "S6 · Onboarding — Hyderabad and 6 km",
+    "Onboarding",
+    "A profile location, not proof of local worker capacity."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.44.03 PM.png",
+    "S7 · Onboarding — gender identity",
+    "Onboarding",
+    "Skippable profile field."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.44.05 PM.png",
+    "S8 · Onboarding — resume upload",
+    "Onboarding",
+    "Optional resume upload with autofill promise."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.44.52 PM.png",
+    "S9 · Onboarding — languages",
+    "Onboarding",
+    "At least one language required; step 9 is not captured."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.46.08 PM.png",
+    "S10 · Profile — generated preview",
+    "Profile",
+    "Editable generated profile; accuracy untested."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.46.23 PM.png",
+    "S11 · Profile — regenerate option",
+    "Profile",
+    "A second captured preview state."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.46.35 PM.png",
+    "S12 · Profile — sharing card",
+    "Profile",
+    "Share through X, LinkedIn, device or copied link."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.47.01 PM.png",
+    "S13 · Task — Renta assistant",
+    "Tasks",
+    "Conversational task intake and offered MCP connection."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.47.31 PM.png",
+    "S14 · Task — call local stores",
+    "Tasks",
+    "Asks goal, number of stores, location and deadline. No completed task shown."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.47.45 PM.png",
+    "S15 · Marketplace — bounty listings",
+    "Marketplace",
+    "Advertised rewards and applications; completed work unverified."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.47.57 PM.png",
+    "S16 · Marketplace — browse humans",
+    "Marketplace",
+    "India-prioritised discovery and visible supply count; availability unverified."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.53.17 PM.png",
+    "S17 · Jobs — create and wallet",
+    "Jobs & integrations",
+    "Task templates and a zero-balance wallet."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.53.21 PM.png",
+    "S18 · Jobs — schedules",
+    "Jobs & integrations",
+    "Empty recurring-schedule view."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.53.23 PM.png",
+    "S19 · Jobs — no runs yet",
+    "Jobs & integrations",
+    "Captured account's empty state, not platform-wide activity."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.53.25 PM.png",
+    "S20 · Integrations — MCP, API and skill",
+    "Jobs & integrations",
+    "Offered agent connections; installation and execution untested."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.53.29 PM.png",
+    "S21 · Workers — preferred and blocked",
+    "Jobs & integrations",
+    "Worker preference controls; no worker selections shown."
+  ],
+  [
+    "Screenshot 2026-10-02 at 11.53.40 PM.png",
+    "S22 · Messaging — empty inbox",
+    "Messaging",
+    "No worker conversation or returned result captured."
+  ]
+];
+const gallery=document.getElementById('gallery'),viewer=document.getElementById('viewer');
+for(const [file,title,group,note] of items){
+const figure=document.createElement('figure');figure.dataset.group=group;
+const link=document.createElement('a');link.href='screenshots/'+encodeURIComponent(file);link.setAttribute('aria-label','Enlarge '+title);
+const img=document.createElement('img');img.src=link.href;img.alt=title;img.loading='lazy';link.append(img);
+link.addEventListener('click',e=>{e.preventDefault();document.getElementById('large').src=link.href;document.getElementById('large').alt=title;document.getElementById('imageTitle').textContent=title;document.getElementById('imageNote').textContent=note;document.getElementById('original').href=link.href;viewer.showModal();});
+const caption=document.createElement('figcaption'),strong=document.createElement('strong');strong.textContent=title;caption.append(strong);
+const meta=document.createElement('span');meta.className='meta';meta.textContent=group+' · '+file;caption.append(meta);
+const description=document.createElement('span');description.className='note';description.textContent=note;caption.append(description);
+figure.append(link,caption);gallery.append(figure);
+}
+function updateCount(){document.getElementById('count').textContent=[...gallery.children].filter(f=>!f.hidden).length+' of '+items.length+' screenshots';}
+for(const group of ['All',...new Set(items.map(i=>i[2]))]){
+const b=document.createElement('button');b.type='button';b.textContent=group;b.setAttribute('aria-pressed',String(group==='All'));
+b.onclick=()=>{for(const f of gallery.children)f.hidden=group!=='All'&&f.dataset.group!==group;for(const button of document.querySelectorAll('#filters button'))button.setAttribute('aria-pressed',String(button===b));updateCount();};document.getElementById('filters').append(b);
+}
+updateCount();
+document.getElementById('close').onclick=()=>viewer.close();
+</script></body></html>
+

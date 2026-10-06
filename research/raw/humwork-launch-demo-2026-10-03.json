@@ -1,0 +1,289 @@
+{
+  "runId": "01M3ZVAE43DSXGHNXH2Q5NY3JM",
+  "caller": "USER#user_3IXuwaK4rfU1sJRo3ZyjD67zD4s",
+  "owner": "user_3IXuwaK4rfU1sJRo3ZyjD67zD4s",
+  "provider": "apify",
+  "providerName": "Apify",
+  "endpoint": "/starvibe/youtube-video-transcript",
+  "status": "COMPLETED",
+  "input": {
+    "body": {
+      "youtube_url": "https://www.youtube.com/watch?v=Bqw_qP_jubA",
+      "language": "en",
+      "include_transcript_text": true
+    }
+  },
+  "providerResponse": {
+    "httpStatus": 200
+  },
+  "price": {
+    "type": "PER_RESULT",
+    "amount": {
+      "value": 0.0075,
+      "currency": "USD"
+    },
+    "notes": [
+      "One result is returned per input query. Total results and cost scale with the number of queries provided."
+    ]
+  },
+  "cost": {
+    "value": 0.0075,
+    "currency": "USD"
+  },
+  "resultCount": 1,
+  "billedUnits": 1,
+  "createdAt": "2026-10-03T03:01:01.947Z",
+  "startedAt": "2026-10-03T03:01:02.125Z",
+  "completedAt": "2026-10-03T03:01:08.369Z",
+  "hints": {
+    "retrieve the response later": "Call monid_get_run with {\"runId\":\"01M3ZVAE43DSXGHNXH2Q5NY3JM\"}"
+  },
+  "output": [
+    {
+      "available_languages": [
+        "English (auto-generated)"
+      ],
+      "channel_id": "UCStgOsWtx9Ptu9TmVgyHm7w",
+      "channel_name": "Humwork",
+      "channel_thumbnail": "https://yt3.ggpht.com/ceOitZfK2bdq5qmSJo2B93T5g-6JIThjhKKSmpr4Suxuj5GDzrnFifWV4qEDQgYzG-hZ-huOzQ=s800-c-k-c0x00ffffff-no-rj",
+      "channel_username": "humworkai",
+      "comment_count": 7,
+      "description": "Humwork lets AI agents chat with human experts in real-time. When AI agents like Claude Code or OpenClaw hit a wall, Humwork's MCP server connects them to a verified domain expert in under 30 seconds. Our experts include senior engineers, lawyers, marketers, designers, and more.",
+      "duration_seconds": 86,
+      "geo_restrict": null,
+      "is_auto_generated": true,
+      "language": "en",
+      "like_count": 35,
+      "message": "Successfully fetched the transcript for the video with ID 'Bqw_qP_jubA'",
+      "published_at": "2026-04-15T05:15:08Z",
+      "selected_language": "English (auto-generated)",
+      "status": "success",
+      "subscriber_count": 27,
+      "thumbnail": "https://i.ytimg.com/vi/Bqw_qP_jubA/hqdefault.jpg",
+      "timestamp": 1776230108,
+      "title": "Introducing Humwork (YC P26)",
+      "transcript": [
+        {
+          "duration": 5.88,
+          "end": 5.88,
+          "start": 0,
+          "text": "AI agents will pay you to chat with"
+        },
+        {
+          "duration": 6,
+          "end": 8.2,
+          "start": 2.2,
+          "text": "them. Yes, really. We built a platform"
+        },
+        {
+          "duration": 5,
+          "end": 10.88,
+          "start": 5.88,
+          "text": "where AI agents can hire human experts"
+        },
+        {
+          "duration": 5.12,
+          "end": 13.32,
+          "start": 8.2,
+          "text": "in real time and pay them for it."
+        },
+        {
+          "duration": 5.12,
+          "end": 16,
+          "start": 10.88,
+          "text": "This is Humwork. We are backed by Y"
+        },
+        {
+          "duration": 5.6,
+          "end": 18.92,
+          "start": 13.32,
+          "text": "Combinator to solve one problem. Your AI"
+        },
+        {
+          "duration": 5.08,
+          "end": 21.08,
+          "start": 16,
+          "text": "agents get stuck. Coding agents loop on"
+        },
+        {
+          "duration": 4.64,
+          "end": 23.56,
+          "start": 18.92,
+          "text": "the same bug. Legal AI site cases that"
+        },
+        {
+          "duration": 4.44,
+          "end": 25.52,
+          "start": 21.08,
+          "text": "don't exist. Marketing AIs have more end"
+        },
+        {
+          "duration": 4.32,
+          "end": 27.88,
+          "start": 23.56,
+          "text": "dashes than personality. And when that"
+        },
+        {
+          "duration": 5.4,
+          "end": 30.92,
+          "start": 25.52,
+          "text": "happens, the only one who can fix it is"
+        },
+        {
+          "duration": 4.96,
+          "end": 32.84,
+          "start": 27.88,
+          "text": "you. What if instead, they could ask"
+        },
+        {
+          "duration": 4.24,
+          "end": 35.16,
+          "start": 30.92,
+          "text": "expert? Let me show you what that looks"
+        },
+        {
+          "duration": 4.76,
+          "end": 37.6,
+          "start": 32.84,
+          "text": "like. Your agent hits a wall. It calls"
+        },
+        {
+          "duration": 4,
+          "end": 39.16,
+          "start": 35.16,
+          "text": "Humwork automatically. Then in under 30"
+        },
+        {
+          "duration": 3.92,
+          "end": 41.52,
+          "start": 37.6,
+          "text": "seconds, we match it with the right"
+        },
+        {
+          "duration": 4.64,
+          "end": 43.8,
+          "start": 39.16,
+          "text": "expert. Senior engineers, lawyers,"
+        },
+        {
+          "duration": 4.16,
+          "end": 45.68,
+          "start": 41.52,
+          "text": "designers, whatever your agent needs."
+        },
+        {
+          "duration": 3.76,
+          "end": 47.56,
+          "start": 43.8,
+          "text": "The expert drops in, talks directly to"
+        },
+        {
+          "duration": 4.4,
+          "end": 50.08,
+          "start": 45.68,
+          "text": "your agent, and solves the problem."
+        },
+        {
+          "duration": 4.56,
+          "end": 52.12,
+          "start": 47.56,
+          "text": "Allowing your agent to continue building"
+        },
+        {
+          "duration": 4.24,
+          "end": 54.32,
+          "start": 50.08,
+          "text": "without you ever lifting a finger. And"
+        },
+        {
+          "duration": 4.56,
+          "end": 56.68,
+          "start": 52.12,
+          "text": "the best part? The experts just earned"
+        },
+        {
+          "duration": 4.84,
+          "end": 59.16,
+          "start": 54.32,
+          "text": "real money for chatting with an AI."
+        },
+        {
+          "duration": 5.04,
+          "end": 61.72,
+          "start": 56.68,
+          "text": "Every expert on Humwork is verified and"
+        },
+        {
+          "duration": 4.36,
+          "end": 63.52,
+          "start": 59.16,
+          "text": "technically evaluated. No exceptions."
+        },
+        {
+          "duration": 4.16,
+          "end": 65.88,
+          "start": 61.72,
+          "text": "Thousands of them around the world"
+        },
+        {
+          "duration": 5.68,
+          "end": 69.2,
+          "start": 63.52,
+          "text": "available 24/7. You can add Humwork"
+        },
+        {
+          "duration": 6.32,
+          "end": 72.2,
+          "start": 65.88,
+          "text": "today as an MCP, API, or plugin to any"
+        },
+        {
+          "duration": 5.32,
+          "end": 74.52,
+          "start": 69.2,
+          "text": "AI agent out there. This is the future"
+        },
+        {
+          "duration": 5,
+          "end": 77.2,
+          "start": 72.2,
+          "text": "of work. Humans on the edge providing"
+        },
+        {
+          "duration": 4.96,
+          "end": 79.48,
+          "start": 74.52,
+          "text": "expertise AI contraplace."
+        },
+        {
+          "duration": 4.28,
+          "end": 81.48,
+          "start": 77.2,
+          "text": "If you build with AI, start today at"
+        },
+        {
+          "duration": 3.96,
+          "end": 83.44,
+          "start": 79.48,
+          "text": "humwork.ai. If you're an expert"
+        },
+        {
+          "duration": 5.52,
+          "end": 87,
+          "start": 81.48,
+          "text": "yourself, the agents are hiring and"
+        },
+        {
+          "duration": 3.56,
+          "end": 87,
+          "start": 83.44,
+          "text": "looking for someone like you."
+        }
+      ],
+      "transcript_text": "AI agents will pay you to chat with them. Yes, really. We built a platform where AI agents can hire human experts in real time and pay them for it. This is Humwork. We are backed by Y Combinator to solve one problem. Your AI agents get stuck. Coding agents loop on the same bug. Legal AI site cases that don't exist. Marketing AIs have more end dashes than personality. And when that happens, the only one who can fix it is you. What if instead, they could ask expert? Let me show you what that looks like. Your agent hits a wall. It calls Humwork automatically. Then in under 30 seconds, we match it with the right expert. Senior engineers, lawyers, designers, whatever your agent needs. The expert drops in, talks directly to your agent, and solves the problem. Allowing your agent to continue building without you ever lifting a finger. And the best part? The experts just earned real money for chatting with an AI. Every expert on Humwork is verified and technically evaluated. No exceptions. Thousands of them around the world available 24/7. You can add Humwork today as an MCP, API, or plugin to any AI agent out there. This is the future of work. Humans on the edge providing expertise AI contraplace. If you build with AI, start today at humwork.ai. If you're an expert yourself, the agents are hiring and looking for someone like you.",
+      "url": "https://www.youtube.com/watch?v=Bqw_qP_jubA",
+      "video_id": "Bqw_qP_jubA",
+      "view_count": 1672
+    }
+  ]
+}

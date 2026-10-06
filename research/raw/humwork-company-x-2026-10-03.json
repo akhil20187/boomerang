@@ -1,0 +1,67 @@
+{
+  "runId": "01M3ZV7ETZ4W1DHGN8BSA8ZZ72",
+  "caller": "USER#user_3IXuwaK4rfU1sJRo3ZyjD67zD4s",
+  "owner": "user_3IXuwaK4rfU1sJRo3ZyjD67zD4s",
+  "provider": "tikhub",
+  "providerName": "TikHub",
+  "endpoint": "/api/v1/twitter/web/fetch_user_post_tweet",
+  "status": "COMPLETED",
+  "input": {
+    "queryParams": {
+      "screen_name": "humworkai"
+    }
+  },
+  "providerResponse": {
+    "httpStatus": 200
+  },
+  "price": {
+    "type": "PER_CALL",
+    "amount": {
+      "value": 0.0015,
+      "currency": "USD"
+    }
+  },
+  "cost": {
+    "value": 0.0015,
+    "currency": "USD"
+  },
+  "resultCount": 1,
+  "billedUnits": 1,
+  "createdAt": "2026-10-03T02:59:24.493Z",
+  "startedAt": "2026-10-03T02:59:24.705Z",
+  "completedAt": "2026-10-03T02:59:27.663Z",
+  "hints": {
+    "retrieve the response later": "Call monid_get_run with {\"runId\":\"01M3ZV7ETZ4W1DHGN8BSA8ZZ72\"}"
+  },
+  "output": {
+    "timeline": [],
+    "next_cursor": null,
+    "prev_cursor": null,
+    "status": "ok",
+    "user": {
+      "status": "active",
+      "profile": "humworkai",
+      "rest_id": "2044073219104063488",
+      "blue_verified": false,
+      "verification_type": {
+        "is_identity_verified": false
+      },
+      "affiliates": [],
+      "business_account": [],
+      "avatar": "https://pbs.twimg.com/profile_images/2044073877547167746/9ZCDheKg_normal.jpg",
+      "header_image": "",
+      "desc": "When AI agents hit a wall, Humwork connects them to a verified domain expert in 30 seconds.",
+      "name": "Humwork",
+      "website": "humwork.ai",
+      "protected": false,
+      "location": "San Francisco",
+      "friends": 7,
+      "sub_count": 750,
+      "statuses_count": 1,
+      "media_count": 0,
+      "created_at": "Tue Apr 14 15:21:56 +0000 2026",
+      "pinned_tweet_ids_str": null,
+      "id": "2044073219104063488"
+    }
+  }
+}

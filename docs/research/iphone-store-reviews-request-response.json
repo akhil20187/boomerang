@@ -1,0 +1,137 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://places.googleapis.com/v1/places:searchText",
+    "headers": {
+      "X-Goog-Api-Key": "[REDACTED]",
+      "X-Goog-FieldMask": "places.id,places.displayName,places.rating,places.userRatingCount,places.reviews",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "textQuery": "iMagine Nexus Mall Kukatpally",
+      "regionCode": "IN",
+      "languageCode": "en",
+      "pageSize": 1
+    }
+  },
+  "response": {
+    "places": [
+      {
+        "id": "ChIJQYMLJImRyzsRUXxER-Dhepc",
+        "rating": 4.9,
+        "userRatingCount": 5157,
+        "displayName": {
+          "text": "iMagine (Apple Authorised Reseller)",
+          "languageCode": "en"
+        },
+        "reviews": [
+          {
+            "name": "places/ChIJQYMLJImRyzsRUXxER-Dhepc/reviews/Ci9DQUlRQUNvZENodHljRjlvT2xZM1RHRnJYMEZUU1RRMVZYUkJia3haWWtOMGFYYxAB",
+            "relativePublishTimeDescription": "3 months ago",
+            "rating": 5,
+            "text": {
+              "text": "The best and most trusted shop for all your apple products.All products are top notch & I recently purchased my macbook from them.The behavior of Mr. Naresh & Mr. Subhash is excellent & I thank u for guiding me on my recent purchase.Best wishes 2 all.\nThank u Hyderabad @ Kukatpally @ Nexus Mall @ Imagine Store👍",
+              "languageCode": "en"
+            },
+            "originalText": {
+              "text": "The best and most trusted shop for all your apple products.All products are top notch & I recently purchased my macbook from them.The behavior of Mr. Naresh & Mr. Subhash is excellent & I thank u for guiding me on my recent purchase.Best wishes 2 all.\nThank u Hyderabad @ Kukatpally @ Nexus Mall @ Imagine Store👍",
+              "languageCode": "en"
+            },
+            "authorAttribution": {
+              "displayName": "Siddharth Rout",
+              "uri": "https://www.google.com/maps/contrib/112489447568133059816/reviews",
+              "photoUri": "https://lh3.googleusercontent.com/a/ACg8ocIavAoOvjLWeI9W6os4V4Oj2YIDha9aJ0j2VzjLxtQGf6XbiA=s128-c0x00000000-cc-rp-mo-ba2"
+            },
+            "publishTime": "2026-06-07T08:11:36.900111022Z",
+            "flagContentUri": "https://www.google.com/local/content/rap/report?postId=Ci9DQUlRQUNvZENodHljRjlvT2xZM1RHRnJYMEZUU1RRMVZYUkJia3haWWtOMGFYYxAB&d=17924085&t=1",
+            "googleMapsUri": "https://www.google.com/maps/reviews/data=!4m6!14m5!1m4!2m3!1sCi9DQUlRQUNvZENodHljRjlvT2xZM1RHRnJYMEZUU1RRMVZYUkJia3haWWtOMGFYYxAB!2m1!1s0x3bcb9189240b8341:0x977ae1e047447c51"
+          },
+          {
+            "name": "places/ChIJQYMLJImRyzsRUXxER-Dhepc/reviews/Ci9DQUlRQUNvZENodHljRjlvT25rNU1YbHVSVGxtVkcxNllVcFhVMHcxWmt0TlEzYxAB",
+            "relativePublishTimeDescription": "2 months ago",
+            "rating": 1,
+            "text": {
+              "text": "Complaint Regarding Yellow Shade on Mobile Cover\n\nI purchased a Gripp Clear MagSafe Case for my Apple iPhone 17 Pro from Imagine Store. However, after using the cover, I noticed that the clear cover has developed a yellowish shade, which affects the appearance and quality of the product. Since the cover was purchased as a premium accessory, I request you to kindly inspect the issue and provide a suitable replacement or solution at the earliest. Complaint Regarding Yellow Shade on Mobile Cover\n\nI purchased a Gripp Clear MagSafe Case for my Apple iPhone 17 Pro from Imagine Store. However, after using the cover, I noticed that the clear cover has developed a yellowish shade, which affects the appearance and quality of the product. Since the cover was purchased as a premium accessory, I request you to kindly inspect the issue and provide a suitable replacement or solution at the earliest. Complaint Regarding Yellow Shade on Mobile Cover\n\nI purchased a Gripp Clear MagSafe Case for my Apple iPhone 17 Pro from Imagine Store. However, after using the cover, I noticed that the clear cover has developed a yellowish shade, which affects the appearance and quality of the product. Since the cover was purchased as a premium accessory, I request you to kindly inspect the issue and provide a suitable replacement or solution at the earliest.",
+              "languageCode": "en"
+            },
+            "originalText": {
+              "text": "Complaint Regarding Yellow Shade on Mobile Cover\n\nI purchased a Gripp Clear MagSafe Case for my Apple iPhone 17 Pro from Imagine Store. However, after using the cover, I noticed that the clear cover has developed a yellowish shade, which affects the appearance and quality of the product. Since the cover was purchased as a premium accessory, I request you to kindly inspect the issue and provide a suitable replacement or solution at the earliest. Complaint Regarding Yellow Shade on Mobile Cover\n\nI purchased a Gripp Clear MagSafe Case for my Apple iPhone 17 Pro from Imagine Store. However, after using the cover, I noticed that the clear cover has developed a yellowish shade, which affects the appearance and quality of the product. Since the cover was purchased as a premium accessory, I request you to kindly inspect the issue and provide a suitable replacement or solution at the earliest. Complaint Regarding Yellow Shade on Mobile Cover\n\nI purchased a Gripp Clear MagSafe Case for my Apple iPhone 17 Pro from Imagine Store. However, after using the cover, I noticed that the clear cover has developed a yellowish shade, which affects the appearance and quality of the product. Since the cover was purchased as a premium accessory, I request you to kindly inspect the issue and provide a suitable replacement or solution at the earliest.",
+              "languageCode": "en"
+            },
+            "authorAttribution": {
+              "displayName": "P j Josemon",
+              "uri": "https://www.google.com/maps/contrib/110449106064322294835/reviews",
+              "photoUri": "https://lh3.googleusercontent.com/a-/ALV-UjU6Du_7lT0wMBAbY2kFCQHAJwUvsOdrSPg7tUT0HbT5o4M_FsDLGw=s128-c0x00000000-cc-rp-mo-ba2"
+            },
+            "publishTime": "2026-07-10T06:34:52.183206008Z",
+            "flagContentUri": "https://www.google.com/local/content/rap/report?postId=Ci9DQUlRQUNvZENodHljRjlvT25rNU1YbHVSVGxtVkcxNllVcFhVMHcxWmt0TlEzYxAB&d=17924085&t=1",
+            "googleMapsUri": "https://www.google.com/maps/reviews/data=!4m6!14m5!1m4!2m3!1sCi9DQUlRQUNvZENodHljRjlvT25rNU1YbHVSVGxtVkcxNllVcFhVMHcxWmt0TlEzYxAB!2m1!1s0x3bcb9189240b8341:0x977ae1e047447c51"
+          },
+          {
+            "name": "places/ChIJQYMLJImRyzsRUXxER-Dhepc/reviews/Ci9DQUlRQUNvZENodHljRjlvT25CdWR6SXRXR05oV1RGNWJVZGhMVVV0VVhaeFVtYxAB",
+            "relativePublishTimeDescription": "6 months ago",
+            "rating": 5,
+            "text": {
+              "text": "Kiran sir clearly explained the differences between models, features, and pricing without pushing for an unnecessary upgrade. I appreciated how they listened to my needs and recommended options that suited my budget and usage.\n\nTheir professionalism and friendly attitude made the whole experience smooth and comfortable. They also helped with setup tips and answered all my questions without hesitation. Overall, the service was excellent, and it made me feel confident in my purchase. I would definitely recommend this store for anyone looking to buy an iPhone.",
+              "languageCode": "en"
+            },
+            "originalText": {
+              "text": "Kiran sir clearly explained the differences between models, features, and pricing without pushing for an unnecessary upgrade. I appreciated how they listened to my needs and recommended options that suited my budget and usage.\n\nTheir professionalism and friendly attitude made the whole experience smooth and comfortable. They also helped with setup tips and answered all my questions without hesitation. Overall, the service was excellent, and it made me feel confident in my purchase. I would definitely recommend this store for anyone looking to buy an iPhone.",
+              "languageCode": "en"
+            },
+            "authorAttribution": {
+              "displayName": "012- Sophiya",
+              "uri": "https://www.google.com/maps/contrib/112388182482319497953/reviews",
+              "photoUri": "https://lh3.googleusercontent.com/a/ACg8ocIMKtpZqtpF-oT5boR1dK8UDk52RQ-KP7KZtOhrGcJMTbt4uA=s128-c0x00000000-cc-rp-mo"
+            },
+            "publishTime": "2026-03-19T12:18:51.310720892Z",
+            "flagContentUri": "https://www.google.com/local/content/rap/report?postId=Ci9DQUlRQUNvZENodHljRjlvT25CdWR6SXRXR05oV1RGNWJVZGhMVVV0VVhaeFVtYxAB&d=17924085&t=1",
+            "googleMapsUri": "https://www.google.com/maps/reviews/data=!4m6!14m5!1m4!2m3!1sCi9DQUlRQUNvZENodHljRjlvT25CdWR6SXRXR05oV1RGNWJVZGhMVVV0VVhaeFVtYxAB!2m1!1s0x3bcb9189240b8341:0x977ae1e047447c51"
+          },
+          {
+            "name": "places/ChIJQYMLJImRyzsRUXxER-Dhepc/reviews/Ci9DQUlRQUNvZENodHljRjlvT25kZlkzSlhRbDl5VWxaTFExUlpZMk4xVTI5dFpFRRAB",
+            "relativePublishTimeDescription": "a year ago",
+            "rating": 5,
+            "text": {
+              "text": "I strongly recommend to visit all apple related products and services\nWe got i16 256 GB at 73k including card and store discount on July 2025.\n\n📌 Pin point google map location\n🅿️ Parking available for two and four wheeler vehicles\n🏪 Store is Heigine\n₹ They accept all types of payment methods\ncustom\n👌 Nice Customer Service",
+              "languageCode": "en"
+            },
+            "originalText": {
+              "text": "I strongly recommend to visit all apple related products and services\nWe got i16 256 GB at 73k including card and store discount on July 2025.\n\n📌 Pin point google map location\n🅿️ Parking available for two and four wheeler vehicles\n🏪 Store is Heigine\n₹ They accept all types of payment methods\ncustom\n👌 Nice Customer Service",
+              "languageCode": "en"
+            },
+            "authorAttribution": {
+              "displayName": "Krishna Udumula",
+              "uri": "https://www.google.com/maps/contrib/103021459312421582645/reviews",
+              "photoUri": "https://lh3.googleusercontent.com/a-/ALV-UjXa6CgoBX72ouDBcop6eTgmeHHkyybqufXraa3gAoQdOw5lztE=s128-c0x00000000-cc-rp-mo-ba6"
+            },
+            "publishTime": "2025-08-06T02:50:54.682037666Z",
+            "flagContentUri": "https://www.google.com/local/content/rap/report?postId=Ci9DQUlRQUNvZENodHljRjlvT25kZlkzSlhRbDl5VWxaTFExUlpZMk4xVTI5dFpFRRAB&d=17924085&t=1",
+            "googleMapsUri": "https://www.google.com/maps/reviews/data=!4m6!14m5!1m4!2m3!1sCi9DQUlRQUNvZENodHljRjlvT25kZlkzSlhRbDl5VWxaTFExUlpZMk4xVTI5dFpFRRAB!2m1!1s0x3bcb9189240b8341:0x977ae1e047447c51"
+          },
+          {
+            "name": "places/ChIJQYMLJImRyzsRUXxER-Dhepc/reviews/Ci9DQUlRQUNvZENodHljRjlvT25CbWExTjFlR0ZPVTFGTmMzQkpRWFkwUWt0MFowRRAB",
+            "relativePublishTimeDescription": "6 months ago",
+            "rating": 5,
+            "text": {
+              "text": "Naresh has been extremely helpful. I came in with an account issue during a busy weekend, but he didn’t hesitate to assist me. In fact, I had to visit twice with different queries, and each time he patiently helped resolve everything without expecting anything in return. Really appreciate the excellent service and dedication!",
+              "languageCode": "en"
+            },
+            "originalText": {
+              "text": "Naresh has been extremely helpful. I came in with an account issue during a busy weekend, but he didn’t hesitate to assist me. In fact, I had to visit twice with different queries, and each time he patiently helped resolve everything without expecting anything in return. Really appreciate the excellent service and dedication!",
+              "languageCode": "en"
+            },
+            "authorAttribution": {
+              "displayName": "K.tulasiramreddy",
+              "uri": "https://www.google.com/maps/contrib/104276717664036570326/reviews",
+              "photoUri": "https://lh3.googleusercontent.com/a/ACg8ocKM_RCf-wV3riLO-83HCNe8efRxq-2xPmemRmiIjLFJmH8AfA=s128-c0x00000000-cc-rp-mo"
+            },
+            "publishTime": "2026-03-15T13:28:42.055730609Z",
+            "flagContentUri": "https://www.google.com/local/content/rap/report?postId=Ci9DQUlRQUNvZENodHljRjlvT25CbWExTjFlR0ZPVTFGTmMzQkpRWFkwUWt0MFowRRAB&d=17924085&t=1",
+            "googleMapsUri": "https://www.google.com/maps/reviews/data=!4m6!14m5!1m4!2m3!1sCi9DQUlRQUNvZENodHljRjlvT25CbWExTjFlR0ZPVTFGTmMzQkpRWFkwUWt0MFowRRAB!2m1!1s0x3bcb9189240b8341:0x977ae1e047447c51"
+          }
+        ]
+      }
+    ]
+  }
+}

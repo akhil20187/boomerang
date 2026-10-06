@@ -1,0 +1,459 @@
+{
+  "runId": "01M4431QPKJ8DC2ZPPZW6ZE6CV",
+  "endpoint": "/delicious_zebu/amazon-product-details-scraper",
+  "input": {
+    "body": {
+      "Params": [
+        "https://www.amazon.in/dp/B0H4LBXQDC?th=1"
+      ],
+      "website": "amazon.in",
+      "language": "en",
+      "currency": "INR"
+    }
+  },
+  "cost": {
+    "value": 0.00375,
+    "currency": "USD"
+  },
+  "durationSeconds": 16.625,
+  "output": [
+    {
+      "search_source": "https://www.amazon.in/dp/B0H4LBXQDC?th=1",
+      "asin": "B0H4LBXQDC",
+      "product_url": "https://www.amazon.in/dp/B0H4LBXQDC",
+      "title": "Samsung Galaxy M47 5G Mobile (Blaze Blue, 6GB RAM, 128GB Storage, 6000mAh Battery)| 50MP OIS| Snapdragon Processor| LPDDR5X RAM,UFS 3.1 Storage| Gorilla Glass Victus+| sAMOLED| Knox Security| AI",
+      "brand_name": "Samsung",
+      "brand_page_url": "https://www.amazon.in/stores/SamsungBrandPage/page/7613B800-61FF-4320-8DEF-4A3711D5E41C?lp_asin=B0H4LBXQDC&ref_=ast_bln&store_ref=bl_ast_dp_brandlogo_sto&bl_grd_status=override",
+      "breadcrumbs": "Electronics › Mobiles & Accessories › Smartphones & Basic Mobiles › Smartphones",
+      "price": "₹35,999",
+      "price_value": 35999,
+      "currency": "INR",
+      "list_price": "₹46,999",
+      "discount_percent": "-23%",
+      "unit_price": "",
+      "subscribe_save_price": "",
+      "coupon": "",
+      "rating_stars": "3.1",
+      "rating_count": "700",
+      "rating_distribution": {
+        "5star": "36%",
+        "4star": "16%",
+        "3star": "8%",
+        "2star": "8%",
+        "1star": "32%"
+      },
+      "best_sellers_rank": "#3,191 in Electronics #129 in Smartphones",
+      "recent_purchases": "100+ bought in past month",
+      "badge": "",
+      "default_variant": [
+        "Colour: Blaze Blue",
+        "Size: 6GB + 128GB",
+        "Configuration: Without Samsung Care"
+      ],
+      "variants": [
+        {
+          "asin": "B0H4LBXQDC",
+          "attributes": [
+            "Blaze Blue",
+            "6GB + 128GB",
+            "Without Samsung Care"
+          ]
+        },
+        {
+          "asin": "B0HBW2CW1C",
+          "attributes": [
+            "Rogue Red",
+            "8GB + 128GB",
+            "With Samsung Care"
+          ]
+        },
+        {
+          "asin": "B0H4L5CSHK",
+          "attributes": [
+            "Blaze Blue",
+            "8GB + 128GB",
+            "Without Samsung Care"
+          ]
+        },
+        {
+          "asin": "B0HBWGQH5J",
+          "attributes": [
+            "Blaze Blue",
+            "8GB + 256GB",
+            "With Samsung Care"
+          ]
+        },
+        {
+          "asin": "B0H4L92YY7",
+          "attributes": [
+            "Rogue Red",
+            "8GB + 128GB",
+            "Without Samsung Care"
+          ]
+        },
+        {
+          "asin": "B0H4LBSKK3",
+          "attributes": [
+            "Blaze Blue",
+            "8GB + 256GB",
+            "Without Samsung Care"
+          ]
+        },
+        {
+          "asin": "B0H4L5T84X",
+          "attributes": [
+            "Rogue Red",
+            "6GB + 128GB",
+            "Without Samsung Care"
+          ]
+        },
+        {
+          "asin": "B0HBW4NB51",
+          "attributes": [
+            "Blaze Blue",
+            "6GB + 128GB",
+            "With Samsung Care"
+          ]
+        },
+        {
+          "asin": "B0HBWBRJ9L",
+          "attributes": [
+            "Blaze Blue",
+            "8GB + 128GB",
+            "With Samsung Care"
+          ]
+        },
+        {
+          "asin": "B0HBW5MQJG",
+          "attributes": [
+            "Rogue Red",
+            "6GB + 128GB",
+            "With Samsung Care"
+          ]
+        }
+      ],
+      "availability": "In stock",
+      "delivery_date": "Wednesday, 7 October",
+      "fastest_delivery_date": "Today 8 am - 12 pm",
+      "ships_from": "Amazon",
+      "seller_name": "Clicktech Retail Private Ltd",
+      "seller_page_url": "https://www.amazon.in/gp/help/seller/at-a-glance.html/ref=dp_merchant_link?ie=UTF8&seller=AJ6SIZC8YQDZX&asin=B0H4LBXQDC&ref_=dp_merchant_link&isAmazonFulfilled=1",
+      "returns": "10 days Service Centre Replacement",
+      "other_sellers": {},
+      "images": [
+        "https://m.media-amazon.com/images/I/71Wv9hJURNL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/71PLlLseWYL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/81DwyEghtoL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/81UB2drKY0L._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/81MFEedfxfL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/710NAAkc3jL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/71yWsT3wSvL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/81bTt3ADrIL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/711QMlaOMJL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/71kQ4fq4iQL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/81rvb3S8yBL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/81l4yKKKtBL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/719kbk31SBL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/71KCz47w0bL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/61yc8CRswNL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/71Zm+7DNvAL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/71c7+wiHChL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/61zZJ3L9Z-L._SL1500_.jpg"
+      ],
+      "videos": [
+        {
+          "title": "Samsung Galaxy M47 5G - Next Level Monster",
+          "duration_seconds": 40,
+          "url": "https://m.media-amazon.com/images/S/vse-vms-transcoding-artifact-eu-west-1-prod/2334eeb0-e904-42f8-b7bc-3c99003cabdd/default.vertical.jobtemplate.hls.m3u8",
+          "thumbnail": "https://m.media-amazon.com/images/I/71cK2vdcZpL.SX522_.jpg",
+          "creator": "",
+          "creator_type": "Vendor"
+        },
+        {
+          "title": "Samsung Galaxy M47 5G - Next Level Performance",
+          "duration_seconds": 35,
+          "url": "https://m.media-amazon.com/images/S/vse-vms-transcoding-artifact-eu-west-1-prod/c75f30d6-cf48-4b27-b492-ba92ec9a7d0f/default.vertical.jobtemplate.hls.m3u8",
+          "thumbnail": "https://m.media-amazon.com/images/I/71IEZITQrPL.SX522_.jpg",
+          "creator": "",
+          "creator_type": "Vendor"
+        },
+        {
+          "title": "Samsung Galaxy M47 5G",
+          "duration_seconds": 78,
+          "url": "https://m.media-amazon.com/images/S/vse-vms-transcoding-artifact-eu-west-1-prod/5fc0bc84-8d95-4b1d-aa8a-36a9af68ccb0/default.vertical.jobtemplate.hls.m3u8",
+          "thumbnail": "https://m.media-amazon.com/images/I/61thUC5ZhOL.SX522_.jpg",
+          "creator": "",
+          "creator_type": ""
+        },
+        {
+          "title": "Samsung Galaxy M47 5G - Next Level Monster",
+          "duration_seconds": 61,
+          "url": "https://m.media-amazon.com/images/S/vse-vms-transcoding-artifact-eu-west-1-prod/b9003e85-9251-488c-8b0b-b54460a571cc/default.vertical.jobtemplate.hls.m3u8",
+          "thumbnail": "https://m.media-amazon.com/images/I/61lDQoYanZL.SX522_.jpg",
+          "creator": "",
+          "creator_type": "Vendor"
+        },
+        {
+          "title": "Samsung Galaxy M47 5G vs Other Phones",
+          "duration_seconds": 33,
+          "url": "https://m.media-amazon.com/images/S/vse-vms-transcoding-artifact-eu-west-1-prod/1af7461d-37b2-4513-a3a3-23256d76d8b3/default.vertical.jobtemplate.hls.m3u8",
+          "thumbnail": "https://m.media-amazon.com/images/I/61fdVDhCwJL.SX522_.jpg",
+          "creator": "",
+          "creator_type": "Vendor"
+        },
+        {
+          "title": "Galaxy M47 5G - Next Level Monster",
+          "duration_seconds": null,
+          "url": "https://m.media-amazon.com/images/S/vse-vms-transcoding-artifact-eu-west-1-prod/6debe517-65f8-4bf7-a3a4-0f9c66698549/default.jobtemplate.hls.m3u8",
+          "thumbnail": "https://m.media-amazon.com/images/I/A1VyiPQ+JSL.jpg",
+          "creator": "",
+          "creator_type": ""
+        },
+        {
+          "title": "Galaxy M47 5G - Next Level Performance",
+          "duration_seconds": null,
+          "url": "https://m.media-amazon.com/images/S/vse-vms-transcoding-artifact-eu-west-1-prod/36ede77d-9d46-4017-99aa-d674efdb5511/default.jobtemplate.hls.m3u8",
+          "thumbnail": "https://m.media-amazon.com/images/I/91hiqSjn73L.jpg",
+          "creator": "",
+          "creator_type": ""
+        },
+        {
+          "title": "Galaxy M47 5G vs Other Phones",
+          "duration_seconds": null,
+          "url": "https://m.media-amazon.com/images/S/vse-vms-transcoding-artifact-eu-west-1-prod/72023e44-ae52-43e7-99ff-4f89228e5004/default.jobtemplate.hls.m3u8",
+          "thumbnail": "https://m.media-amazon.com/images/I/71HyT0cYzvL.jpg",
+          "creator": "",
+          "creator_type": ""
+        },
+        {
+          "title": "Galaxy M47 5G - Next Level Monster",
+          "duration_seconds": null,
+          "url": "https://m.media-amazon.com/images/S/vse-vms-transcoding-artifact-eu-west-1-prod/c5e9538a-0e12-4353-ab7d-2af1eb19ff7e/default.jobtemplate.hls.m3u8",
+          "thumbnail": "https://m.media-amazon.com/images/I/81K2v6aM3ML.jpg",
+          "creator": "",
+          "creator_type": ""
+        }
+      ],
+      "about_item": "𝐏𝐄𝐑𝐅𝐎𝐑𝐌𝐀𝐍𝐂𝐄 𝐔𝐍𝐋𝐄𝐀𝐒𝐇𝐄𝐃 - Galaxy M47 5G delivers Next Level Monster performance with its strong combination of Powerful Snapdragon Processor, Fast LPDDR5x and Fast UFS 3.1. It is made in India and it enables smooth multitasking and peak gaming performance with faster app switching reduced stutter during heavy usage, quicker app installations and faster game loading.   𝐁𝐔𝐈𝐋𝐓 𝐓𝐎𝐔𝐆𝐇 𝐀𝐍𝐃 𝐒𝐓𝐔𝐍𝐍𝐈𝐍𝐆 𝐃𝐈𝐒𝐏𝐋𝐀𝐘 - Galaxy M47 5G is built to last long with Corning Gorilla Glass Victus+ Protection providing 4x Better Scratch Resistance, 2.0 m Fall Endurance, unleash your adventurous side without any worry. Its Water and Dust Resistant design adds everyday confidence. On the front, a segment leading FHD+ Super AMOLED Display with 120Hz Refresh Rate and High Brightness Mode delivers captivating visuals with instant touch response - whether you are gaming, streaming or scrolling even under a bright sunlight.   𝐆𝐀𝐌𝐈𝐍𝐆 𝐍𝐎𝐍-𝐒𝐓𝐎𝐏 - Galaxy M47 5G is powered with bigger 6000 mAh battery and up to 8GB of RAM for you to enjoy extended gaming hours without any lag. It supports Bypass charging which gives more power to your phone allowing throttle free performance during intense gaming sessions. It carries high level of optimisations with the latest Android 16 and One UI 8.5 putting unused apps in sleep mode which prevents background drain so your adventure never stops.   𝐄𝐗𝐂𝐋𝐔𝐒𝐈𝐕𝐄 𝐁𝐑𝐀𝐍𝐃 𝐏𝐑𝐎𝐌𝐈𝐒𝐄 - Galaxy M47 5G comes with Segment Best 6 Gen of OS updates, 6 years of Security Upgrades, EAL5+ certified Knox Vault Security for enhanced Software and Hardware Security, and Seamless and secure payments with Samsung Wallet's Tap and Pay feature. Experience innovative AI features like Google Gemini, Circle to Search for enhanced search results and real time AI conversations. Stay worry free with the largest service network for smartphones, now serviced at more than 3300 touchpoints   𝐄𝐍𝐇𝐀𝐍𝐂𝐄𝐃 𝐂𝐀𝐌𝐄𝐑𝐀 𝐂𝐀𝐏𝐀𝐁𝐈𝐋𝐈𝐓𝐈𝐄𝐒 - Galaxy M47 5G mobile packs 50 MP OIS Triple Camera Setup with Front HDR Camera for a sharper, more detailed output in any light. Its HDR camera delivers vivid output even against bright backgrounds or harsh sunlight. It supports video recording in 4k resolution. The Nightography feature ensures stunning low light photos and its AI editing tools i.e. Object eraser, Edit suggestions and My Filter turn every picture into a masterpiece.",
+      "product_information": {
+        "Operating System": "Android 16.0 with One UI 8.5",
+        "RAM Memory Installed": "6 GB",
+        "Processor Series": "Snapdragon",
+        "Processor Speed": "2.4 GHz",
+        "Memory Storage Capacity": "128 GB",
+        "Colour": "Blaze Blue",
+        "SIM Card Slot Count": "Dual SIM",
+        "Connector Type": "USB Type C",
+        "Form Factor": "Bar",
+        "Biometric Security Feature": "Fingerprint Recognition",
+        "Human Interface Types": "Touchscreen",
+        "Sim Card Size": "Nano",
+        "Water Resistance Level": "Water Resistant",
+        "Product Features": "Always On Display, Built-In GPS, Expandable Memory, Fast Charging Support, Supports Usb Otg",
+        "Front Photo Sensor Resolution": "12 MP",
+        "Rear Facing Camera Photo Sensor Resolution": "2, 5, 50 MP",
+        "Camera Description": "Front, Rear",
+        "Camera Flash Type": "LED",
+        "Shooting Modes": "Bixby Vision,Food,Fun,Hyperlapse,Macro,Night,Panorama,Photo,Portrait,Pro,Pro Video,Single Take,Slow Motion,Super slow-mo,Video",
+        "Number of Rear Facing Cameras": "3",
+        "Number of Front Cameras": "1",
+        "Battery Capacity": "6000 milliamp_hours",
+        "Battery Description": "Lithium-Ion",
+        "Battery Power": "6000 Milliamp Hours",
+        "Item Weight Unit of Measure": "206 Grams",
+        "Item Dimensions": "8 x 78 x 162 Millimeters",
+        "GPS Geotagging Functionality": "True",
+        "Supported Satellite Navigation System": "BeiDou, GLONASS, GPS, Galileo",
+        "Screen Size Unit of Measure": "6.7 Inches",
+        "Resolution": "2340 x 1080",
+        "Refresh Rate": "120",
+        "Display Type": "AMOLED",
+        "Maximum Display Resolution": "2340 x 1080 Pixels Per Inch",
+        "Display Pixel Density": "387 Pixels Per Inch (PPI)",
+        "Wireless Provider": "Unlocked for All Carriers",
+        "Cellular Technology": "5G",
+        "Network Connectivity Technology": "Bluetooth, NFC, USB, Wi-Fi",
+        "Wireless Network Technology": "GSM, NFC, Wi-Fi",
+        "Brand Name": "Samsung",
+        "Model Year": "2026",
+        "Country of Origin": "India",
+        "Box Contents": "Data Cable (C to C), Quick Start Guide, SIM Ejection PIN, Smartphone",
+        "Warranty Description": "1 Year Manufacturer Warranty for Device and 6 Months for In-Box Accessories",
+        "Manufacturer": "Samsung, Samsung India Electronics Pvt. Ltd. having its Registered Office at: 6th Floor, DLF Centre, Sansad Marg, New Delhi – 110001. Email us at: support.india@samsung.com",
+        "Specific Uses For Product": "Entertainment, Gaming, Photography",
+        "Unit Count": "1 Count",
+        "Importer Contact Information": "Samsung India Electronics Pvt. Ltd. having its Registered Office at: 6th Floor, DLF Centre, Sansad Marg, New Delhi – 110001. Email us at: support.india@samsung.com",
+        "Item Type Name": "Smartphone",
+        "Manufacturer Contact Information": "Samsung India Electronics Pvt. Ltd. having its Registered Office at: 6th Floor, DLF Centre, Sansad Marg, New Delhi – 110001. Email us at: support.india@samsung.com",
+        "Packer Contact Information": "Samsung India Electronics Pvt. Ltd. having its Registered Office at: 6th Floor, DLF Centre, Sansad Marg, New Delhi – 110001. Email us at: support.india@samsung.com",
+        "ASIN": "B0H4LBXQDC",
+        "Video Capture Resolution": "1080p, 4k",
+        "Brand": "Samsung",
+        "RAM Memory Installed Size": "6 GB",
+        "CPU Model": "Snapdragon",
+        "CPU Speed": "2.4 GHz"
+      },
+      "model_number": "",
+      "manufacturer": "Samsung, Samsung India Electronics Pvt. Ltd. having its Registered Office at: 6th Floor, DLF Centre, Sansad Marg, New Delhi – 110001. Email us at: support.india@samsung.com",
+      "whats_in_the_box": [
+        "Smartphone",
+        "Data Cable (C to C)",
+        "SIM Ejection PIN",
+        "Quick Start Guide"
+      ],
+      "important_information": {},
+      "product_description": "Samsung Galaxy M47 5G (Blaze Blue, 6GB RAM, 128GB Storage) | Powerful Snapdragon Processor | Fast LPDDR5x RAM, UFS 3.1 Storage | Gorilla Glass Victus+ | IP64 | Super AMOLED Display | AI | Gemini Live",
+      "manufacturer_description": "Galaxy M47 5G - Next Level Monster\nGalaxy M47 5G - Next Level Performance\nGalaxy M47 5G vs Other Phones\nGalaxy M47 5G - Next Level Monster\nNext Level Performance\nPerformance unleashed\nEffortless multitasking. Lag-free gaming\nPowerful Snapdragon Processor | Fast LPDDR5X RAM | UFS 3.1 Storage\nNext Level Display\nSmooth. Sharp. Vibrant Display\nPrecision and detail in every pixel.\nSuper AMOLED Display | 120Hz Refresh Rate\nNext Level Battery\nBuilt to outlast your day\nGame more. Worry less.\n31 hours of video playback time* | 8+ hours of gaming* | 45W Fast charging\nBypass Charging\nStay cool. Play on\nMore power to your game, less strain on your battery.\nBypass charging\nNext Level Durability\nEngineered for endurance\nBe ready for every outdoor adventure.\nCorning Gorilla Glass Victus+ | Water and dust resistant | 4X scratch resistance | 2.0m fall endurance\nNext Level Camera\nCapture every detail\nSharp and vibrant HDR selfie camera\nEnhanced camera capabilities | Sharper detailed output\n4K Resolution Videos\n4K resolution video recording\nFull-clarity for smooth performance\nNext Level Editing\nRe-create. Re-touch. With AI\nPerfect every photo with AI editing tools\nNext Level Upgrades\nUpdated for the future\nStay updated and protected.\n6 Gen OS upgrades | 6 Years of security updates\nNext Level Payments\nJust Tap & Pay\nQuick access to secure payments with your fingerprint\nNext Level Design\nStyle meets adventure\nElevate your style.\nSleek design | Bold colours\nNext Level Privacy\nYour privacy, locked in.\nMost secure for payments and privacy.\nKnox security | Private album | Malicious web access alert\nNext Level Calling Experience\nElevate your calling experience\nOn-device Voicemail | AI Voice transcription\nOne UI 8.5\nDo more. Effortlessly. One UI 8.5 with Android 16\nExperience flagship inspired features\nNow Bar | Live notification | Home screen personalization\nGalaxy Experience\nSamsung Galaxy experience\nQuick Share | Voice Focus\nTerms and Conditions\nDoes the Galaxy M47 5G offer smooth multitasking and fast performance?\nYes, the Galaxy M47 5G is built to deliver fast, lag-free performance. Powered by a Qualcomm Snapdragon 6 Gen 3 (4nm) chip with LPDDR5X RAM and UFS 3.1 storage, it ensures instant app launches, swift file transfers, and fluid multitasking.\nHow durable is Galaxy M47 5G?\nThe Galaxy M47 5G features Corning Gorilla Glass Victus+ for 2x better scratch resistance and superior drop survival. It also has an IP64 rating, keeping it fully protected against dust ingress and everyday water splashes.\nHow long does the 6000mAh battery last, and what is \"Bypass Charging\" on the Galaxy M47 5G?\nThe 6000mAh battery delivers up to 31 hours of video playback. With 45W Bypass Charging, power is sent straight to the processor instead of the battery, minimizing heat buildup and protecting long-term battery health during gaming.\nHow is the Galaxy M47 5G display?\nThe Galaxy M47 5G features a segment-leading 120Hz Super AMOLED display. It delivers vibrant colors, silky-smooth scrolling, and exceptional clarity for an immersive viewing experience, even under direct bright sunlight.\nHow long will the Galaxy M47 5G receive software and security updates?\nSamsung provides industry-leading longevity with 6 generations of Android OS upgrades and 6 years of security updates. Shipping with Android 16 (One UI), your device stays secure and up-to-date for years to come.",
+      "customer_review_summary": "Customers report that the phone is extremely laggy and hangs constantly, making it frustrating to use. The display, battery life, and camera quality receive mixed reviews - while some find the display pleasant to use and the camera capable of capturing good shots, others report display problems, fast-draining battery, and poor camera performance. The phone's quality and value for money are also mixed, with some finding it very good while others say it's not worth the price.",
+      "customer_review_aspects": [
+        {
+          "aspect": "Quality",
+          "mentions": 191,
+          "positive": 64,
+          "negative": 127,
+          "sentiment": "mixed"
+        },
+        {
+          "aspect": "Battery life",
+          "mentions": 56,
+          "positive": 34,
+          "negative": 22,
+          "sentiment": "mixed"
+        },
+        {
+          "aspect": "Display",
+          "mentions": 48,
+          "positive": 19,
+          "negative": 29,
+          "sentiment": "mixed"
+        },
+        {
+          "aspect": "Camera quality",
+          "mentions": 46,
+          "positive": 26,
+          "negative": 20,
+          "sentiment": "mixed"
+        },
+        {
+          "aspect": "Performance",
+          "mentions": 195,
+          "positive": 27,
+          "negative": 168,
+          "sentiment": "negative"
+        },
+        {
+          "aspect": "Value for money",
+          "mentions": 153,
+          "positive": 31,
+          "negative": 122,
+          "sentiment": "negative"
+        },
+        {
+          "aspect": "Hanging",
+          "mentions": 40,
+          "positive": 2,
+          "negative": 38,
+          "sentiment": "negative"
+        },
+        {
+          "aspect": "User experience",
+          "mentions": 34,
+          "positive": 6,
+          "negative": 28,
+          "sentiment": "negative"
+        }
+      ],
+      "top_reviews": [
+        {
+          "reviewer": "shoba N",
+          "rating": 5,
+          "title": "M47: Samsung’s Quiet Powerhouse",
+          "date": "17 August 2026",
+          "country": "India",
+          "variant": "Colour: Rogue Red Size: 6GB + 128GB Configuration: Without Samsung Care",
+          "verified_purchase": true,
+          "helpful_votes": 15,
+          "body": "The Samsung M47 feels like one of those phones that quietly gets everything right. 📱✨ The design looks premium without trying too hard, the display is a joy to use, and the overall performance feels smooth in everyday use. What I especially like is how balanced the phone feels—it doesn't rely on one flashy feature while ignoring the basics. Battery life is solid, the camera is capable of capturing some really good shots, and Samsung's software experience makes the phone feel polished and easy to live with. **My verdict:** If you're looking for a phone that feels reliable, stylish, and well-rounded rather than just impressive on paper, the M47 is definitely worth considering. Samsung has managed to make this one feel like a phone you'll actually enjoy using every day. ❤️📱"
+        },
+        {
+          "reviewer": "Manphooli d.",
+          "rating": 1,
+          "title": "Defective Device & Horrible After-Sales Support from Amazon & Samsung.",
+          "date": "7 August 2026",
+          "country": "India",
+          "variant": "Colour: Rogue Red Size: 6GB + 128GB Configuration: Without Samsung Care",
+          "verified_purchase": true,
+          "helpful_votes": 98,
+          "body": "You would be better off buying a second-hand phone instead of this junk! It is completely pathetic, and neither Amazon nor Samsung is taking any responsibility. I ordered this phone on its release day (4th July 2026) and received it on 10th July 2026. From Day 1, the phone has been hanging constantly, crashing, and facing severe heating issues. The camera quality is also extremely poor. To put things into perspective, I bought a Redmi Note 8 Pro (6GB/128GB) back in 2019, and even today, with 70% storage full, it has never hung once! Meanwhile, this brand-new phone started lagging and freezing right out of the box. On top of that, I found a defect in the fingerprint sensor. I contacted both Amazon and Samsung, but neither took responsibility. I simply requested a replacement, but instead of processing it, they forced me to visit the service center multiple times. For the last 15 days, my phone, box, accessories, and invoice have all been sitting at the Samsung authorized service center, yet they haven't resolved the issue. Out of the last 28 days, I have barely used this device for 2-3 days. Please do not waste your hard-earned money on this device. I have been a loyal Amazon customer since 2017, but this experience has been deeply disappointing and unprofessional. I do not want endless repairs for a defective piece—I demand either a full refund or an upgrade to a better model immediately!"
+        },
+        {
+          "reviewer": "Jatin sharma",
+          "rating": 4,
+          "title": "Good phone",
+          "date": "7 September 2026",
+          "country": "India",
+          "variant": "Colour: Rogue Red Size: 6GB + 128GB Configuration: Without Samsung Care",
+          "verified_purchase": true,
+          "helpful_votes": 9,
+          "body": "Overall good phone camera quality is good and also audio is good but only i thing is that's why I gave this 4 star because of some lagging issue"
+        },
+        {
+          "reviewer": "Rupam",
+          "rating": 5,
+          "title": "Greatest phone under 26k",
+          "date": "30 August 2026",
+          "country": "India",
+          "variant": "Colour: Rogue Red Size: 6GB + 128GB Configuration: Without Samsung Care",
+          "verified_purchase": true,
+          "helpful_votes": 13,
+          "body": "I am writing after 7 days of use. Whoever is spreading negativity about Galaxy M47 i really don't know whats their problem. This is one of the best Budget friendly Smartphone under 26k. Device is smooth running. Display is Superrrrrrr Amoled. Best for video watch. Camera quality is best if you enable all the features. With Snap processors device run smoothly. Battery is awesome. I bought 45w charger and it completed 55 min to full charge. With 6 years of updates that's a plus point. Yes i agree this device is not for heavy gaming. Overall this is the best Phone"
+        },
+        {
+          "reviewer": "Ashish Tripathi",
+          "rating": 1,
+          "title": "Don't buy this phone",
+          "date": "7 August 2026",
+          "country": "India",
+          "variant": "Colour: Rogue Red Size: 6GB + 128GB Configuration: Without Samsung Care",
+          "verified_purchase": true,
+          "helpful_votes": 62,
+          "body": "⭐ Very Disappointing Experience with Samsung Galaxy M47 I purchased the Samsung Galaxy M47 on 10 July, and within just 15 days, on 24 July, the phone suddenly stopped charging. I submitted the phone to the Samsung Service Center. First, they told me that the charging socket was damaged and needed to be replaced. They ordered a new charging socket and replaced it, but the phone still did not turn on. After that, they said the display had failed and ordered a new display. Even after replacing the display, the phone still did not work. Now, after keeping my phone at the service center for around 15 days, they are telling me that the motherboard has also failed and they need to order another part. I bought a brand-new phone, and within just 15 days it has already gone through multiple hardware failures. This has been an extremely frustrating and disappointing experience. I genuinely regret my decision to purchase the Samsung Galaxy M47. A new phone should not create this kind of trouble within such a short period. I expected much better quality and after-sales service from Samsung. Very disappointed with this purchase."
+        },
+        {
+          "reviewer": "Shinchan",
+          "rating": 2,
+          "title": "Disappointed",
+          "date": "11 August 2026",
+          "country": "India",
+          "variant": "Colour: Blaze Blue Size: 6GB + 128GB Configuration: Without Samsung Care",
+          "verified_purchase": true,
+          "helpful_votes": 28,
+          "body": "After 1 month of usage, i can clearly say that this phone is not worth its price. It lags a lot and the ui is not smooth. It started lagging from the first week itself. It has a good camera and a good battery but it is just for normal usage. Do not buy this if you are looking for heavy usage. The display is good for the price range though. Overall my experience was disappointing as i was expecting more from a phone priced above 25k."
+        },
+        {
+          "reviewer": "Sreedhar RS",
+          "rating": 3,
+          "title": "AVOID this samsung model",
+          "date": "25 August 2026",
+          "country": "India",
+          "variant": "Colour: Rogue Red Size: 6GB + 128GB Configuration: Without Samsung Care",
+          "verified_purchase": true,
+          "helpful_votes": 27,
+          "body": "Cons Speaker sound is not good. Did not expect from Samsung . My old Samsung M51 had much better sound . Phone is very slow . I had to change many settings in developer mode to make it work fast ( even basic app opening was slow ). After changes its better . Pros The phone display is good though . I like the looks . Basic photos are good . I did not do detailed analysis of photos I use it only for basic stuff . I don't play games on phone . So can't comment on it . Battery lasts for 1.5 days for mixed usage . Overall It's not worth the price . Worth only if it's less than 20 k ."
+        },
+        {
+          "reviewer": "Raman",
+          "rating": 5,
+          "title": "Good Phone with Fast RAM and Storage",
+          "date": "16 September 2026",
+          "country": "India",
+          "variant": "Colour: Blaze Blue Size: 6GB + 128GB Configuration: Without Samsung Care",
+          "verified_purchase": true,
+          "helpful_votes": 5,
+          "body": "My dad has been using this for quite a few weeks now. With good storage UFS 3 and LPDDR5X RAM, he seems to like it - especially the phone is good design and thin enough . The speakers are mono, would have preferred stereo but sound is good enough that my Mom sometimes asks him to lower the sound😀 Overall good phone, with Samsung 6 year OS upgrade promise and a good snapdragon processor which is welcome shift from Exynos. Has Knox and all good security features as well."
+        }
+      ],
+      "scrape_time": "2026-10-05 02:33"
+    }
+  ]
+}

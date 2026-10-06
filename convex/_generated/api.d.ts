@@ -22,6 +22,7 @@ import type * as maintenance from "../maintenance.js";
 import type * as mcp from "../mcp.js";
 import type * as notifications from "../notifications.js";
 import type * as oauth from "../oauth.js";
+import type * as onboarding from "../onboarding.js";
 import type * as recordings from "../recordings.js";
 import type * as tasks from "../tasks.js";
 import type * as users from "../users.js";
@@ -50,6 +51,7 @@ declare const fullApi: ApiFromModules<{
   mcp: typeof mcp;
   notifications: typeof notifications;
   oauth: typeof oauth;
+  onboarding: typeof onboarding;
   recordings: typeof recordings;
   tasks: typeof tasks;
   users: typeof users;

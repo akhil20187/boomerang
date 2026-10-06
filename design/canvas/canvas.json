@@ -1,0 +1,190 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "DoneCompact.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
+      "page": "approved",
+      "title": "3c · Results (collapsed)",
+      "w": 390,
+      "x": 1880,
+      "y": 0
+    },
+    "ExpandA.dc.html": {
+      "h": 1900,
+      "is_interactive": true,
+      "page": "approved",
+      "title": "3a · expanded: AI calling, waiting",
+      "w": 390,
+      "x": 940,
+      "y": 1700
+    },
+    "ExpandB.dc.html": {
+      "h": 1900,
+      "is_interactive": true,
+      "page": "approved",
+      "title": "3b · expanded: in stock, prefers a personal call, retrying",
+      "w": 390,
+      "x": 1410,
+      "y": 1700
+    },
+    "ExpandC.dc.html": {
+      "h": 1900,
+      "is_interactive": true,
+      "page": "approved",
+      "title": "3c · expanded: in stock, prefers a personal call, no stock, couldn’t reach",
+      "w": 390,
+      "x": 1880,
+      "y": 1700
+    },
+    "Flow.dc.html": {
+      "h": 1500,
+      "is_interactive": true,
+      "page": "compare",
+      "title": "Option 1 · New status card (fallback)",
+      "w": 390,
+      "x": 0,
+      "y": 0
+    },
+    "FlowOne.dc.html": {
+      "h": 1500,
+      "is_interactive": true,
+      "page": "compare",
+      "title": "Option 2 · Same card changes (chosen)",
+      "w": 390,
+      "x": 470,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "approved",
+      "title": "1 · Shop list",
+      "w": 390,
+      "x": 0,
+      "y": 0
+    },
+    "More.dc.html": {
+      "h": 1360,
+      "is_interactive": true,
+      "page": "approved",
+      "title": "2 · Select shops + show more",
+      "w": 390,
+      "x": 470,
+      "y": 0
+    },
+    "Status.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
+      "page": "approved",
+      "title": "3b · Calls in progress (collapsed)",
+      "w": 390,
+      "x": 1410,
+      "y": 0
+    },
+    "StatusStart.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
+      "page": "approved",
+      "title": "3a · Calls started (collapsed)",
+      "w": 390,
+      "x": 940,
+      "y": 0
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-04T15:10:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "page": "compare",
+    "view": "canvas"
+  },
+  "notes": {
+    "apTitle": {
+      "kind": "title1",
+      "maxW": 2270,
+      "page": "approved",
+      "text": "Approved screens",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "cmpTitle": {
+      "kind": "title1",
+      "maxW": 860,
+      "page": "compare",
+      "text": "Tap “Call 3 shops” in each",
+      "w": 240,
+      "x": 0,
+      "y": -280
+    },
+    "expTitle": {
+      "kind": "title1",
+      "maxW": 1330,
+      "page": "approved",
+      "text": "Tapped open: expanded shop rows",
+      "w": 240,
+      "x": 940,
+      "y": 1440
+    },
+    "ovFlow": {
+      "fill": "blue",
+      "maxH": 900,
+      "page": "overview",
+      "size": 24,
+      "text": "How it works\n\n1. User shares a product link or describes the product, plus a pincode, in ChatGPT.\n2. Our server finds nearby shops; the shop card shows in the chat.\n3. User ticks shops (5 at a time, 'Show 5 more shops'), then taps 'Call 3 shops'.\n4. The same card turns into live call status. Our AI calls; if a shop wants a person, it shows 'Prefers a personal call' so the user can call directly (later: 'Passed to our team').\n5. Results: one row per shop, small call and map icons, tap for price, offers and the recording.\n6. Email with a live status link; 'Open on website' at the bottom of the card.",
+      "w": 560,
+      "x": 0,
+      "y": 300
+    },
+    "ovRules": {
+      "fill": "green",
+      "maxH": 900,
+      "page": "overview",
+      "size": 24,
+      "text": "Agreed rules (full list in DESIGN.md)\n\n- Highest Google rating first; shops with fewer than 50 ratings hidden unless too few others.\n- Rating shows count, e.g. ★ 4.6 (1,240).\n- No answer: AI retries once after 5 min.\n- Recording player like a voice note; otherwise 'answer from caller's notes'.\n- Phone's own font; black main button only; green = has it, blue = calling, amber = needs attention, grey = no luck, red = error.\n- Sample data only; nothing built or tested in ChatGPT yet.",
+      "w": 560,
+      "x": 640,
+      "y": 300
+    },
+    "ovTitle": {
+      "kind": "title1",
+      "maxW": 1400,
+      "page": "overview",
+      "text": "Human MCP · ChatGPT flow",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "More.dc.html",
+    "StatusStart.dc.html",
+    "Status.dc.html",
+    "DoneCompact.dc.html",
+    "ExpandA.dc.html",
+    "ExpandB.dc.html",
+    "ExpandC.dc.html",
+    "Flow.dc.html",
+    "FlowOne.dc.html"
+  ],
+  "pages": [
+    {
+      "id": "overview",
+      "name": "Overview"
+    },
+    {
+      "id": "approved",
+      "name": "Approved screens"
+    },
+    {
+      "id": "compare",
+      "name": "Compare: one card vs two"
+    }
+  ],
+  "title": "Human MCP ChatGPT Cards"
+}

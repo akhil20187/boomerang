@@ -11,3 +11,5 @@ call-bridge/.state/
 call-bridge/data/
 web/dist/
 docs/verification/*.webm
+.playwright-mcp/
+.claude/settings*.json
