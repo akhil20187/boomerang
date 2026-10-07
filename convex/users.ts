@@ -1,7 +1,7 @@
 import { query, mutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { requireUser, hashToken } from "./access";
-import { balances, configuredPrice } from "./credits";
+import { balances, configuredPrice, formatINR } from "./credits";
 export const updateProfile = mutation({
   args: { name: v.string() },
   returns: v.null(),
@@ -44,8 +44,12 @@ export const me = query({
       creditBalance: credit.balanceCents / 100,
       availableBalance: credit.availableCents / 100,
       reservedBalance: credit.reservedCents / 100,
-      currency: "USD",
+      balanceCents: credit.balanceCents,
+      availableCents: credit.availableCents,
+      reservedCents: credit.reservedCents,
+      currency: "INR",
       answerPriceCents,
+      answerPriceLabel: answerPriceCents === null ? null : formatINR(answerPriceCents),
       pricingConfigured: answerPriceCents !== null,
       callingEnabled: process.env.LIVE_CALLS_ENABLED === "true",
       emailConfigured:

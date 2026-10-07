@@ -111,6 +111,7 @@ export default defineSchema({
   tasks: defineTable({
     selfTest: v.optional(v.boolean()),
     answerPriceCents: v.optional(v.number()),
+    currency: v.optional(v.literal("INR")),
     verification: v.optional(v.boolean()),
     userId: v.id("users"),
     draftId: v.id("drafts"),
@@ -203,7 +204,7 @@ export default defineSchema({
     userId: v.id("users"),
     taskId: v.optional(v.id("tasks")),
     amount: v.number(),
-    currency: v.literal("USD"),
+    currency: v.union(v.literal("USD"), v.literal("INR")),
     type: v.union(
       v.literal("grant"),
       v.literal("reservation"),

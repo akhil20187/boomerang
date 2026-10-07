@@ -9,7 +9,7 @@ const modules = import.meta.glob([
   "!../convex/**/*.d.ts",
 ]);
 afterEach(() => vi.unstubAllEnvs());
-it("welcome credit is exactly one dollar and repeated approval cannot duplicate it", async () => {
+it("welcome credit is exactly ₹100 in INR and repeated approval cannot duplicate it", async () => {
   const t = convexTest(schema, modules);
   const email = "welcome-test@example.com";
   const userId = await t.run(ctx => ctx.db.insert("users", { email }));
@@ -19,11 +19,14 @@ it("welcome credit is exactly one dollar and repeated approval cannot duplicate 
     await t.mutation(internal.admin.approve, { email, grantWelcomeCredit: true });
   const account = await user.query(api.users.me, {});
   expect(account.eligible).toBe(true);
-  expect(account.creditBalance).toBe(1);
-  expect(account.availableBalance).toBe(1);
+  expect(account.creditBalance).toBe(100);
+  expect(account.availableBalance).toBe(100);
+  expect(account.availableCents).toBe(10000);
   expect(account.reservedBalance).toBe(0);
+  expect(account.currency).toBe("INR");
   const grants = await t.run(ctx => ctx.db.query("creditEntries").collect());
   expect(grants.filter(entry => entry.type === "grant")).toHaveLength(1);
+  expect(grants[0]).toMatchObject({amountCents: 10000, currency: "INR"});
 });
 it('verified signup onboarding approves and grants once, preserving existing welcome grants', async () => {
   const t = convexTest(schema, modules);
@@ -32,7 +35,7 @@ it('verified signup onboarding approves and grants once, preserving existing wel
   await t.run(ctx => approveWithWelcomeCredit(ctx, userId));
   const account = await t.withIdentity({subject:`${userId}|session`}).query(api.users.me, {});
   expect(account.eligible).toBe(true);
-  expect(account.availableBalance).toBe(1);
+  expect(account.availableBalance).toBe(100);
   const existing = await t.run(async ctx => {
     const id = await ctx.db.insert('users', {email:'legacy@example.com'});
     await ctx.db.insert('creditEntries', {userId:id,amount:5,currency:'USD',type:'grant',reason:'Legacy welcome credit',operationId:`welcome:${id}`});
@@ -150,7 +153,7 @@ it("rejects a changed or missing customer quote before saving any task or held c
         idempotencyKey: "price-review",
         expectedAnswerPriceCents,
       }),
-    ).rejects.toThrow("service-call price");
+    ).rejects.toThrow("The price changed to ₹2 per answer");
   const balance = await s.user.query(api.users.me, {});
   expect(balance.reservedBalance).toBe(0);
   expect(balance.availableBalance).toBe(5);
@@ -334,4 +337,21 @@ it("can charge substantive caller notes without a recording or final price", asy
   expect(
     (await s.user.query(api.tasks.get, { taskId })).shops[0].billingState,
   ).toBe("charged");
+});
+it("explains a credit shortfall in rupees with how many shops are affordable", async () => {
+  const s = await setup("300");
+  await s.t.run(async ctx => {
+    const shops = [1, 2].map(i => ({placeId:`p${i}`,name:`Shop ${i}`,address:"Road",phone:"+919999999999",ratingCount:100,distanceKm:1,mapsUrl:"https://maps.google.com",fewRatings:false}));
+    await ctx.db.patch(s.draftId, {shops});
+  });
+  await expect(s.user.mutation(api.tasks.start, {draftId:s.draftId,selectedPlaceIds:["p1","p2"],idempotencyKey:"too-many",expectedAnswerPriceCents:300}))
+    .rejects.toThrow("You have ₹5, enough for 1 shop. Pick fewer shops.");
+  expect((await s.user.query(api.users.me, {})).reservedBalance).toBe(0);
+});
+it("saves new tasks in INR", async () => {
+  const s = await setup("300");
+  const {taskId} = await s.user.mutation(api.tasks.start, {draftId:s.draftId,selectedPlaceIds:["p1"],idempotencyKey:"inr-task",expectedAnswerPriceCents:300});
+  expect((await s.user.query(api.tasks.get, {taskId})).task.currency).toBe("INR");
+  const entries = await s.t.run(ctx => ctx.db.query("creditEntries").collect());
+  expect(entries.find(e => e.type === "reservation")?.currency).toBe("INR");
 });

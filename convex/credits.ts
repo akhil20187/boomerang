@@ -15,6 +15,11 @@ export function configuredPrice() {
     );
   return Number(raw);
 }
+// Amounts are stored in paise (₹1 = 100 paise) in the existing *Cents fields.
+export function formatINR(paise: number) {
+  const rupees = paise / 100;
+  return "₹" + rupees.toLocaleString("en-IN", {minimumFractionDigits: Number.isInteger(rupees) ? 0 : 2, maximumFractionDigits: 2});
+}
 export function callingQuote() {
   let answerPriceCents: number | null = null;
   try { answerPriceCents = configuredPrice(); } catch {}
@@ -23,7 +28,7 @@ export function callingQuote() {
     !process.env.CALL_BRIDGE_URL || !process.env.CALL_BRIDGE_SECRET ? 'calling_not_ready' : null;
   const message = reason === 'pricing_not_configured' ? 'Shop calling is unavailable because the service price has not been set.' :
     reason ? 'Shop calling is currently unavailable. You can still discover shops.' : null;
-  return {answerPriceCents, callingAvailable: reason === null, callingUnavailableReason: reason, callingUnavailableMessage: message};
+  return {answerPriceCents, currency: 'INR' as const, answerPriceLabel: answerPriceCents === null ? null : formatINR(answerPriceCents), callingAvailable: reason === null, callingUnavailableReason: reason, callingUnavailableMessage: message};
 }
 export async function balances(
   ctx: QueryCtx | MutationCtx,
@@ -77,13 +82,13 @@ export async function reserve(
 ) {
   const account = await accountForWrite(ctx, userId);
   const total = price * shopJobIds.length;
-  if (
-    !Number.isSafeInteger(total) ||
-    account.balanceCents - account.reservedCents < total
-  )
+  const available = account.balanceCents - account.reservedCents;
+  if (!Number.isSafeInteger(total) || available < total) {
+    const affordable = Math.max(0, Math.floor(available / price));
     throw new ConvexError(
-      "Your available credit cannot cover these shops. Add credit or pick fewer shops.",
+      `You have ${formatINR(Math.max(0, available))}, enough for ${affordable} ${affordable === 1 ? "shop" : "shops"}. Pick fewer shops.`,
     );
+  }
   await ctx.db.patch(account._id, {
     reservedCents: account.reservedCents + total,
   });
@@ -101,7 +106,7 @@ export async function reserve(
       shopJobId,
       amount: 0,
       amountCents: price,
-      currency: "USD",
+      currency: "INR",
       type: "reservation",
       reason: "Credit held for one final shop answer",
       operationId: `reserve:${shopJobId}`,
@@ -143,7 +148,7 @@ export async function settle(
     shopJobId,
     amount: chargeable ? -price / 100 : 0,
     amountCents: chargeable ? -price : price,
-    currency: "USD",
+    currency: "INR",
     type: chargeable ? "charge" : "release",
     reason: chargeable
       ? "Final caller answer supplied; notes-only evidence is accepted"
@@ -192,7 +197,7 @@ export const refund = internalMutation({
       shopJobId: r.shopJobId,
       amount: r.amountCents / 100,
       amountCents: r.amountCents,
-      currency: "USD",
+      currency: "INR",
       type: "refund",
       reason: args.reason,
       operationId: `refund:${r.shopJobId}`,

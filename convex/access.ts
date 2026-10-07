@@ -69,6 +69,6 @@ export async function requireEligible(ctx: MutationCtx, userId: any) {
     );
   const balance = await balances(ctx, userId);
   if (balance.availableCents <= 0)
-    throw new ConvexError("Your account needs credit before calls can start.");
+    throw new ConvexError("You’ve used all your credit. Paid top-ups aren’t available yet.");
   return user;
 }

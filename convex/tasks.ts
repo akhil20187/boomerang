@@ -9,7 +9,7 @@ import { v, ConvexError } from "convex/values";
 import { requireUser, requireEligible } from "./access";
 import { validateSelection } from "./domain";
 import { workflow } from "./workflows";
-import { configuredPrice, reserve, balances } from "./credits";
+import { configuredPrice, reserve, balances, formatINR } from "./credits";
 import { paginationOptsValidator } from "convex/server";
 import { terminalStates } from "./validators";
 export const start = mutation({
@@ -65,7 +65,7 @@ export const start = mutation({
     const answerPriceCents = configuredPrice();
     if (args.expectedAnswerPriceCents !== answerPriceCents)
       throw new ConvexError(
-        "Review the current service-call price shown in the shop search and approve the total again. No calls started and no credit was charged.",
+        `The price changed to ${formatINR(answerPriceCents)} per answer. Check and press Call again. No calls started and no credit was charged.`,
       );
     const customer = await requireEligible(ctx, userId);
     if (!(customer as any).name?.trim())
@@ -101,6 +101,7 @@ export const start = mutation({
       approvedAt: Date.now(),
       idempotencyKey: args.idempotencyKey,
       answerPriceCents,
+      currency: "INR",
     });
     const shopJobIds = [];
     for (const shop of selected)
