@@ -357,8 +357,8 @@ export const endpoint = httpAction(async (ctx, request) => {
         if (!account) throw new Error("Sign in required");
         result = { email: account.email, eligible: account.eligible,
           availableBalance: account.availableBalance, creditBalance: account.creditBalance,
-          reservedBalance: account.reservedBalance, currency: account.currency,
-          ...callingQuote() };
+          reservedBalance: account.reservedBalance, availableCents: account.availableCents,
+          reservedCents: account.reservedCents, ...callingQuote() };
       } else if (name === "find_shops")
         result = await ctx.runAction(api.discovery.search, {
           ...args,
