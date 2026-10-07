@@ -367,6 +367,7 @@ it("explains each shop's charge and totals the task", async () => {
   let task = await s.user.query(api.tasks.get, {taskId});
   expect(task.shops.map((x: any) => x.chargeNote)).toEqual(Array(3).fill({kind:"held",amountCents:1000}));
   expect(task.task).toMatchObject({heldCents:3000,maxCents:3000,currency:"INR"});
+  expect(task.task.refundedCents).toBe(0);
   const [a, b, c] = task.shops.map((x: any) => x._id);
   await s.t.run(async ctx => {
     await ctx.db.patch(a, {state:"answered",answer:{stock:"available",variantMatch:"yes",notes:"ok"}} as any);

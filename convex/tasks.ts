@@ -181,7 +181,7 @@ export const get = query({
       }),
     );
     return {
-      task:{...task,currency:'INR',...billingTotals(reservations)},
+      task:{...task,currency:task.currency??'USD',...billingTotals(reservations)},
       credit: await balances(ctx, userId),
       product: task.product,
       shops,

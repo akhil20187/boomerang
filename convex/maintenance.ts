@@ -26,7 +26,7 @@ export const convertCreditsToRupees = internalMutation({
   args: { cursor: v.union(v.string(), v.null()) },
   returns: v.any(),
   handler: async (ctx, args) => {
-    const page = await ctx.db.query("creditEntries").paginate({ cursor: args.cursor, numItems: 100 });
+    const page = await ctx.db.query("creditEntries").paginate({ cursor: args.cursor, numItems: 10 });
     const users = [...new Set(page.page.filter(e => e.currency === "USD").map(e => e.userId))];
     const mismatched: Id<"users">[] = [];
     let converted = 0;

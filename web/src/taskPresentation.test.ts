@@ -42,6 +42,7 @@ test('task charge summary for history rows',()=>{
  assert.equal(taskChargeText({...base,chargedCents:0,notChargedCount:3,maxCents:3000}),'No charge · 3 shops not charged');
  assert.equal(taskChargeText({...base,chargedCents:3000,notChargedCount:0,maxCents:3000}),'Charged ₹30');
  assert.equal(taskChargeText({...base,active:true,chargedCents:0,maxCents:3000}),'Up to ₹30 · final charge when calls finish');
+ assert.equal(taskChargeText({...base,chargedCents:0,refundedCents:1000,notChargedCount:2,maxCents:3000}),'No charge · ₹10 refunded · 2 shops not charged');
 });
 test('credit history rows say what happened in plain words',()=>{
  assert.deepEqual(creditRowText({type:'grant',amountCents:10000}),{title:'Credit added',detail:'',amount:'+₹100'});
