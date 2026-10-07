@@ -1,5 +1,8 @@
 import { ConvexError, v } from "convex/values";
-import { internalMutation } from "./_generated/server";
+import { internalMutation, internalQuery, query } from "./_generated/server";
+import { paginationOptsValidator } from "convex/server";
+import { requireUser } from "./access";
+import { notChargedReason } from "./domain";
 import type { QueryCtx, MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 export function configuredPrice() {
@@ -229,3 +232,33 @@ export async function convertUserToRupees(ctx: MutationCtx, userId: Id<"users">)
   for (const r of reservations) await ctx.db.patch(r._id, { amountCents: r.amountCents * 100 });
   return "converted" as const;
 }
+export const availableFor = internalQuery({
+  args: { userId: v.union(v.id("users"), v.null()) },
+  returns: v.union(v.number(), v.null()),
+  handler: async (ctx, args) => args.userId ? (await balances(ctx, args.userId)).availableCents : null,
+});
+// Money movements for the signed-in user. Holds are left out: a call appears
+// once, when it settles; money currently held is shown separately.
+export const history = query({
+  args: { paginationOpts: paginationOptsValidator, accessToken: v.optional(v.string()) },
+  returns: v.any(),
+  handler: async (ctx, args) => {
+    const userId = await requireUser(ctx, args.accessToken);
+    const result = await ctx.db.query("creditEntries")
+      .withIndex("by_user", q => q.eq("userId", userId))
+      .order("desc")
+      .filter(q => q.neq(q.field("type"), "reservation"))
+      .paginate(args.paginationOpts);
+    const page = await Promise.all(result.page.map(async e => {
+      const task = e.taskId ? await ctx.db.get(e.taskId) : null;
+      const job = e.shopJobId ? await ctx.db.get(e.shopJobId) : null;
+      return {
+        _id: e._id, _creationTime: e._creationTime, type: e.type, currency: e.currency,
+        amountCents: e.amountCents ?? Math.round(e.amount * 100),
+        taskId: e.taskId, productName: task?.product.name, shopName: job?.shop.name,
+        note: e.type === "release" ? notChargedReason(job?.state) : undefined,
+      };
+    }));
+    return { ...result, page };
+  },
+});

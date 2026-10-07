@@ -1,4 +1,5 @@
 import type { Id } from "./_generated/dataModel";
+import { notChargedReason } from "./domain";
 import {
   mutation,
   query,
@@ -249,8 +250,6 @@ export const markRunning = internalMutation({
 type Reservation={shopJobId:Id<'shopJobs'>;amountCents:number;state:'reserved'|'charged'|'released'|'refunded'};
 const sumCents=(rows:Reservation[],state?:Reservation['state'])=>rows.filter(r=>!state||r.state===state).reduce((n,r)=>n+r.amountCents,0);
 function billingTotals(rows:Reservation[]){return {chargedCents:sumCents(rows,'charged'),heldCents:sumCents(rows,'reserved'),releasedCents:sumCents(rows,'released'),refundedCents:sumCents(rows,'refunded'),maxCents:sumCents(rows)}}
-// Same wording as notChargedReason in web/src/taskPresentation.ts.
-function notChargedReason(state?:string){return state==='unreachable'?'shop didn’t answer':state==='personal_call_needed'?'shop prefers a personal call':state==='technical_error'||state==='failed'?'call didn’t finish':'no useful answer'}
 function chargeNote(task:{selfTest?:boolean;verification?:boolean},state:string,r?:Reservation){
   if(task.selfTest||task.verification)return {kind:'free',amountCents:0};
   if(!r)return null;

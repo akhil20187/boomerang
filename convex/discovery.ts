@@ -248,6 +248,7 @@ export const search = action({
     return {
       draftId,
       ...callingQuote(),
+      availableCents: await ctx.runQuery(internal.credits.availableFor, { userId: userId ?? null }),
       product,
       shops: cleanShops,
       pincode: args.pincode,

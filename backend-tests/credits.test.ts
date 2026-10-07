@@ -387,3 +387,29 @@ it("explains each shop's charge and totals the task", async () => {
   task = await s.user.query(api.tasks.get, {taskId});
   expect(task.shops[0].chargeNote).toEqual({kind:"refunded",amountCents:1000});
 });
+it("credit history lists only the signed-in user's money movements, newest first, without holds", async () => {
+  const s = await setup("1000");
+  const {taskId} = await s.user.mutation(api.tasks.start, {draftId:s.draftId,selectedPlaceIds:["p1"],idempotencyKey:"history-1",expectedAnswerPriceCents:300}).catch(() => ({taskId:null}));
+  expect(taskId).toBeNull();
+  await s.t.run(ctx => ctx.db.insert("creditEntries", {userId:s.userId,amount:100,amountCents:10000,currency:"INR",type:"grant",reason:"top",operationId:"top"}));
+  const started = await s.user.mutation(api.tasks.start, {draftId:s.draftId,selectedPlaceIds:["p1"],idempotencyKey:"history-2",expectedAnswerPriceCents:1000});
+  const task = await s.user.query(api.tasks.get, {taskId:started.taskId});
+  await s.t.run(ctx => settle(ctx, task.shops[0]._id, true));
+  const other = await s.t.run(async ctx => {
+    const id = await ctx.db.insert("users", {email:"other@example.com"});
+    await ctx.db.insert("creditEntries", {userId:id,amount:100,amountCents:10000,currency:"INR",type:"grant",reason:"theirs",operationId:"theirs"});
+    return id;
+  });
+  const page = await s.user.query(api.credits.history, {paginationOpts:{numItems:10,cursor:null}});
+  expect(page.page.map((r: any) => r.type)).toEqual(["charge", "grant", "grant"]);
+  expect(page.page[0]).toMatchObject({amountCents:-1000,taskId:started.taskId,productName:"phone",shopName:"Shop"});
+  expect(page.page.some((r: any) => "operationId" in r)).toBe(false);
+  const theirs = await s.t.withIdentity({subject:`${other}|session`}).query(api.credits.history, {paginationOpts:{numItems:10,cursor:null}});
+  expect(theirs.page).toHaveLength(1);
+  await expect(s.t.query(api.credits.history, {paginationOpts:{numItems:10,cursor:null}})).rejects.toThrow();
+});
+it("a saved search includes the price label and available credit", async () => {
+  const s = await setup("1000");
+  const draft = await s.user.query(api.drafts.get, {draftId:s.draftId});
+  expect(draft).toMatchObject({answerPriceCents:1000,answerPriceLabel:"₹10",currency:"INR",availableCents:500});
+});
