@@ -1,6 +1,7 @@
 import { convexAuth } from "@convex-dev/auth/server";
 import { Email } from "@convex-dev/auth/providers/Email";
 import { approveWithWelcomeCredit } from './onboarding';
+import { websiteRedirect } from './websiteOrigins';
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [
     Email({
@@ -42,12 +43,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         await approveWithWelcomeCredit(ctx, args.userId);
     },
     async redirect({ redirectTo }) {
-      const base = process.env.SITE_URL ?? "http://localhost:5173";
-      if (!redirectTo) return base;
-      const url = new URL(redirectTo, base);
-      if (url.origin !== new URL(base).origin)
-        throw new Error("Sign-in redirect is not allowed.");
-      return url.toString();
+      return websiteRedirect(redirectTo);
     },
   },
 });

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test voice-test/*.test.cjs call-bridge/*.test.cjs mcp/*.test.mjs web/src/errors.test.ts",
+    "test": "node --test voice-test/*.test.cjs call-bridge/*.test.cjs mcp/*.test.mjs web/src/errors.test.ts scripts/configure-development.test.mjs",
     "test:backend": "vitest run backend-tests",
     "typecheck": "tsc -p web/tsconfig.json && tsc -p convex/tsconfig.json",
     "dev": "vite --config web/vite.config.ts --host 127.0.0.1",
@@ -28,6 +28,7 @@
     "@playwright/test": "^1.63.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@vercel/analytics": "^2.0.1",
     "@vitejs/plugin-react": "^6.1.1",
     "convex": "^1.46.0",
     "convex-test": "^0.0.60",

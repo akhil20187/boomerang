@@ -21,6 +21,7 @@ const setupSource=await fs.readFile(path.resolve('design/pages/connect-boomerang
 const styleEnd=setupSource.indexOf('</style>')+'</style>'.length;
 if(styleEnd<'</style>'.length)throw new Error('Setup page style boundary is missing.');
 const publicSite=process.env.MCP_PUBLIC_URL || process.env.CONVEX_SITE_URL || 'https://little-kangaroo-718.convex.site';
+const website=process.env.VITE_APP_PUBLIC_URL || publicSite;
 const setup=setupSource
  .replace('https://[YOUR-APP].convex.site/mcp',new URL('/mcp',publicSite).href)
  .replace('Sign up on our website first.','<a href="/account">Sign in on our website</a> first.')
@@ -45,9 +46,11 @@ const landing=landingSource
  .replace('<title>Boomerang Landing Story</title>','<title>Boomerang · We call shops for you</title>')
  .replaceAll('https://little-kangaroo-718.convex.site/account','/account')
  .replaceAll('https://little-kangaroo-718.convex.site/mcp',new URL('/mcp',publicSite).href)
- .replaceAll('https://little-kangaroo-718.convex.site/SKILL.md',new URL('/SKILL.md',publicSite).href);
+ .replaceAll('https://little-kangaroo-718.convex.site/SKILL.md',new URL('/SKILL.md',website).href)
+ .replaceAll('https://<wbr>little-kangaroo-718.convex.site<wbr>/SKILL.md',new URL('/SKILL.md',website).href);
 const skill=await fs.readFile(path.resolve('web/public/SKILL.md'),'utf8');
-await fs.writeFile(path.join(directory,'SKILL.md'),skill.replaceAll('https://little-kangaroo-718.convex.site',new URL(publicSite).origin));
+const publishedSkill=skill.replace(/https:\/\/little-kangaroo-718\.convex\.site(\/[^\s"`]*)?/g,(_match,route='')=>new URL(route||'/',route==='/mcp'?publicSite:website).href);
+await fs.writeFile(path.join(directory,'SKILL.md'),publishedSkill);
 await fs.copyFile(path.join(directory,'SKILL.md'),path.join(directory,'boomerang-skill.md'));
 const icons='<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png">';
 // A complete page (doctype + head) is published as-is with the icons added; a fragment is wrapped.

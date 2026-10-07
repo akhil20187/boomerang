@@ -6,6 +6,22 @@ import { auth } from "./auth";
 import { endpoint, oauthHttp } from "./mcp";
 const http = httpRouter();
 auth.addHttpRoutes(http);
+// Website bookmarks go to the canonical frontend; service endpoints stay here.
+function websiteRedirect(request: Request, path: string) {
+  const current = new URL(request.url);
+  const base = process.env.SITE_URL;
+  if (!base || new URL(base).origin === current.origin) return null;
+  const target = new URL(path, base);
+  target.search = current.search;
+  return new Response(null, { status: 302, headers: {
+    Location: target.href, 'Cache-Control': 'no-store',
+  } });
+}
+for (const path of ['/app', '/account', '/tasks', '/status', '/connect', '/demo', '/landing.html', '/index.html']) {
+  const destination = path === '/landing.html' ? '/' : path === '/index.html' ? '/app' : path;
+  http.route({ path, method: 'GET', handler: httpAction(async (_ctx, request) =>
+    websiteRedirect(request, destination) ?? new Response('Website address is not configured.', { status: 503 })) });
+}
 // The shareable skill should open as readable text, not a binary download.
 http.route({ path: "/SKILL.md", method: "GET", handler: httpAction(async () => {
   const response = await fetch(`${process.env.CONVEX_SITE_URL}/boomerang-skill.md`,
@@ -141,7 +157,9 @@ http.route({
 http.route({
   path: "/",
   method: "GET",
-  handler: httpAction(async () => {
+  handler: httpAction(async (_ctx, request) => {
+    const redirect = websiteRedirect(request, '/');
+    if (redirect) return redirect;
     const response = await fetch(
       `${process.env.CONVEX_SITE_URL}/landing.html`,
       { signal: AbortSignal.timeout(15000) },

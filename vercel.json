@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run build && node scripts/prepare-vercel.mjs",
+  "outputDirectory": "web/dist",
+  "routes": [
+    { "src": "/", "dest": "/landing.html" },
+    { "src": "/setup(?:\\.html)?", "status": 302, "headers": { "Location": "/" } },
+    { "src": "/audio/(.*)", "dest": "/sample-audio/$1" },
+    { "src": "/SKILL.md", "headers": { "Content-Type": "text/plain; charset=utf-8" }, "continue": true },
+    { "src": "/api/(.*)", "dest": "https://little-kangaroo-718.convex.site/api/$1" },
+    { "handle": "filesystem" },
+    { "src": "/(app|account|tasks|status|connect|demo)/?", "dest": "/index.html" }
+  ]
+}

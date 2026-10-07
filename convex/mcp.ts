@@ -3,6 +3,7 @@ import { api, internal } from "./_generated/api";
 import { ConvexError } from "convex/values";
 import { metadata } from "./oauth";
 import { callingQuote } from "./credits";
+import { websiteOrigins } from "./websiteOrigins";
 const uiUri = "ui://boomerang/shops-v3.html";
 const textSchema = { type: "string" },
   idSchema = { type: "string", minLength: 1 };
@@ -137,12 +138,10 @@ const json = (body: any, status = 200, extra?: Record<string, string>) =>
     },
   });
 function headers(request: Request): Record<string, string> {
-  const origin = request.headers.get("Origin"),
-    website = new URL(process.env.SITE_URL ?? process.env.CONVEX_SITE_URL!)
-      .origin;
-  return origin === website
+  const origin = request.headers.get("Origin");
+  return origin && websiteOrigins().has(origin)
     ? {
-        "Access-Control-Allow-Origin": website,
+        "Access-Control-Allow-Origin": origin,
         Vary: "Origin",
         "Access-Control-Allow-Headers": "Authorization, Content-Type",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",

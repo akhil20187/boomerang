@@ -14,6 +14,6 @@ if(!has('JWT_PRIVATE_KEY')||!has('JWKS')){
   const publicKey=await exportJWK(keys.publicKey);
   set('JWT_PRIVATE_KEY',privateKey);set('JWKS',JSON.stringify({keys:[{use:'sig',...publicKey}]}));
 }
-set('SITE_URL',process.env.CONVEX_SITE_URL || 'http://127.0.0.1:5173');
-set('LIVE_CALLS_ENABLED','false');
-console.log('Configuration complete. Calling remains disabled. No emails or calls were sent.');
+if(!has('SITE_URL'))set('SITE_URL',process.env.VITE_APP_PUBLIC_URL || process.env.SITE_URL || process.env.CONVEX_SITE_URL || 'http://127.0.0.1:5173');
+if(!has('LIVE_CALLS_ENABLED'))set('LIVE_CALLS_ENABLED','false');
+console.log('Configuration complete. Existing website and calling settings preserved; new deployments default to calls disabled. No emails or calls were sent.');
