@@ -25,9 +25,11 @@ import type * as oauth from "../oauth.js";
 import type * as onboarding from "../onboarding.js";
 import type * as recordings from "../recordings.js";
 import type * as tasks from "../tasks.js";
+import type * as testCalls from "../testCalls.js";
 import type * as users from "../users.js";
 import type * as validators from "../validators.js";
 import type * as verification from "../verification.js";
+import type * as websiteOrigins from "../websiteOrigins.js";
 import type * as workflows from "../workflows.js";
 
 import type {
@@ -54,9 +56,11 @@ declare const fullApi: ApiFromModules<{
   onboarding: typeof onboarding;
   recordings: typeof recordings;
   tasks: typeof tasks;
+  testCalls: typeof testCalls;
   users: typeof users;
   validators: typeof validators;
   verification: typeof verification;
+  websiteOrigins: typeof websiteOrigins;
   workflows: typeof workflows;
 }>;
 

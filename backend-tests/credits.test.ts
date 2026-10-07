@@ -176,6 +176,7 @@ it("charges a notes-only terminal answer once at the frozen price, refunds at mo
     answer: { stock: "available", notes: "Caller confirmed availability." },
   };
   delete callback.to;
+  delete callback.businessName;
   delete callback.customerName;
   delete callback.productDescription;
   delete callback.instructions;

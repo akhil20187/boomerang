@@ -28,7 +28,7 @@ export const prepare = internalMutation({
     if (!task) return null;
     const user = await ctx.db.get(task.userId);
     const number = job.attemptCount + 1;
-    if (number > 2) return null;
+    if (number > (task.selfTest ? 1 : 2)) return null;
     const attemptId = await ctx.db.insert("callAttempts", {
       taskId: task._id,
       shopJobId: job._id,
@@ -50,7 +50,7 @@ export const prepare = internalMutation({
       attemptId,
       eventId: `${attemptId}:dispatch`,
       type: "dispatch",
-      text: `AI agent calling · try ${number} of 2`,
+      text: task.selfTest ? 'Calling your mobile · personal test' : `AI agent calling · try ${number} of 2`,
       timestamp: Date.now(),
     });
     return {
@@ -58,6 +58,7 @@ export const prepare = internalMutation({
       taskId: task._id,
       shopJobId: job._id,
       to: job.shop.phone,
+      businessName: job.shop.name,
       customerName: user?.name?.split(" ")[0] ?? "our customer",
       productDescription: task.product.description ?? task.product.name,
       instructions: [
@@ -218,7 +219,7 @@ async function finishIfReady(ctx: any, taskId: any) {
         status: "finished",
         finishedAt: Date.now(),
       });
-      await ctx.scheduler.runAfter(0, internal.notifications.send, {
+      if (!task?.selfTest) await ctx.scheduler.runAfter(0, internal.notifications.send, {
         taskId,
         type: "completed",
       });
@@ -369,7 +370,8 @@ export const receive = internalMutation({
     else if (args.status === "completed")
       outcome =
         answer && answer.stock !== "unconfirmed" ? "completed" : "incomplete";
-    const state = nextOutcome(outcome, a.number);
+    const task = await ctx.db.get(a.taskId);
+    const state = nextOutcome(outcome, task?.selfTest ? 2 : a.number);
     await ctx.db.patch(a._id, {
       status: outcome,
       endedAt: Date.now(),

@@ -8,10 +8,11 @@ const health = await fetch(`${origin}/health`, { signal: AbortSignal.timeout(150
 assert.equal(health.status, 200);
 const state = await health.json();
 assert.equal(state.ready, true);
+if (process.env.EXPECTED_CALL_PROVIDER) assert.equal(state.provider, process.env.EXPECTED_CALL_PROVIDER);
 assert.equal(state.active, 0);
 assert.equal(state.reconciliationRequired, 0);
 const forbidden = await fetch(`${origin}/dispatch`, { method: 'POST', body: '{}', signal: AbortSignal.timeout(15000) });
 assert.equal(forbidden.status, 401);
 const lookup = await fetch(`${origin}/attempts/nonexistent-deployment-smoke`, { headers: { Authorization: `Bearer ${secret}` }, signal: AbortSignal.timeout(15000) });
 assert.equal(lookup.status, 404);
-console.log(JSON.stringify({ ready: true, active: 0, reconciliationRequired: 0, unauthenticatedDispatch: 401, authenticatedMissingAttempt: 404, callsPlaced: 0 }));
+console.log(JSON.stringify({ ready: true, provider: state.provider, active: 0, reconciliationRequired: 0, unauthenticatedDispatch: 401, authenticatedMissingAttempt: 404, callsPlaced: 0 }));

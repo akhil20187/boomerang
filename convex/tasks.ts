@@ -56,6 +56,8 @@ export const start = mutation({
       throw new ConvexError("Search not found.");
     if (draft.expiresAt < Date.now())
       throw new ConvexError("This search has expired. Find shops again.");
+    if (draft.shops.some(shop => shop.placeId === 'personal-test'))
+      throw new ConvexError('Use the personal test-call form for this request.');
     validateSelection(
       args.selectedPlaceIds,
       draft.shops.map((s) => s.placeId),

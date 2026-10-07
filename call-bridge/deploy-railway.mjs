@@ -16,7 +16,19 @@ function run(command, args, input) {
   if (result.status !== 0) throw new Error(`${command} failed (${result.status ?? 'timeout'}); credential-bearing output suppressed`);
   return result.stdout;
 }
-if (mode === 'configure') {
+if (mode === 'configure-sarvam') {
+  const keys = ['SARVAM_VOICE_API_KEY','SARVAM_ORG_ID','SARVAM_WORKSPACE_ID','SARVAM_AGENT_ID','SARVAM_AGENT_VERSION','SARVAM_CONNECTION_ID'];
+  for (const key of keys) if (!process.env[key]) throw new Error(`Missing ${key}`);
+  if (process.env.SARVAM_AGENT_VERSION !== '2') throw new Error('Only reviewed agent v2 is approved for this rollout');
+  const variables = Object.fromEntries(keys.map(key => [key, process.env[key]]));
+  variables.SARVAM_FROM_NUMBER = process.env.SARVAM_FROM_NUMBER || process.env.VOBIZ_FROM_NUMBER;
+  if (variables.SARVAM_FROM_NUMBER !== '+917965480585') throw new Error('Unexpected Sarvam caller');
+  variables.CALL_PROVIDER = 'sarvam';
+  for (const [key,value] of Object.entries(variables)) {
+    run('railway',['variable','set',key,'--stdin','--skip-deploys','--project',project,'--service',service,'--environment',environment],value);
+    console.log(`Configured Railway ${key}`);
+  }
+} else if (mode === 'configure') {
   const required = ['OPENAI_API_KEY', 'VOBIZ_AUTH_ID', 'VOBIZ_AUTH_TOKEN', 'VOBIZ_FROM_NUMBER'];
   for (const key of required) if (!process.env[key]) throw new Error(`Missing ${key}`);
   const secretFile = join(root, '.env.voice');
@@ -48,7 +60,7 @@ if (mode === 'configure') {
 } else if (mode === 'stage') {
   const files = ['call-bridge/Dockerfile', 'call-bridge/Dockerfile.dockerignore',
     'call-bridge/package.json', 'call-bridge/package-lock.json', 'call-bridge/bootstrap.cjs',
-    'call-bridge/bridge.cjs', 'call-bridge/answer.cjs', 'call-bridge/reconcile.cjs',
+    'call-bridge/bridge.cjs', 'call-bridge/answer.cjs', 'call-bridge/reconcile.cjs', 'call-bridge/sarvam.cjs',
     'voice-test/phone-agent.cjs', 'voice-test/phone-core.cjs'];
   for (const file of files) if (!existsSync(join(root, file))) throw new Error(`Missing production file ${file}`);
   const folder = mkdtempSync(join(tmpdir(), 'boomerang-voice-'));
@@ -57,4 +69,4 @@ if (mode === 'configure') {
     copyFileSync(join(root, file), join(folder, file));
   }
   console.log(JSON.stringify({ folder, files, project, service, environment }));
-} else throw new Error('Choose configure or stage');
+} else throw new Error('Choose configure, configure-sarvam or stage');

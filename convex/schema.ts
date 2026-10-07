@@ -109,6 +109,7 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_expiry", ["expiresAt"]),
   tasks: defineTable({
+    selfTest: v.optional(v.boolean()),
     answerPriceCents: v.optional(v.number()),
     verification: v.optional(v.boolean()),
     userId: v.id("users"),
@@ -133,6 +134,7 @@ export default defineSchema({
     workflowId: v.optional(v.string()),
   })
     .index("by_user", ["userId"])
+    .index("by_user_self_test", ["userId", "selfTest"])
     .index("by_user_operation", ["userId", "idempotencyKey"]),
   shopJobs: defineTable({
     taskId: v.id("tasks"),

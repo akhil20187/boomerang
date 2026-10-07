@@ -94,6 +94,17 @@ afterEach(() => {
   vi.useRealTimers();
 });
 describe("saved backend behaviour", () => {
+  it('passes the selected shop name and exact customer requirements to the call bridge',async()=>{
+    const t=setup(),s=await seed(t);await t.run(async ctx=>{await ctx.db.patch(s.shopJobId,{state:'waiting',attemptCount:0});await ctx.db.patch(s.taskId,{comments:'lavender only',cards:['HDFC']});});
+    const request=await t.mutation(internal.calls.prepare,{shopJobId:s.shopJobId});expect(request.businessName).toBe('Shop');expect(request.customerName).toBe('Test');expect(request.instructions).toContain('lavender only');expect(request.instructions).toContain('HDFC');
+  });
+  it('ingests Sarvam recordings only through the exact authenticated attempt URL',async()=>{
+    const t=setup(),s=await seed(t);vi.stubEnv('CALL_BRIDGE_URL','https://bridge.example.com');vi.stubEnv('CALL_BRIDGE_SECRET','bridge-secret');vi.stubEnv('RECORDING_ALLOWED_HOSTS','media.vobiz.ai');
+    const request=vi.fn(async(url,options)=>{expect(String(url)).toBe(`https://bridge.example.com/attempts/${s.attemptId}/recording`);expect(options.headers.Authorization).toBe('Bearer bridge-secret');expect(options.redirect).toBe('error');return new Response('wave',{headers:{'content-type':'audio/wav'}});});vi.stubGlobal('fetch',request);
+    const args={attemptId:s.attemptId,taskId:s.taskId,shopJobId:s.shopJobId,eventId:'sarvam-recording'};
+    for(const url of ['https://bridge.example.com/admin','https://bridge.example.com/attempts/other/recording','https://bridge.example.com.attacker.test/recording'])await expect(t.action(internal.recordings.ingest,{...args,url})).rejects.toThrow();
+    expect(request).not.toHaveBeenCalled();await t.action(internal.recordings.ingest,{...args,url:`https://bridge.example.com/attempts/${s.attemptId}/recording`});expect((await t.run(ctx=>ctx.db.get(s.attemptId)))?.recordingStatus).toBe('ready');
+  });
   it('paginates only the signed-in customers tasks with settled charges and outcomes',async()=>{
     const t=setup(),s=await seed(t);await t.run(async ctx=>{await ctx.db.patch(s.taskId,{status:'finished'});await ctx.db.patch(s.shopJobId,{state:'answered',answer:{stock:'available',variantMatch:'yes',finalPrice:1200,currency:'INR'}});await ctx.db.insert('creditReservations',{userId:s.userId,taskId:s.taskId,shopJobId:s.shopJobId,amountCents:10,state:'charged'});await ctx.db.insert('tasks',{userId:s.otherId,draftId:s.draftId,title:'Private other task',type:'shop_calls',detailsVersion:1,product:{name:'Private'},pincode:'500037',cards:[],comments:'',status:'running',approvedAt:Date.now(),idempotencyKey:'other'});});
     const page=await t.withIdentity({subject:s.userId}).query(api.tasks.history,{paginationOpts:{numItems:1,cursor:null}});expect(page.page).toHaveLength(1);expect(page.page[0]._id).toBe(s.taskId);expect(page.page[0].summary).toMatchObject({shopCount:1,resolvedCount:1,availableCount:1,chargedCents:10,active:false});expect(page.isDone).toBe(true);

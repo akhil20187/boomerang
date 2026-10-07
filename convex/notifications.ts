@@ -26,7 +26,7 @@ export const claim = internalMutation({
     )
       return null;
     const task = await ctx.db.get(args.taskId);
-    if (!task) return null;
+    if (!task || task.selfTest) return null;
     const user = await ctx.db.get(task.userId);
     const url = `${process.env.SITE_URL ?? "http://localhost:5173"}/status?task=${args.taskId}`;
     const payload = existing?.payload ?? {

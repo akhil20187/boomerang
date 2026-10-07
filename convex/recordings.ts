@@ -134,18 +134,24 @@ export const ingest = internalAction({
         .split(",")
         .map((x) => x.trim())
         .filter(Boolean);
+    const bridgeOrigin = process.env.CALL_BRIDGE_URL
+      ? new URL(process.env.CALL_BRIDGE_URL).origin : null;
+    const privateBridgeRecording = !!bridgeOrigin &&
+      url.origin === bridgeOrigin &&
+      url.pathname === `/attempts/${encodeURIComponent(args.attemptId)}/recording` &&
+      !url.search && !url.hash;
     if (
       url.protocol !== "https:" ||
       url.username ||
       url.password ||
-      !allowed.includes(url.hostname)
+      (!privateBridgeRecording && (!allowed.includes(url.hostname) || url.origin === bridgeOrigin))
     )
       throw new Error(
         "Recording host is not approved. Configure RECORDING_ALLOWED_HOSTS.",
       );
     let downloadUrl=url.toString();
     let headers: Record<string,string> | undefined;
-    if(url.hostname==='media.vobiz.ai'){
+    if(url.hostname==='media.vobiz.ai'||privateBridgeRecording){
       if(!process.env.CALL_BRIDGE_URL||!process.env.CALL_BRIDGE_SECRET)throw new Error('Private recording bridge is not configured');
       const bridge=new URL(process.env.CALL_BRIDGE_URL);
       if(bridge.protocol!=='https:'||bridge.username||bridge.password||bridge.search||bridge.hash)throw new Error('Invalid private recording bridge');

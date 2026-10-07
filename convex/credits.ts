@@ -117,7 +117,7 @@ export async function settle(
   const job = await ctx.db.get(shopJobId);
   if (!job) return;
   const task = await ctx.db.get(job.taskId);
-  if (task?.verification) return;
+  if (task?.verification || task?.selfTest) return;
   const reservation = await ctx.db
     .query("creditReservations")
     .withIndex("by_shop", (q) => q.eq("shopJobId", shopJobId))

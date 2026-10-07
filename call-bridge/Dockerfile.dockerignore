@@ -9,6 +9,7 @@
 !call-bridge/bridge.cjs
 !call-bridge/answer.cjs
 !call-bridge/reconcile.cjs
+!call-bridge/sarvam.cjs
 !call-bridge/bootstrap.cjs
 !voice-test/
 !voice-test/phone-agent.cjs

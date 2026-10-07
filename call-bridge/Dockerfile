@@ -13,7 +13,7 @@ ENV NODE_ENV=production \
     CALL_BRIDGE_JOURNAL=/var/lib/human-mcp/attempts.json
 WORKDIR /app
 COPY --from=dependencies --chown=node:node /opt/runtime/node_modules ./node_modules
-COPY --chown=node:node call-bridge/bridge.cjs call-bridge/answer.cjs call-bridge/reconcile.cjs call-bridge/bootstrap.cjs ./call-bridge/
+COPY --chown=node:node call-bridge/bridge.cjs call-bridge/answer.cjs call-bridge/reconcile.cjs call-bridge/sarvam.cjs call-bridge/bootstrap.cjs ./call-bridge/
 COPY --chown=node:node voice-test/phone-agent.cjs voice-test/phone-core.cjs ./voice-test/
 RUN mkdir -p /var/lib/human-mcp \
     && chown node:node /var/lib/human-mcp \
