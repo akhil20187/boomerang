@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {taskOutcome,taskLabel,formatPaise,priceSummary,notChargedReason} from './taskPresentation.ts';
+import {taskOutcome,taskLabel,formatPaise,priceSummary,notChargedReason,chargeText,taskChargeText,creditRowText} from './taskPresentation.ts';
 const summary={shopCount:3,resolvedCount:3,availableCount:0,unreachableCount:0,chargedCents:0,active:false};
 test('history distinguishes no answer from confirmed stock and keeps progress independent',()=>{
  assert.deepEqual(taskOutcome({...summary,unreachableCount:3}),['Couldn’t reach the shops','amber']);
@@ -27,4 +27,25 @@ test('not-charged reasons follow the final shop state',()=>{
  assert.equal(notChargedReason('personal_call_needed'),'shop prefers a personal call');
  assert.equal(notChargedReason('technical_error'),'call didn’t finish');
  assert.equal(notChargedReason('answered'),'no useful answer');
+});
+test('one charge line per shop',()=>{
+ assert.equal(chargeText({kind:'held',amountCents:1000}),'₹10 on hold');
+ assert.equal(chargeText({kind:'charged',amountCents:1000}),'Charged ₹10');
+ assert.equal(chargeText({kind:'not_charged',amountCents:1000,reason:'shop didn’t answer'}),'Not charged · shop didn’t answer');
+ assert.equal(chargeText({kind:'refunded',amountCents:1000}),'Refunded ₹10');
+ assert.equal(chargeText({kind:'free',amountCents:0}),'Free test · no charge');
+ assert.equal(chargeText(null),'');
+});
+test('task charge summary for history rows',()=>{
+ const base={shopCount:3,resolvedCount:3,availableCount:0,unreachableCount:0,active:false};
+ assert.equal(taskChargeText({...base,chargedCents:2000,notChargedCount:1,maxCents:3000}),'Charged ₹20 · 1 shop not charged');
+ assert.equal(taskChargeText({...base,chargedCents:0,notChargedCount:3,maxCents:3000}),'No charge · 3 shops not charged');
+ assert.equal(taskChargeText({...base,chargedCents:3000,notChargedCount:0,maxCents:3000}),'Charged ₹30');
+ assert.equal(taskChargeText({...base,active:true,chargedCents:0,maxCents:3000}),'Up to ₹30 · final charge when calls finish');
+});
+test('credit history rows say what happened in plain words',()=>{
+ assert.deepEqual(creditRowText({type:'grant',amountCents:10000}),{title:'Credit added',detail:'',amount:'+₹100'});
+ assert.deepEqual(creditRowText({type:'charge',amountCents:-1000,shopName:'Croma',productName:'iPhone 17'}),{title:'Croma',detail:'iPhone 17',amount:'−₹10'});
+ assert.deepEqual(creditRowText({type:'release',amountCents:1000,shopName:'Croma',productName:'iPhone 17',note:'shop didn’t answer'}),{title:'Not charged · Croma',detail:'shop didn’t answer · iPhone 17',amount:'₹0'});
+ assert.deepEqual(creditRowText({type:'refund',amountCents:1000,shopName:'Croma',productName:'iPhone 17'}),{title:'Refund · Croma',detail:'iPhone 17',amount:'+₹10'});
 });

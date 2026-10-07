@@ -10,6 +10,6 @@
     { "src": "/SKILL.md", "headers": { "Content-Type": "text/plain; charset=utf-8" }, "continue": true },
     { "src": "/api/(.*)", "dest": "https://little-kangaroo-718.convex.site/api/$1" },
     { "handle": "filesystem" },
-    { "src": "/(app|account|tasks|status|connect|demo)/?", "dest": "/index.html" }
+    { "src": "/(app|account|tasks|credit|status|connect|demo)/?", "dest": "/index.html" }
   ]
 }

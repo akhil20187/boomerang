@@ -71,9 +71,9 @@ Under the shop list, above the button:
 | State | Line shown | Colour |
 | --- | --- | --- |
 | reserved (call not finished) | "₹10 on hold" | grey |
-| charged | "Charged ₹10" | default text |
-| released | "Not charged · shop didn't answer" / "· shop prefers a personal call" / "· call didn't finish" / "· no useful answer" (chosen from the shop's final state) | green |
-| refunded | "Refunded ₹10" | green |
+| charged | "Charged ₹10" | grey |
+| released | "Not charged · shop didn't answer" / "· shop prefers a personal call" / "· call didn't finish" / "· no useful answer" (chosen from the shop's final state) | grey |
+| refunded | "Refunded ₹10" | grey |
 | test task / personal test call | "Free test · no charge" | grey |
 
 Task-level totals use the same words:
@@ -84,6 +84,8 @@ Task-level totals use the same words:
   
 - **Inline/chat card footer:** a one-line total once finished, e.g. "Charged ₹20 for 2 of 3 shops."
   
+Charge lines are always small grey text: green means only "the shop has it" (DESIGN.md, D72).
+
 ## 4. Credit & charges page (`/credit`)
 A new signed-in page. Top section:
 

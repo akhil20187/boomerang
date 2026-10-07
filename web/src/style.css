@@ -19,3 +19,5 @@
 @keyframes hm-pulse{0%{box-shadow:0 0 0 0 rgba(35,65,181,.45)}70%{box-shadow:0 0 0 6px rgba(35,65,181,0)}100%{box-shadow:0 0 0 0 rgba(35,65,181,0)}}
 @media(max-width:600px){.topbar{padding:0 20px;height:56px}.workspace{padding:28px 16px 48px}.intro h1{font-size:22px}.intro p{font-size:13px}.search{padding:16px;grid-template-columns:minmax(0,1fr) 100px}.demo-banner{font-size:11px}.account{padding:22px}.search .product-input{grid-column:1/-1}.search .primary{grid-column:2;grid-row:2}.intro{margin-bottom:22px}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media(max-width:600px){.topbar{height:auto;min-height:56px;gap:10px;flex-wrap:wrap;padding:14px 16px}.topbar nav{gap:14px;flex-wrap:wrap}.topbar>a{flex-shrink:0}}
+.price-block{display:grid;gap:4px}.price-block p{font-size:13px;line-height:18px;color:#1a1a19}.price-block strong{font-weight:600}.card-footer .price-block .price-rule{font-size:11px;line-height:15px;color:#6b6a66}
+.charge-line{display:block;font-size:11px;line-height:15px;color:#6b6a66;margin-top:2px}.status-footer .charge-summary{color:#1a1a19}
