@@ -205,3 +205,27 @@ export const refund = internalMutation({
     return null;
   },
 });
+// One-off move from dollar cents to paise (D135: ₹100 per $1). A user converts
+// in one transaction; rows already in INR are never touched again.
+export async function convertUserToRupees(ctx: MutationCtx, userId: Id<"users">) {
+  const entries = await ctx.db.query("creditEntries").withIndex("by_user", q => q.eq("userId", userId)).take(10001);
+  if (entries.length > 10000) return "mismatched" as const;
+  const old = entries.filter(e => e.currency === "USD");
+  if (!old.length) return "skipped" as const;
+  const account = await ctx.db.query("creditAccounts").withIndex("by_user", q => q.eq("userId", userId)).unique();
+  const historyCents = entries
+    .filter(e => !["reservation", "release"].includes(e.type))
+    .reduce((sum, e) => sum + (e.amountCents ?? Math.round(e.amount * 100)), 0);
+  if (old.length !== entries.length || (account && account.balanceCents !== historyCents)) return "mismatched" as const;
+  for (const e of entries)
+    await ctx.db.patch(e._id, {
+      amount: e.amount * 100,
+      ...(e.amountCents === undefined ? {} : { amountCents: e.amountCents * 100 }),
+      currency: "INR",
+    });
+  if (account)
+    await ctx.db.patch(account._id, { balanceCents: account.balanceCents * 100, reservedCents: account.reservedCents * 100 });
+  const reservations = await ctx.db.query("creditReservations").withIndex("by_user", q => q.eq("userId", userId)).collect();
+  for (const r of reservations) await ctx.db.patch(r._id, { amountCents: r.amountCents * 100 });
+  return "converted" as const;
+}
