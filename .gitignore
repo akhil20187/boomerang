@@ -14,3 +14,7 @@ docs/verification/*.webm
 .playwright-mcp/
 .claude/settings*.json
 .vercel
+
+# HyperFrames editor caches
+design/videos/*/.thumbnails/
+design/videos/*/.waveform-cache/
