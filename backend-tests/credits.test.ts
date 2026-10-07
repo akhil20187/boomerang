@@ -4,6 +4,7 @@ import workflowTest from "@convex-dev/workflow/test";
 import schema from "../convex/schema";
 import { api, internal } from "../convex/_generated/api";
 import { approveWithWelcomeCredit } from '../convex/onboarding';
+import { settle } from '../convex/credits';
 const modules = import.meta.glob([
   "../convex/**/*.{ts,js}",
   "!../convex/**/*.d.ts",
@@ -354,4 +355,35 @@ it("saves new tasks in INR", async () => {
   expect((await s.user.query(api.tasks.get, {taskId})).task.currency).toBe("INR");
   const entries = await s.t.run(ctx => ctx.db.query("creditEntries").collect());
   expect(entries.find(e => e.type === "reservation")?.currency).toBe("INR");
+});
+it("explains each shop's charge and totals the task", async () => {
+  const s = await setup("1000");
+  await s.t.run(async ctx => {
+    await ctx.db.insert("creditEntries", {userId:s.userId,amount:100,amountCents:10000,currency:"INR",type:"grant",reason:"more",operationId:"more"});
+    const shops = [1, 2, 3].map(i => ({placeId:`p${i}`,name:`Shop ${i}`,address:"Road",phone:"+919999999999",ratingCount:100,distanceKm:1,mapsUrl:"https://maps.google.com",fewRatings:false}));
+    await ctx.db.patch(s.draftId, {shops});
+  });
+  const {taskId} = await s.user.mutation(api.tasks.start, {draftId:s.draftId,selectedPlaceIds:["p1","p2","p3"],idempotencyKey:"charge-notes",expectedAnswerPriceCents:1000});
+  let task = await s.user.query(api.tasks.get, {taskId});
+  expect(task.shops.map((x: any) => x.chargeNote)).toEqual(Array(3).fill({kind:"held",amountCents:1000}));
+  expect(task.task).toMatchObject({heldCents:3000,maxCents:3000,currency:"INR"});
+  const [a, b, c] = task.shops.map((x: any) => x._id);
+  await s.t.run(async ctx => {
+    await ctx.db.patch(a, {state:"answered",answer:{stock:"available",variantMatch:"yes",notes:"ok"}} as any);
+    await ctx.db.patch(b, {state:"unreachable"});
+    await ctx.db.patch(c, {state:"answered"});
+    await settle(ctx, a, true); await settle(ctx, b, false); await settle(ctx, c, false);
+  });
+  task = await s.user.query(api.tasks.get, {taskId});
+  expect(task.shops.map((x: any) => x.chargeNote)).toEqual([
+    {kind:"charged",amountCents:1000},
+    {kind:"not_charged",amountCents:1000,reason:"shop didn’t answer"},
+    {kind:"not_charged",amountCents:1000,reason:"no useful answer"},
+  ]);
+  expect(task.task).toMatchObject({chargedCents:1000,releasedCents:2000,heldCents:0});
+  const history = await s.user.query(api.tasks.history, {paginationOpts:{numItems:5,cursor:null}});
+  expect(history.page[0].summary).toMatchObject({chargedCents:1000,notChargedCount:2,maxCents:3000,currency:"INR"});
+  await s.t.mutation(internal.credits.refund, {shopJobId:a,reason:"approved"});
+  task = await s.user.query(api.tasks.get, {taskId});
+  expect(task.shops[0].chargeNote).toEqual({kind:"refunded",amountCents:1000});
 });
