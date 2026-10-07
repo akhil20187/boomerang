@@ -13,6 +13,7 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const MODEL = process.env.SAMPLE_CALL_MODEL || 'gpt-realtime-2.1';
 const VOICES = { ai: 'marin', shop: 'cedar' };
 const RATE = 24000;
+const SPEED = Number(process.env.SAMPLE_CALL_SPEED || 1.25); // played faster so the call doesn't drag; pitch kept
 
 function apiKey() {
   const line = fs.readFileSync(path.join(ROOT, '.env'), 'utf8').split('\n').find(l => l.startsWith('OPENAI_API_KEY='));
@@ -78,9 +79,9 @@ async function main(scriptPath) {
   }
   const list = path.join(work, 'list.txt');
   fs.writeFileSync(list, parts.map(p => `file '${p}'`).join('\n'));
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-ar', String(RATE), '-ac', '1', '-b:a', '96k', path.join(outDir, `${name}.mp3`)]);
-  fs.writeFileSync(path.join(outDir, `${name}.json`), JSON.stringify({ model: MODEL, voices: VOICES, total: +t.toFixed(2), lines: lines.map(({ said, ...l }) => l) }, null, 1));
-  console.log(`${name}.mp3 · ${t.toFixed(1)} s · ${MODEL}`);
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-af', `atempo=${SPEED}`, '-ar', String(RATE), '-ac', '1', '-b:a', '96k', path.join(outDir, `${name}.mp3`)]);
+  fs.writeFileSync(path.join(outDir, `${name}.json`), JSON.stringify({ model: MODEL, voices: VOICES, speed: SPEED, total: +(t / SPEED).toFixed(2), lines: lines.map(({ said, ...l }) => ({ ...l, start: +(l.start / SPEED).toFixed(2), end: +(l.end / SPEED).toFixed(2) })) }, null, 1));
+  console.log(`${name}.mp3 · ${(t / SPEED).toFixed(1)} s at ${SPEED}× · ${MODEL}`);
 }
 
 main(process.argv[2]).catch(err => { console.error(err.message); process.exit(1); });

@@ -1,0 +1,410 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1A1A19;
+    }
+    .es05-ground {
+      position: absolute;
+      inset: 0;
+      background-color: #FF3E9A;
+    }
+    .es05-dots {
+      position: absolute;
+      background-image: radial-gradient(#1A1A19 1.6px, transparent 1.8px);
+      background-size: 24px 24px;
+      opacity: 0.22;
+    }
+    #es05-dots-a { left: 1180px; top: 790px; width: 640px; height: 120px; }
+    #es05-dots-b { left: 24px; top: 300px; width: 72px; height: 420px; }
+
+    /* truck-art bands, top and bottom edges */
+    .es05-band {
+      position: absolute;
+      left: 0;
+      width: 1920px;
+      height: 64px;
+      overflow: hidden;
+      background-color: #1A1A19;
+    }
+    #es05-band-top { top: 0; border-bottom: 4px solid #1A1A19; }
+    #es05-band-bot { top: 1016px; border-top: 4px solid #1A1A19; }
+    .es05-band-inner {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2400px;
+      height: 64px;
+      background-image: url("assets/gen/truck-art-strip.png");
+      background-size: 1024px 384px;
+      background-repeat: repeat-x;
+    }
+    #es05-band-top .es05-band-inner { background-position: 0 -6px; }
+    #es05-band-bot .es05-band-inner { background-position: 0 -314px; }
+
+    /* hero card holding the real call-map screenshot */
+    #es05-card {
+      position: absolute;
+      left: 110px;
+      top: 112px;
+      padding: 14px;
+      background: #FFFFFF;
+      border: 4px solid #1A1A19;
+      box-shadow: 8px 8px 0 #1A1A19;
+    }
+    #es05-shot {
+      position: relative;
+      width: 900px;
+      height: 710px;
+      overflow: hidden;
+    }
+    #es05-shot img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 900px;
+      height: 710px;
+      display: block;
+    }
+    /* ring pulses centred on "You · 500037" dot: 50.9% x, 47.4% y of the image */
+    .es05-ring {
+      position: absolute;
+      left: 78px;   /* 458 - 380 */
+      top: -44px;   /* 336 - 380 */
+      width: 760px;
+      height: 760px;
+      border: 4px solid #1A1A19;
+      border-radius: 50%;
+      box-sizing: border-box;
+      opacity: 0;
+    }
+    /* overlay layer in image space; not clipped so stickers may bleed */
+    #es05-over {
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      width: 900px;
+      height: 710px;
+    }
+    .es05-bubble {
+      position: absolute;
+      width: 362px;
+      padding: 14px 20px 14px;
+      background: #FFF1D6;
+      border: 4px solid #1A1A19;
+      box-shadow: 6px 6px 0 #1A1A19;
+      text-align: center;
+      box-sizing: border-box;
+      opacity: 0;
+    }
+    .es05-bubble::before,
+    .es05-bubble::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+    .es05-bubble::before {
+      bottom: -26px;
+      margin-left: -18px;
+      border-width: 22px 18px 0 18px;
+      border-color: #1A1A19 transparent transparent transparent;
+    }
+    .es05-bubble::after {
+      bottom: -17px;
+      margin-left: -12px;
+      border-width: 15px 12px 0 12px;
+      border-color: #FFF1D6 transparent transparent transparent;
+    }
+    .es05-q {
+      font-size: 45px;
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .es05-en {
+      margin-top: 5px;
+      font-size: 25px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    /* bubble anchors = top centre of each shop label (image space), bubble sits above with tail */
+    #es05-b1 { left: 204px; top: 140px; }
+    #es05-b3 { left: 217px; top: 376px; }
+    #es05-b4 { left: 590px; top: 505px; }
+
+    .es05-chipbox {
+      position: absolute;
+      border: 4px solid #1A1A19;
+      box-shadow: 4px 4px 0 #1A1A19;
+      opacity: 0;
+    }
+    #es05-chip-a { left: 109px; top: 199px; width: 220px; height: 54px; }
+    #es05-chip-b { left: 104px; top: 434px; width: 222px; height: 55px; }
+
+    #es05-example {
+      position: absolute;
+      left: 150px;
+      top: 838px;
+      padding: 8px 18px;
+      background: #FFFFFF;
+      border: 3px solid #1A1A19;
+      border-radius: 9999px;
+      box-shadow: 4px 4px 0 #1A1A19;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      opacity: 0;
+    }
+
+    /* right column */
+    #es05-head {
+      position: absolute;
+      left: 1222px;
+      top: 138px;
+      width: 610px;
+      padding: 22px 28px 24px;
+      background: #FFC21A;
+      border: 4px solid #1A1A19;
+      box-shadow: 8px 8px 0 #1A1A19;
+      box-sizing: border-box;
+      font-size: 68px;
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+    #es05-sub {
+      position: absolute;
+      left: 1236px;
+      top: 372px;
+      width: 590px;
+      padding: 14px 20px;
+      background: #FFFFFF;
+      border: 3px solid #1A1A19;
+      box-shadow: 4px 4px 0 #1A1A19;
+      box-sizing: border-box;
+      font-size: 30px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    #es05-pill {
+      position: absolute;
+      left: 1236px;
+      top: 520px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 26px 12px 18px;
+      background: #19C2B0;
+      border: 3px solid #1A1A19;
+      border-radius: 9999px;
+      box-shadow: 4px 4px 0 #1A1A19;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    #es05-pill-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #FF3E9A;
+      border: 3px solid #1A1A19;
+    }
+    #es05-star {
+      position: absolute;
+      left: 1712px;
+      top: 470px;
+      width: 150px;
+      height: 150px;
+      background: #FFF1D6;
+      clip-path: polygon(50% 0%, 61% 30%, 93% 21%, 72% 46%, 98% 66%, 65% 68%, 69% 100%, 50% 77%, 31% 100%, 35% 68%, 2% 66%, 28% 46%, 7% 21%, 39% 30%);
+    }
+    #es05-star-ink {
+      position: absolute;
+      left: 1706px;
+      top: 464px;
+      width: 162px;
+      height: 162px;
+      background: #1A1A19;
+      clip-path: polygon(50% 0%, 61% 30%, 93% 21%, 72% 46%, 98% 66%, 65% 68%, 69% 100%, 50% 77%, 31% 100%, 35% 68%, 2% 66%, 28% 46%, 7% 21%, 39% 30%);
+    }
+    #es05-jawab {
+      position: absolute;
+      left: 1250px;
+      top: 628px;
+      width: 560px;
+      padding: 20px 28px 22px;
+      background: #FF8A00;
+      border: 4px solid #1A1A19;
+      box-shadow: 8px 8px 0 #1A1A19;
+      box-sizing: border-box;
+      opacity: 0;
+    }
+    #es05-jawab-t {
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 0.98;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    #es05-jawab-en {
+      margin-top: 8px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    /* arrow on the sticker's left edge, pointing back at the map */
+    #es05-jawab-arrow {
+      position: absolute;
+      left: -62px;
+      top: 50%;
+      margin-top: -30px;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 30px 58px 30px 0;
+      border-color: transparent #1A1A19 transparent transparent;
+    }
+  </style>
+
+  <div data-hf-id="hf-3j49" id="root" data-composition-id="05-ek-saath" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-x7p9" class="clip es05-ground" id="es05-ground" data-start="0" data-duration="5.64" data-track-index="0"></div>
+    <div data-hf-id="hf-8qf4" class="es05-dots" id="es05-dots-a"></div>
+    <div data-hf-id="hf-heaz" class="es05-dots" id="es05-dots-b"></div>
+
+    <div data-hf-id="hf-46s2" class="es05-band" id="es05-band-top"><div data-hf-id="hf-fc1t" class="es05-band-inner" id="es05-band-top-in"></div></div>
+    <div data-hf-id="hf-efkk" class="es05-band" id="es05-band-bot"><div data-hf-id="hf-9ykj" class="es05-band-inner" id="es05-band-bot-in"></div></div>
+
+    <div data-hf-id="hf-jlkj" id="es05-card">
+      <div data-hf-id="hf-efit" id="es05-shot">
+        <img data-hf-id="hf-r65v" src="assets/screens/call-map.png" alt="Boomerang call map: five nearby shops around You 500037">
+        <div data-hf-id="hf-a0sq" class="es05-ring" id="es05-r0"></div>
+        <div data-hf-id="hf-g6ij" class="es05-ring" id="es05-r1"></div>
+        <div data-hf-id="hf-5b0w" class="es05-ring" id="es05-r2"></div>
+        <div data-hf-id="hf-62op" class="es05-ring" id="es05-r3"></div>
+        <div data-hf-id="hf-xesu" class="es05-ring" id="es05-r4"></div>
+        <div data-hf-id="hf-1cwv" class="es05-ring" id="es05-r5"></div>
+        <div data-hf-id="hf-sp10" class="es05-ring" id="es05-r6"></div>
+        <div data-hf-id="hf-tgot" class="es05-ring" id="es05-r7"></div>
+        <div data-hf-id="hf-3o02" class="es05-ring" id="es05-r8"></div>
+      </div>
+      <div data-hf-id="hf-jnj3" id="es05-over">
+        <div data-hf-id="hf-8pdt" class="es05-chipbox" id="es05-chip-a"></div>
+        <div data-hf-id="hf-cnhu" class="es05-chipbox" id="es05-chip-b"></div>
+        <div data-hf-id="hf-ietz" class="es05-bubble" id="es05-b1"><div data-hf-id="hf-vqxx" class="es05-q">iPhone 17 hai?</div><div data-hf-id="hf-n3lf" class="es05-en">In stock?</div></div>
+        <div data-hf-id="hf-8b05" class="es05-bubble" id="es05-b3"><div data-hf-id="hf-25ep" class="es05-q">Final price?</div><div data-hf-id="hf-jtc1" class="es05-en">Final price?</div></div>
+        <div data-hf-id="hf-r2pu" class="es05-bubble" id="es05-b4"><div data-hf-id="hf-ikwc" class="es05-q">Card offer?</div><div data-hf-id="hf-cpxm" class="es05-en">Any card offer?</div></div>
+      </div>
+    </div>
+    <div data-hf-id="hf-ijel" id="es05-example">Example · sample answers</div>
+
+    <div data-hf-id="hf-3z8m" id="es05-star-ink"></div>
+    <div data-hf-id="hf-qtlt" id="es05-star"></div>
+    <div data-hf-id="hf-8fpq" id="es05-head">Ek saath,<br data-hf-id="hf-x5px">sab ko call.</div>
+    <div data-hf-id="hf-fm9x" id="es05-sub">Every shop gets a call. At the same time.</div>
+    <div data-hf-id="hf-5wsq" id="es05-pill"><span data-hf-id="hf-b3qv" id="es05-pill-dot"></span>Calling 5 shops</div>
+
+    <div data-hf-id="hf-xxmo" id="es05-jawab">
+      <div data-hf-id="hf-hn0s" id="es05-jawab-arrow"></div>
+      <div data-hf-id="hf-gxm8" id="es05-jawab-t">Jawab aa gaye</div>
+      <div data-hf-id="hf-0l99" id="es05-jawab-en">The answers are back</div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      var DUR = 5.64;
+      var beats = [0.0, 0.47, 0.94, 1.41, 1.88, 2.35, 2.82, 3.29, 3.76];
+
+      // ambient: truck-art bands drift slowly (whole duration)
+      tl.fromTo("#es05-band-top-in", { x: 0 }, { x: -140, duration: DUR, ease: "none" }, 0);
+      tl.fromTo("#es05-band-bot-in", { x: -140 }, { x: 0, duration: DUR, ease: "none" }, 0);
+
+      // Scene 1 (0.0–1.9): hero card lands, heading slams, subline, counter pill
+      tl.fromTo("#es05-card",
+        { autoAlpha: 1, scale: 0.94, y: 24, rotation: -1 },
+        { autoAlpha: 1, scale: 1, y: 0, rotation: 0, duration: 0.42, ease: "back.out(1.8)" }, 0);
+      tl.fromTo("#es05-head",
+        { autoAlpha: 1, scale: 1.55, rotation: -6 },
+        { autoAlpha: 1, scale: 1, rotation: -2, duration: 0.22, ease: "power4.out" }, 0);
+      tl.fromTo("#es05-sub",
+        { autoAlpha: 0, y: 26 },
+        { autoAlpha: 1, y: 0, duration: 0.24, ease: "power3.out" }, 0.0);
+      tl.fromTo("#es05-pill",
+        { autoAlpha: 0, scale: 0.3, rotation: 6 },
+        { autoAlpha: 1, scale: 1, rotation: 2, duration: 0.34, ease: "back.out(2.6)" }, 0.94);
+      tl.fromTo(["#es05-star-ink", "#es05-star"],
+        { autoAlpha: 1, scale: 0, rotation: -60 },
+        { autoAlpha: 1, scale: 1, rotation: 10, duration: 0.4, ease: "back.out(2.2)" }, 0.94);
+
+      // ring pulses from the "You · 500037" dot, one per beat until 4.23
+      beats.forEach(function (b, i) {
+        tl.fromTo("#es05-r" + i,
+          { opacity: 0.95, scale: 0.06 },
+          { opacity: 0, scale: 1, duration: Math.min(0.95, 4.23 - b), ease: "power2.out" }, b);
+      });
+      // pill dot blinks on the beats while calling (finite, diegetic)
+      beats.filter(function (b) { return b >= 0.94; }).forEach(function (b) {
+        tl.fromTo("#es05-pill-dot", { scale: 1.5 }, { scale: 1, duration: 0.3, ease: "power2.out" }, b);
+      });
+
+      // Scene 2 (1.41–4.23): three question stickers, each held two beats
+      var bubbles = [
+        { id: "#es05-b1", t: 1.41, rot: -5 },
+        { id: "#es05-b3", t: 2.35, rot: 4 },
+        { id: "#es05-b4", t: 3.29, rot: -5 }
+      ];
+      bubbles.forEach(function (b, i) {
+        tl.fromTo(b.id,
+          { autoAlpha: 0, xPercent: -50, yPercent: -100, scale: 0.2, rotation: 0, transformOrigin: "50% 100%" },
+          { autoAlpha: 1, xPercent: -50, yPercent: -100, scale: 1, rotation: b.rot, duration: 0.3, ease: "back.out(2.8)" }, b.t);
+        // previous bubble shrinks back a little; the one before it clears (max two on screen)
+        if (i >= 1) {
+          tl.to(bubbles[i - 1].id, { scale: 0.82, duration: 0.2, ease: "power2.out" }, b.t);
+        }
+        if (i >= 2) {
+          tl.to(bubbles[i - 2].id, { scale: 0, autoAlpha: 0, duration: 0.18, ease: "power2.in" }, b.t);
+        }
+      });
+
+      // Scene 3 (4.23–5.64): bubbles clear, pulses stop, receipt sticker
+      tl.to(["#es05-b3", "#es05-b4"], { scale: 0, autoAlpha: 0, duration: 0.18, ease: "power2.in" }, 4.23);
+      tl.to("#es05-pill-dot", { backgroundColor: "#FFF1D6", duration: 0.12 }, 4.23);
+
+      tl.fromTo("#es05-jawab",
+        { autoAlpha: 0, scale: 1.6, rotation: 10 },
+        { autoAlpha: 1, scale: 1, rotation: 3, duration: 0.24, ease: "power4.out" }, 4.70);
+      tl.fromTo("#es05-chip-a",
+        { autoAlpha: 0, scale: 1.3 },
+        { autoAlpha: 1, scale: 1, duration: 0.22, ease: "back.out(2.4)" }, 4.82);
+      tl.fromTo("#es05-chip-b",
+        { autoAlpha: 0, scale: 1.3 },
+        { autoAlpha: 1, scale: 1, duration: 0.22, ease: "back.out(2.4)" }, 4.94);
+      tl.fromTo("#es05-example",
+        { autoAlpha: 0, y: 14 },
+        { autoAlpha: 1, y: 0, duration: 0.26, ease: "power3.out" }, 4.94);
+
+      // hold to the frame end (no exit; root transition owns the cut)
+      tl.set({}, {}, DUR);
+
+      window.__timelines["05-ek-saath"] = tl;
+    })();
+  </script>
+</template>

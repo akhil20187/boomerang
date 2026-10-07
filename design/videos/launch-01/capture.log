@@ -1,0 +1,65 @@
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"browser","status":"started","remainingMs":null}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"browser","status":"completed","remainingMs":null}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"navigation","status":"started","remainingMs":null}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"navigation","status":"completed","remainingMs":null}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"core-extraction","status":"started","remainingMs":null}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"core-extraction","status":"completed","remainingMs":86304}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"fonts","status":"started","remainingMs":86303}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"fonts","status":"completed","remainingMs":86301}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"assets","status":"started","remainingMs":86295}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"assets","status":"completed","remainingMs":85016}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"vision","status":"started","remainingMs":85011}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"vision","status":"completed","remainingMs":74486}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"contact-sheets","status":"started","remainingMs":74483}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"contact-sheets","status":"completed","remainingMs":73248}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"scaffold","status":"started","remainingMs":73247}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"scaffold","status":"completed","remainingMs":73240}
+HYPERFRAMES_CAPTURE_PHASE {"schema":"hyperframes.capture.phase.v1","phase":"complete","status":"completed","remainingMs":73240}
+{
+  "ok": true,
+  "projectDir": "/Users/akhilesh/build-sprint-app/design/videos/launch-01/capture",
+  "url": "https://little-kangaroo-718.convex.site",
+  "httpStatus": 200,
+  "title": "Boomerang · We call every shop near you",
+  "screenshots": 9,
+  "assets": 34,
+  "dropped": {
+    "size-floor": 0,
+    "budget-exhausted": 0,
+    "cap-reached": 16,
+    "unavailable": 0
+  },
+  "detectedSections": 7,
+  "fonts": [
+    "-apple-system"
+  ],
+  "fontsDetailed": [
+    {
+      "family": "-apple-system",
+      "weights": [
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "variable": false
+    }
+  ],
+  "animations": {
+    "webAnimations": 4,
+    "cssDeclarations": 152,
+    "scrollTargets": 2,
+    "cdpAnimations": 106,
+    "canvases": 0
+  },
+  "warnings": [
+    "16 referenced asset(s) are not in this capture (16 cap-reached). A thin capture with no drops is a thin page; this one was truncated."
+  ],
+  "lastPhase": {
+    "schema": "hyperframes.capture.phase.v1",
+    "phase": "complete",
+    "status": "completed",
+    "remainingMs": 73240
+  }
+}

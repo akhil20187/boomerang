@@ -1,0 +1,224 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1A1A19;
+    }
+    .op01-ground {
+      position: absolute;
+      inset: 0;
+      background-color: #FFF1D6;
+    }
+    .op01-dots {
+      position: absolute;
+      width: 420px;
+      height: 300px;
+      background-image: radial-gradient(#1A1A19 1.6px, transparent 1.8px);
+      background-size: 24px 24px;
+      opacity: 0.22;
+    }
+    #op01-dots-l { left: 40px; top: 120px; }
+    #op01-dots-r { right: 40px; top: 560px; }
+    #op01-strip {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 68px;
+      background-image: url("assets/gen/truck-art-strip.png");
+      background-size: cover;
+      background-position: center 45%;
+      border-bottom: 4px solid #1A1A19;
+    }
+    #op01-stripe {
+      position: absolute;
+      right: 120px;
+      top: 150px;
+      width: 150px;
+      height: 54px;
+      border: 3px solid #1A1A19;
+      box-shadow: 4px 4px 0 #1A1A19;
+      background-image: repeating-linear-gradient(45deg, #1A1A19 0 10px, #19C2B0 10px 22px);
+    }
+    #op01-price {
+      position: absolute;
+      left: 960px;
+      top: 440px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      white-space: nowrap;
+    }
+    .op01-pill {
+      display: inline-block;
+      padding: 10px 30px;
+      border: 3px solid #1A1A19;
+      border-radius: 9999px;
+      box-shadow: 4px 4px 0 #1A1A19;
+      background: #FFC21A;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .op01-model {
+      font-size: 44px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+    .op01-amount {
+      font-size: 210px;
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+    }
+    .op01-source {
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.3;
+      opacity: 0.8;
+    }
+    .op01-block {
+      position: absolute;
+      left: 960px;
+      top: 648px;
+      padding: 26px 44px 22px;
+      border: 4px solid #1A1A19;
+      box-shadow: 8px 8px 0 #1A1A19;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .op01-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .op01-label-hi {
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+    .op01-label-en {
+      font-size: 28px;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+    #op01-line-b { background: #FF3E9A; }
+    .op01-line {
+      font-size: 68px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+    .op01-sub {
+      margin-top: 12px;
+      font-size: 30px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    #op01-star {
+      position: absolute;
+      right: -70px;
+      top: -86px;
+      width: 150px;
+      height: 150px;
+    }
+    .op01-star-edge,
+    .op01-star-fill {
+      position: absolute;
+      clip-path: polygon(50% 0%, 61% 25%, 85% 15%, 77% 40%, 100% 50%, 77% 60%, 85% 85%, 61% 75%, 50% 100%, 39% 75%, 15% 85%, 23% 60%, 0% 50%, 23% 40%, 15% 15%, 39% 25%);
+    }
+    .op01-star-edge { inset: 0; background: #1A1A19; }
+    .op01-star-fill {
+      inset: 7px;
+      background: #FF8A00;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      font-weight: 800;
+      color: #1A1A19;
+    }
+  </style>
+
+  <div data-hf-id="hf-6lpw" id="root" data-composition-id="01-online-price" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-6pg3" class="clip op01-ground" id="op01-ground" data-start="0" data-duration="2.9" data-track-index="0"></div>
+    <div data-hf-id="hf-6j9b" class="op01-dots" id="op01-dots-l"></div>
+    <div data-hf-id="hf-nrfl" class="op01-dots" id="op01-dots-r"></div>
+    <div data-hf-id="hf-8i84" id="op01-strip"></div>
+    <div data-hf-id="hf-wdt5" id="op01-stripe"></div>
+
+    <div data-hf-id="hf-q1xt" id="op01-price">
+      <div data-hf-id="hf-2lsz" class="op01-pill">Online</div>
+      <div data-hf-id="hf-wsvi" class="op01-model">iPhone 17 · 256GB</div>
+      <div data-hf-id="hf-ntb5" class="op01-amount">₹99,900</div>
+      <div class="op01-label">
+        <div class="op01-label-hi">Online toh dekh liya.</div>
+        <div class="op01-label-en">You've checked online.</div>
+      </div>
+      <div data-hf-id="hf-z0oz" class="op01-source">Apple India store price · 7 Oct 2026</div>
+    </div>
+
+    <div data-hf-id="hf-thbc" class="op01-block" id="op01-line-b">
+      <div data-hf-id="hf-qhbk" class="op01-line">Shayad offline mein aur kam mile?</div>
+      <div data-hf-id="hf-xswh" class="op01-sub">Maybe it's even less at a shop nearby?</div>
+      <div data-hf-id="hf-tflq" id="op01-star">
+        <div data-hf-id="hf-d5th" class="op01-star-edge"></div>
+        <div data-hf-id="hf-pjc2" class="op01-star-fill">?</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // Base states (deterministic, set at t=0)
+      gsap.set("#op01-line-b", { xPercent: -50, yPercent: -50, rotation: -3, autoAlpha: 0 });
+      gsap.set("#op01-star", { autoAlpha: 0, scale: 0 });
+
+      // Ambient chrome settles in immediately
+      tl.fromTo("#op01-strip", { yPercent: -100 }, { yPercent: 0, duration: 0.18, ease: "power3.out" }, 0);
+      tl.fromTo("#op01-stripe", { autoAlpha: 0, rotation: 0, scale: 0.6 }, { autoAlpha: 1, rotation: 8, scale: 1, duration: 0.25, ease: "back.out(2.2)" }, 0.56);
+
+      // Scene 1 — one-beat slam of the whole price group at 0.09
+      tl.fromTo("#op01-price",
+        { xPercent: -50, yPercent: -50, scale: 1.7, autoAlpha: 0 },
+        { xPercent: -50, yPercent: -50, scale: 1, autoAlpha: 1, duration: 0.16, ease: "power4.in" }, 0.09);
+      // impact jolt after the slam lands
+      tl.to("#op01-price", { y: 8, duration: 0.05, ease: "power1.out" }, 0.25);
+      tl.to("#op01-price", { y: 0, duration: 0.12, ease: "power2.out" }, 0.30);
+
+      // Scene 2 — price group shrinks up to the top third at ~1.2
+      tl.to("#op01-price", { y: -80, scale: 0.7, duration: 0.25, ease: "power3.inOut" }, 1.2);
+
+      // Scene 3 — hot-pink question (with English subline) slams in at 1.41 and holds
+      tl.fromTo("#op01-line-b",
+        { autoAlpha: 0, scale: 1.35 },
+        { autoAlpha: 1, scale: 1, duration: 0.14, ease: "power4.in", immediateRender: false }, 1.41);
+      // small impact settle (static well before the cut)
+      tl.to("#op01-line-b", { scale: 1.03, duration: 0.05, ease: "power2.out" }, 1.55);
+      tl.to("#op01-line-b", { scale: 1, duration: 0.15, ease: "power2.out" }, 1.60);
+      // saffron star-burst "?" pops at the upper-right on 2.44
+      tl.fromTo("#op01-star",
+        { autoAlpha: 1, scale: 0, rotation: -40 },
+        { autoAlpha: 1, scale: 1, rotation: 12, duration: 0.32, ease: "back.out(2.6)", immediateRender: false }, 2.44);
+
+      window.__timelines["01-online-price"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js" integrity="sha384-sG0Hv1tP1lZCk9KQmrIbY/XNwi+OY84GQqhMscbnsoBFqAz8KNCil1kvfL3Hbbk2" crossorigin="anonymous"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #000;
+      }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #FFFFFF;
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-3x1a" id="root" data-composition-id="main" data-start="0" data-duration="26" data-width="1920" data-height="1080">
+      <div data-hf-id="hf-q4sv" id="el-01-online-price" class="scene" data-composition-id="01-online-price" data-composition-src="compositions/frames/01-online-price.html" data-start="0" data-duration="2.9" data-track-index="0"></div>
+
+      <div data-hf-id="hf-l9ig" id="el-02-kaun-karega" class="scene" data-composition-id="02-kaun-karega" data-composition-src="compositions/frames/02-kaun-karega.html" data-start="2.9" data-duration="4.23" data-track-index="1"></div>
+
+      <div data-hf-id="hf-4cht" id="el-03-ab-boomerang" class="scene" data-composition-id="03-ab-boomerang" data-composition-src="compositions/frames/03-ab-boomerang.html" data-start="7.130000000000001" data-duration="1.87" data-track-index="0"></div>
+
+      <div data-hf-id="hf-llgl" id="el-04-bas-pick-karo" class="scene" data-composition-id="04-bas-pick-karo" data-composition-src="compositions/frames/04-bas-pick-karo.html" data-start="9" data-duration="4.36" data-track-index="1"></div>
+
+      <div data-hf-id="hf-cr08" id="el-05-ek-saath" class="scene" data-composition-id="05-ek-saath" data-composition-src="compositions/frames/05-ek-saath.html" data-start="12.76" data-duration="5.64" data-track-index="0"></div>
+
+      <div data-hf-id="hf-aa8w" id="el-06-final-price" class="scene" data-composition-id="06-final-price" data-composition-src="compositions/frames/06-final-price.html" data-start="18.4" data-duration="4.35" data-track-index="1"></div>
+
+      <div data-hf-id="hf-czd9" id="el-07-har-dukaan" class="scene" data-composition-id="07-har-dukaan" data-composition-src="compositions/frames/07-har-dukaan.html" data-start="22.15" data-duration="3.85" data-track-index="0"></div>
+
+      <!-- Soundtrack: Lyria desi track + phone ring + overlapping recreated sample calls (make-soundtrack.sh) -->
+      <audio data-hf-id="hf-u53u" id="el-soundtrack" src="assets/audio/soundtrack.wav" data-start="0" data-duration="26" data-track-index="11"></audio>
+
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+      // ── frame transitions (injected by transitions.mjs) ──
+      (function () { var tl = window.__timelines["main"];
+        tl.to("#el-04-bas-pick-karo", { filter: "blur(10px)", scale: 1.03, opacity: 0, duration: 0.6, ease: "power2.inOut" }, 12.76);
+        tl.fromTo("#el-05-ek-saath", { filter: "blur(10px)", scale: 0.97, opacity: 0 }, { filter: "blur(0px)", scale: 1, opacity: 1, duration: 0.6, ease: "power2.inOut" }, 12.76);
+        tl.to("#el-06-final-price", { filter: "blur(10px)", scale: 1.03, opacity: 0, duration: 0.6, ease: "power2.inOut" }, 22.15);
+        tl.fromTo("#el-07-har-dukaan", { filter: "blur(10px)", scale: 0.97, opacity: 0 }, { filter: "blur(0px)", scale: 1, opacity: 1, duration: 0.6, ease: "power2.inOut" }, 22.15);
+        tl.to({}, { duration: 26 }, 0); // full-span anchor — main.duration() == composition total (Studio master duration)
+      })();
+    </script>
+  </body>
+</html>

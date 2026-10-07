@@ -22,7 +22,9 @@ http.route({ path: "/SKILL.md", method: "GET", handler: httpAction(async () => {
 // which Safari refuses for audio. Serve them as audio/mpeg with byte ranges.
 for (const name of ["aptronix-sample-call.mp3", "aptronix-sample-call-hi.mp3"])
   http.route({ path: `/audio/${name}`, method: "GET", handler: httpAction(async (_ctx, request) => {
-    const source = await fetch(`${process.env.CONVEX_SITE_URL}/sample-audio/${name}`,
+    // The CDN caches /sample-audio/ for a year, so pass the page's ?v= through to fetch each new recording.
+    const version = encodeURIComponent(new URL(request.url).searchParams.get("v") ?? "1");
+    const source = await fetch(`${process.env.CONVEX_SITE_URL}/sample-audio/${name}?v=${version}`,
       { signal: AbortSignal.timeout(15000) });
     if (!source.ok) return new Response("Audio unavailable", { status: 503 });
     const bytes = new Uint8Array(await source.arrayBuffer());

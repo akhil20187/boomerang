@@ -1,0 +1,237 @@
+<template>
+  <div data-hf-id="hf-xyhi" id="root" data-composition-id="02-kaun-karega" data-width="1920" data-height="1080" data-duration="4.23">
+    <style>
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        container-type: size;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #1A1A19;
+      }
+      .f02-kaun-karega-bg { position: absolute; inset: 0; overflow: hidden; background: #1A1A19; }
+      #f02-kaun-karega-world {
+        position: absolute; inset: 0;
+        transform-origin: 50% 54%;
+      }
+      #f02-kaun-karega-photo {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; display: block;
+      }
+      #f02-kaun-karega-shade {
+        position: absolute; inset: 0;
+        background: linear-gradient(to bottom,
+          rgba(26,26,25,0.55) 0%, rgba(26,26,25,0.38) 24%, rgba(26,26,25,0.12) 40%, rgba(26,26,25,0) 52%);
+      }
+      .f02-kaun-karega-sticker {
+        position: absolute; width: 112px; height: 112px;
+        margin-left: -56px; margin-top: -56px;
+        border-radius: 50%;
+        border: 4px solid #1A1A19;
+        box-shadow: 6px 6px 0 #1A1A19;
+        box-sizing: border-box;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .f02-kaun-karega-sticker svg { width: 56px; height: 56px; display: block; }
+      .f02-kaun-karega-saffron { background: #FF8A00; }
+      .f02-kaun-karega-teal { background: #19C2B0; }
+
+      /* headline stack: centre sits at y = 648 (60%) at t=0 */
+      #f02-kaun-karega-slider {
+        position: absolute; left: 0; right: 0; top: 0; height: 1296px;
+        display: grid; place-items: center;
+      }
+      .f02-kaun-karega-block {
+        grid-area: 1 / 1;
+        box-sizing: border-box;
+        border: 4px solid #1A1A19;
+        box-shadow: 8px 8px 0 #1A1A19;
+        padding: 30px 48px 28px;
+        text-align: center;
+        white-space: nowrap;
+      }
+      .f02-kaun-karega-pink { background: #FF3E9A; }
+      .f02-kaun-karega-marigold { background: #FFC21A; }
+      .f02-kaun-karega-saffronblock { background: #FF8A00; }
+      .f02-kaun-karega-hlg {
+        font-size: 3.3cqw; font-weight: 800; line-height: 1.0;
+        letter-spacing: -0.02em; text-transform: uppercase;
+      }
+      .f02-kaun-karega-hxl {
+        font-size: 5.0cqw; font-weight: 800; line-height: 0.95;
+        letter-spacing: -0.03em; text-transform: uppercase;
+      }
+      .f02-kaun-karega-sub {
+        margin-top: 14px; font-size: 1.6cqw; font-weight: 600; line-height: 1.2;
+      }
+
+      /* call counter pill */
+      #f02-kaun-karega-pill {
+        position: absolute; right: 60px; top: 60px;
+        display: flex; align-items: center; gap: 14px;
+        padding: 14px 30px 14px 18px;
+        background: #19C2B0;
+        border: 3px solid #1A1A19;
+        box-shadow: 4px 4px 0 #1A1A19;
+        border-radius: 9999px;
+        font-weight: 800; font-size: 34px; letter-spacing: 0.08em; text-transform: uppercase;
+      }
+      #f02-kaun-karega-pill .f02-kaun-karega-dot {
+        width: 46px; height: 46px; border-radius: 50%;
+        background: #FFF1D6; border: 3px solid #1A1A19; box-sizing: border-box;
+        display: flex; align-items: center; justify-content: center;
+      }
+      #f02-kaun-karega-pill .f02-kaun-karega-dot svg { width: 24px; height: 24px; }
+      .f02-kaun-karega-num { position: relative; display: inline-block; width: 1.6em; height: 1em; }
+      .f02-kaun-karega-num span {
+        position: absolute; right: 0; top: 0; line-height: 1; opacity: 0;
+      }
+    </style>
+
+    <!-- full-bleed ground: bazaar photo + stickers ride the push-in together -->
+    <div data-hf-id="hf-ml6f" id="f02-kaun-karega-ground" class="clip f02-kaun-karega-bg" data-start="0" data-duration="4.23" data-track-index="0">
+      <div data-hf-id="hf-83r6" id="f02-kaun-karega-world">
+        <img data-hf-id="hf-cetz" id="f02-kaun-karega-photo" src="assets/gen/bazaar-shutters.png" alt="">
+        <div data-hf-id="hf-lpmp" id="f02-kaun-karega-shade"></div>
+        <div data-hf-id="hf-mzau" id="f02-kaun-karega-stickers"></div>
+      </div>
+    </div>
+
+    <!-- headline relay (carried-over pink block, then the two swaps) -->
+    <div data-hf-id="hf-1k4i" id="f02-kaun-karega-headline" class="clip" data-start="0" data-duration="4.23" data-track-index="1" style="position:absolute;inset:0;">
+      <div data-hf-id="hf-5myd" id="f02-kaun-karega-slider">
+        <div data-hf-id="hf-u8dh" id="f02-kaun-karega-a" class="f02-kaun-karega-block f02-kaun-karega-pink">
+          <div data-hf-id="hf-6srz" class="f02-kaun-karega-hlg">Shayad offline mein aur kam mile?</div>
+          <div data-hf-id="hf-giv3" class="f02-kaun-karega-sub">Maybe it's even less at a shop nearby?</div>
+        </div>
+        <div data-hf-id="hf-xm17" id="f02-kaun-karega-b" class="f02-kaun-karega-block f02-kaun-karega-marigold">
+          <div data-hf-id="hf-wf8u" class="f02-kaun-karega-hlg">Par dukaan ko call kaun karega?</div>
+          <div data-hf-id="hf-hbng" class="f02-kaun-karega-sub">But who's going to call the shops?</div>
+        </div>
+        <div data-hf-id="hf-m8l3" id="f02-kaun-karega-c" class="f02-kaun-karega-block f02-kaun-karega-saffronblock">
+          <div data-hf-id="hf-l16w" class="f02-kaun-karega-hxl">10 dukaan. 10 calls.</div>
+          <div data-hf-id="hf-fxr9" class="f02-kaun-karega-sub">Ten shops. Ten calls.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- call counter -->
+    <div data-hf-id="hf-ixwf" id="f02-kaun-karega-counter" class="clip" data-start="0" data-duration="4.23" data-track-index="2" style="position:absolute;inset:0;">
+      <div data-hf-id="hf-75x3" id="f02-kaun-karega-pill">
+        <div data-hf-id="hf-iars" class="f02-kaun-karega-dot">
+          <svg data-hf-id="hf-ulu9" viewBox="0 0 24 24"><path data-hf-id="hf-cakm" fill="#1A1A19" d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" /></svg>
+        </div>
+        <div data-hf-id="hf-ifds" class="f02-kaun-karega-num" id="f02-kaun-karega-num"></div>
+        <div data-hf-id="hf-kwyx">Calls</div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        var ID = "02-kaun-karega";
+        var root = document.querySelector('[data-composition-id="' + ID + '"]');
+        var P = "f02-kaun-karega";
+        var q = function (sel) { return root.querySelector(sel); };
+        var PHONE = '<svg viewBox="0 0 24 24"><path fill="#1A1A19" d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>';
+
+        // ten stickers over the six shop fronts; two pop per beat, 0.12s apart
+        // one sticker per beat (5 beats); the counter ticks by two calls each beat -> 10
+        var SPOTS = [
+          [812, 620, "saffron"], [1441, 660, "teal"],
+          [330, 680, "teal"], [1125, 720, "saffron"],
+          [1700, 640, "saffron"]
+        ];
+        var BEATS = [1.95, 2.42, 2.89, 3.36, 3.83];
+        var host = q("#" + P + "-stickers");
+        var numHost = q("#" + P + "-num");
+        var stickers = [], nums = [];
+        SPOTS.forEach(function (s, i) {
+          var el = document.createElement("div");
+          el.className = P + "-sticker " + P + "-" + s[2];
+          el.style.left = s[0] + "px";
+          el.style.top = s[1] + "px";
+          el.innerHTML = PHONE;
+          host.appendChild(el);
+          stickers.push(el);
+        });
+        for (var n = 2; n <= 10; n += 2) {
+          var sp = document.createElement("span");
+          sp.textContent = String(n);
+          numHost.appendChild(sp);
+          nums.push(sp);
+        }
+
+        // deterministic pseudo-random for the jitter
+        var seed = 7;
+        function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+
+        var world = q("#" + P + "-world");
+        var slider = q("#" + P + "-slider");
+        var A = q("#" + P + "-a"), B = q("#" + P + "-b"), C = q("#" + P + "-c");
+        var pill = q("#" + P + "-pill");
+
+        var tl = gsap.timeline({ paused: true });
+
+        // Scene 1 — handoff state: pink block centred, centre y=60%, scale 1, opacity 1, rot -3, static
+        tl.fromTo(A, { rotation: -3, scale: 1, opacity: 1 }, { rotation: -3, scale: 1, opacity: 1, duration: 0.01 }, 0);
+        tl.fromTo(B, { opacity: 0 }, { opacity: 0, duration: 0.01 }, 0);
+        tl.fromTo(C, { opacity: 0 }, { opacity: 0, duration: 0.01 }, 0);
+        tl.fromTo(pill, { opacity: 0, scale: 0.6 }, { opacity: 0, scale: 0.6, duration: 0.01 }, 0);
+        stickers.forEach(function (el) {
+          tl.fromTo(el, { scale: 0, opacity: 0 }, { scale: 0, opacity: 0, duration: 0.01 }, 0);
+        });
+
+        // slow continuous push-in, accelerating into the drop
+        tl.fromTo(world, { scale: 1.0 }, { scale: 1.07, duration: 3.36, ease: "none" }, 0);
+        tl.to(world, { scale: 1.2, duration: 0.87, ease: "power2.in" }, 3.36);
+
+        // 0.54 — block slides up into the upper third (centre 648 -> ~290)
+        tl.fromTo(slider, { y: 0 }, { y: -358, duration: 0.42, ease: "power3.out" }, 0.54);
+
+        // Scene 2 — 1.48 in-place swap to marigold question
+        tl.set(A, { opacity: 0 }, 1.48);
+        tl.fromTo(B, { opacity: 1, scale: 1.14, rotation: -2 },
+          { opacity: 1, scale: 1, rotation: -2, duration: 0.32, ease: "back.out(2.4)" }, 1.48);
+        tl.fromTo(pill, { opacity: 0, scale: 0.6, rotation: 3 },
+          { opacity: 1, scale: 1, rotation: 3, duration: 0.25, ease: "back.out(2.2)" }, 1.85);
+
+        // Scene 3 — 2.89 swap to saffron "10 DUKAAN. 10 CALLS."
+        tl.set(B, { opacity: 0 }, 2.89);
+        tl.fromTo(C, { opacity: 1, scale: 1.2, rotation: -4 },
+          { opacity: 1, scale: 1, rotation: -4, duration: 0.34, ease: "back.out(2.4)" }, 2.89);
+
+        // stickers pop on beats; count pill ticks with each
+        stickers.forEach(function (el, i) {
+          var t = BEATS[i];
+          var r0 = (i % 2 ? 1 : -1) * (8 + (i % 3) * 4);
+          tl.fromTo(el, { scale: 0, opacity: 1, rotation: r0 - 40 },
+            { scale: 1, opacity: 1, rotation: r0, duration: 0.3, ease: "back.out(2.6)" }, t);
+          if (i > 0) tl.set(nums[i - 1], { opacity: 0 }, t);
+          tl.set(nums[i], { opacity: 1 }, t);
+          tl.fromTo(pill, { scale: 1.12 }, { scale: 1, duration: 0.2, ease: "power2.out" }, t);
+        });
+
+        // stickers jitter from 2.89 into the cut (deterministic), intensity rising
+        stickers.forEach(function (el, i) {
+          var popAt = BEATS[i] + 0.3;
+          var start = Math.max(2.89, popAt);
+          var r0 = (i % 2 ? 1 : -1) * (8 + (i % 3) * 4);
+          for (var t = start; t < 4.2; t += 0.06) {
+            var k = 0.4 + 0.6 * (t - 2.89) / 1.34;
+            tl.to(el, {
+              x: (rnd() - 0.5) * 10 * k,
+              y: (rnd() - 0.5) * 10 * k,
+              rotation: r0 + (rnd() - 0.5) * 18 * k,
+              duration: 0.06, ease: "none"
+            }, t);
+          }
+        });
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines[ID] = tl;
+      })();
+    </script>
+  </div>
+</template>

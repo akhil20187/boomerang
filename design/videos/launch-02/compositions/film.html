@@ -1,0 +1,348 @@
+<template id="film-template">
+  <div id="root" data-composition-id="film" data-width="1920" data-height="1080" data-start="0" data-duration="28">
+    <style>
+      [data-composition-id="film"] {
+        --ink: #1A1A19;
+        --paper: #FFFFFF;
+        --ground: #F5F4F1;
+        --line: #DAD7D0;
+        --road: #E4E2DC;
+        --muted: #64625D;
+        --green: #17573A;
+        --green-bg: #E5F2EA;
+        --blue: #2341B5;
+        --amber: #7A4A00;
+        --grey: #55544F;
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, Helvetica, Arial, sans-serif;
+      }
+      [data-composition-id="film"] * { box-sizing: border-box; }
+
+      /* ── the world: map, pins, arcs (the camera moves this) ── */
+      [data-composition-id="film"] .world { position: absolute; inset: 0; transform-origin: 960px 560px; }
+      [data-composition-id="film"] .world svg.map { position: absolute; inset: 0; }
+      [data-composition-id="film"] .area { position: absolute; font-size: 22px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #A9A69F; }
+      [data-composition-id="film"] .pincode {
+        position: absolute; left: 64px; top: 56px; padding: 14px 22px; border: 2px solid var(--line); border-radius: 12px;
+        background: var(--paper); font-size: 26px; font-weight: 600;
+      }
+      [data-composition-id="film"] .pincode span { color: var(--muted); font-weight: 500; }
+
+      [data-composition-id="film"] .you { position: absolute; left: 960px; top: 560px; }
+      [data-composition-id="film"] .you .dot { position: absolute; left: -16px; top: -16px; width: 32px; height: 32px; border-radius: 50%; background: var(--ink); border: 6px solid var(--paper); box-shadow: 0 0 0 2px var(--ink); }
+      [data-composition-id="film"] .you .chip {
+        position: absolute; left: 0; top: 34px; transform: translateX(-50%); white-space: nowrap;
+        padding: 12px 20px; border-radius: 10px; background: var(--ink); color: var(--paper); font-size: 24px; font-weight: 600;
+      }
+      [data-composition-id="film"] .you .chip span { opacity: 0.7; font-weight: 500; }
+
+      [data-composition-id="film"] .shop { position: absolute; }
+      [data-composition-id="film"] .shop .pin { position: absolute; left: -14px; top: -14px; width: 28px; height: 28px; border-radius: 50%; background: var(--ink); border: 5px solid var(--paper); box-shadow: 0 0 0 2px var(--line); }
+      [data-composition-id="film"] .shop .pin.s-calling { background: var(--blue); }
+      [data-composition-id="film"] .shop .pin.s-green { background: var(--green); }
+      [data-composition-id="film"] .shop .pin.s-grey { background: var(--grey); }
+      [data-composition-id="film"] .shop .pin.s-amber { background: var(--amber); }
+      [data-composition-id="film"] .shop .pin + .pin { }
+      [data-composition-id="film"] .shop .ring { position: absolute; left: -14px; top: -14px; width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--blue); }
+      [data-composition-id="film"] .shop .card {
+        position: absolute; top: -40px; width: 380px; padding: 14px 18px; background: var(--paper);
+        border: 2px solid var(--line); border-radius: 12px;
+      }
+      [data-composition-id="film"] .shop.left .card { right: 30px; }
+      [data-composition-id="film"] .shop.right .card { left: 30px; }
+      [data-composition-id="film"] .shop .name { font-size: 26px; font-weight: 650; letter-spacing: -0.01em; white-space: nowrap; }
+      [data-composition-id="film"] .shop .status { position: relative; height: 30px; margin-top: 4px; }
+      [data-composition-id="film"] .shop .st { position: absolute; left: 0; top: 0; font-size: 22px; font-weight: 500; white-space: nowrap; display: flex; align-items: center; gap: 10px; }
+      [data-composition-id="film"] .st.listed { color: var(--muted); }
+      [data-composition-id="film"] .st.calling { color: var(--blue); }
+      [data-composition-id="film"] .st.calling i { width: 12px; height: 12px; border-radius: 50%; background: var(--blue); display: inline-block; }
+      [data-composition-id="film"] .st.green { color: var(--green); font-weight: 650; }
+      [data-composition-id="film"] .st.grey { color: var(--grey); }
+      [data-composition-id="film"] .st.amber { color: var(--amber); }
+
+      [data-composition-id="film"] svg.arcs { position: absolute; inset: 0; overflow: visible; }
+      [data-composition-id="film"] svg.arcs path { fill: none; stroke-linecap: round; }
+      [data-composition-id="film"] svg.arcs .out { stroke: var(--blue); stroke-width: 4; }
+      [data-composition-id="film"] svg.arcs .back { stroke-width: 5; }
+
+      /* ── overlay layer (does not move with the camera) ── */
+      [data-composition-id="film"] .opener { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; display: flex; flex-direction: column; align-items: center; justify-content: center; transform-origin: 960px 560px; }
+      [data-composition-id="film"] .opener .label { font-size: 34px; font-weight: 600; color: var(--muted); letter-spacing: -0.01em; }
+      [data-composition-id="film"] .opener .price { font-size: 230px; font-weight: 800; letter-spacing: -0.05em; line-height: 1; margin-top: 18px; }
+      [data-composition-id="film"] .opener .price small { font-size: 90px; font-weight: 700; letter-spacing: -0.03em; color: var(--muted); margin-left: 24px; }
+      [data-composition-id="film"] .opener .doubt { font-size: 64px; font-style: italic; font-weight: 600; letter-spacing: -0.02em; color: var(--green); margin-top: 44px; }
+
+      [data-composition-id="film"] .caption {
+        position: absolute; left: 50%; bottom: 64px; transform: translateX(-50%); white-space: nowrap;
+        padding: 20px 34px; border-radius: 14px; background: var(--paper); border: 2px solid var(--line);
+        font-size: 46px; font-weight: 700; letter-spacing: -0.02em; display: flex; align-items: center; gap: 22px;
+      }
+      [data-composition-id="film"] .caption img { width: 58px; height: 58px; }
+      [data-composition-id="film"] .caption em { font-style: italic; color: var(--green); }
+      [data-composition-id="film"] .sample-tag { position: absolute; right: 64px; top: 66px; font-size: 22px; font-weight: 500; color: var(--muted); padding: 10px 16px; border-radius: 10px; background: var(--paper); border: 2px solid var(--line); }
+
+      /* result panel */
+      [data-composition-id="film"] .result { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 90px; }
+      [data-composition-id="film"] .result .big { width: 760px; }
+      [data-composition-id="film"] .result .big .label { font-size: 32px; font-weight: 600; color: var(--muted); }
+      [data-composition-id="film"] .result .big .was { position: relative; display: inline-block; font-size: 72px; font-weight: 700; letter-spacing: -0.03em; color: var(--muted); margin-top: 14px; }
+      [data-composition-id="film"] .result .big .was .strike { position: absolute; left: -6px; right: -6px; top: 52%; height: 6px; background: var(--ink); transform-origin: left center; }
+      [data-composition-id="film"] .result .big .now { font-size: 190px; font-weight: 800; font-style: italic; letter-spacing: -0.05em; line-height: 1; color: var(--green); margin-top: 8px; }
+      [data-composition-id="film"] .result .big .where { font-size: 34px; font-weight: 600; margin-top: 22px; }
+      [data-composition-id="film"] .result .big .where span { color: var(--muted); font-weight: 500; }
+      [data-composition-id="film"] .result .big .fine { font-size: 22px; color: var(--muted); margin-top: 18px; }
+      [data-composition-id="film"] .result .rows { width: 720px; background: var(--paper); border: 2px solid var(--line); border-radius: 16px; padding: 10px 30px; }
+      [data-composition-id="film"] .result .rows .hd { font-size: 24px; font-weight: 600; color: var(--muted); padding: 16px 0 12px; }
+      [data-composition-id="film"] .result .row { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; padding: 18px 0; border-top: 2px solid var(--line); }
+      [data-composition-id="film"] .result .row b { font-size: 28px; font-weight: 650; white-space: nowrap; }
+      [data-composition-id="film"] .result .row span { font-size: 25px; font-weight: 550; white-space: nowrap; }
+
+      /* end card */
+      [data-composition-id="film"] .endcard { position: absolute; inset: 0; background: var(--paper); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      [data-composition-id="film"] .endcard img { width: 600px; }
+      [data-composition-id="film"] .endcard .line { font-size: 66px; font-weight: 800; letter-spacing: -0.035em; margin-top: 50px; }
+      [data-composition-id="film"] .endcard .url { margin-top: 52px; padding: 24px 44px; border-radius: 14px; background: var(--ink); color: var(--paper); font-size: 48px; font-weight: 700; letter-spacing: -0.01em; }
+      [data-composition-id="film"] .endcard .free { margin-top: 26px; font-size: 30px; font-weight: 500; color: var(--muted); }
+    </style>
+
+    <!-- WORLD -->
+    <div class="world" id="film-world">
+      <svg class="map" width="1920" height="1080" viewBox="0 0 1920 1080">
+        <rect width="1920" height="1080" fill="#F5F4F1"/>
+        <g fill="#ECEAE4">
+          <rect x="120" y="120" width="300" height="160" rx="8"/><rect x="1500" y="110" width="280" height="150" rx="8"/>
+          <rect x="140" y="900" width="320" height="130" rx="8"/><rect x="1560" y="900" width="260" height="120" rx="8"/>
+          <rect x="640" y="660" width="220" height="140" rx="8"/><rect x="1080" y="360" width="200" height="120" rx="8"/>
+          <rect x="680" y="300" width="160" height="120" rx="8"/><rect x="1120" y="660" width="200" height="130" rx="8"/>
+        </g>
+        <g fill="none" stroke="#FFFFFF" stroke-linecap="round">
+          <path d="M-40 980 C 420 760, 700 600, 960 560 S 1600 300, 1980 120" stroke-width="34"/>
+          <path d="M600 -40 C 640 300, 760 460, 960 560 S 1260 900, 1300 1120" stroke-width="24"/>
+          <path d="M-40 420 H 1980" stroke-width="16"/>
+          <path d="M-40 720 H 1980" stroke-width="14"/>
+          <path d="M300 -40 V 1120" stroke-width="12"/>
+          <path d="M1640 -40 V 1120" stroke-width="12"/>
+          <path d="M1020 -40 V 1120" stroke-width="10"/>
+          <circle cx="960" cy="560" r="300" stroke-width="12"/>
+        </g>
+        <g fill="none" stroke="#E4E2DC" stroke-width="2">
+          <path d="M-40 980 C 420 760, 700 600, 960 560 S 1600 300, 1980 120"/>
+        </g>
+      </svg>
+      <div class="area" style="left:180px;top:470px">Kukatpally</div>
+      <div class="area" style="left:120px;top:660px">JNTU</div>
+      <div class="area" style="left:1560px;top:470px">Vivekananda Nagar</div>
+      <div class="area" style="left:1380px;top:640px">KPHB</div>
+
+      <svg class="arcs" width="1920" height="1080" viewBox="0 0 1920 1080" id="film-arcs"></svg>
+
+      <div class="shop left" id="shop-a" style="left:520px;top:330px">
+        <div class="ring"></div><div class="ring"></div>
+        <div class="pin"></div><div class="pin s-calling"></div><div class="pin s-green"></div>
+        <div class="card"><div class="name">Aptronix · Kukatpally</div>
+          <div class="status"><div class="st listed">★ 4.6 · 1.2 km</div><div class="st calling"><i></i>AI agent calling</div><div class="st green">In stock · ₹95,900</div></div></div>
+      </div>
+      <div class="shop right" id="shop-v2" style="left:1000px;top:190px">
+        <div class="ring"></div><div class="ring"></div>
+        <div class="pin"></div><div class="pin s-calling"></div><div class="pin s-grey"></div>
+        <div class="card"><div class="name">Vijay Sales · Vivekananda Ngr</div>
+          <div class="status"><div class="st listed">★ 4.3 · 3.4 km</div><div class="st calling"><i></i>AI agent calling</div><div class="st grey">No stock</div></div></div>
+      </div>
+      <div class="shop right" id="shop-r" style="left:1420px;top:330px">
+        <div class="ring"></div><div class="ring"></div>
+        <div class="pin"></div><div class="pin s-calling"></div><div class="pin s-amber"></div>
+        <div class="card"><div class="name">Reliance Digital · Kukatpally</div>
+          <div class="status"><div class="st listed">★ 4.2 · 1.8 km</div><div class="st calling"><i></i>AI agent calling</div><div class="st amber">No answer · retrying</div></div></div>
+      </div>
+      <div class="shop right" id="shop-v1" style="left:1440px;top:790px">
+        <div class="ring"></div><div class="ring"></div>
+        <div class="pin"></div><div class="pin s-calling"></div><div class="pin s-green"></div>
+        <div class="card"><div class="name">Vijay Sales · Kukatpally</div>
+          <div class="status"><div class="st listed">★ 4.4 · 2.1 km</div><div class="st calling"><i></i>AI agent calling</div><div class="st green">In stock · ₹99,900</div></div></div>
+      </div>
+      <div class="shop left" id="shop-c" style="left:480px;top:800px">
+        <div class="ring"></div><div class="ring"></div>
+        <div class="pin"></div><div class="pin s-calling"></div><div class="pin s-grey"></div>
+        <div class="card"><div class="name">Croma · JNTU</div>
+          <div class="status"><div class="st listed">★ 4.1 · 2.6 km</div><div class="st calling"><i></i>AI agent calling</div><div class="st grey">No stock · expected Friday</div></div></div>
+      </div>
+
+      <div class="you" id="film-you"><div class="dot"></div><div class="chip">You <span>· ₹99,900 online</span></div></div>
+      <div class="pincode" id="film-pincode">500037 <span>· Hyderabad</span></div>
+    </div>
+
+    <!-- OPENER -->
+    <div class="opener" id="film-opener">
+      <div class="label">iPhone 17 · 256 GB · Apple online store</div>
+      <div class="price">₹99,900<small>online.</small></div>
+      <div class="doubt">A shop nearby might do better.</div>
+    </div>
+
+    <!-- CAPTIONS -->
+    <div class="caption" id="cap-1">5 shops near you might have it.</div>
+    <div class="caption" id="cap-2"><img src="assets/brand/boomerang-mark.svg" alt="">Boomerang calls every one. <em>At the same time.</em></div>
+    <div class="caption" id="cap-3">Every answer comes back.</div>
+    <div class="sample-tag" id="film-sample">Sample calls · AI voices</div>
+
+    <!-- RESULT -->
+    <div class="result" id="film-result">
+      <div class="big">
+        <div class="label">iPhone 17 · 256 GB</div>
+        <div class="was" id="res-was">₹99,900 online<div class="strike" id="res-strike"></div></div>
+        <div class="now" id="res-now">₹99,900</div>
+        <div class="where">Aptronix, Kukatpally <span>· with ICICI card</span></div>
+        <div class="fine">Sample price from a recreated call. Offers vary by shop.</div>
+      </div>
+      <div class="rows" id="res-rows">
+        <div class="hd">5 shops called · 5 accounted for</div>
+        <div class="row"><b>Aptronix · Kukatpally</b><span style="color:#17573A">In stock · ₹95,900</span></div>
+        <div class="row"><b>Vijay Sales · Kukatpally</b><span style="color:#17573A">In stock · ₹99,900</span></div>
+        <div class="row"><b>Reliance Digital · Kukatpally</b><span style="color:#7A4A00">No answer · retrying</span></div>
+        <div class="row"><b>Croma · JNTU</b><span style="color:#55544F">No stock · expected Fri</span></div>
+        <div class="row"><b>Vijay Sales · Vivekananda Ngr</b><span style="color:#55544F">No stock</span></div>
+      </div>
+    </div>
+
+    <!-- END CARD -->
+    <div class="endcard" id="film-end">
+      <img src="assets/brand/boomerang-logo.svg" alt="Boomerang">
+      <div class="line">We call every shop near you.</div>
+      <div class="url">tinyurl.com/tryboomerang</div>
+      <div class="free">Free credits to start.</div>
+    </div>
+
+    <script>
+      (function () {
+        const R = '[data-composition-id="film"]';
+        const q = (s) => document.querySelector(R + ' ' + s);
+        const qa = (s) => Array.from(document.querySelectorAll(R + ' ' + s));
+        const tl = gsap.timeline({ paused: true });
+        const YOU = { x: 960, y: 560 };
+
+        // shop order = pin-drop order; outcome resolves in `doneAt` order (Aptronix last, on the call's final line)
+        const SHOPS = [
+          { id: 'shop-a', kind: 'green',  x: 520,  y: 330, back: '#17573A', doneAt: 20.7, bend: -1 },
+          { id: 'shop-v2', kind: 'grey', x: 1000, y: 190, back: '#55544F', doneAt: 18.5, bend: 1 },
+          { id: 'shop-r', kind: 'amber',  x: 1420, y: 330, back: '#7A4A00', doneAt: 19.1, bend: 1 },
+          { id: 'shop-v1', kind: 'green', x: 1440, y: 790, back: '#17573A', doneAt: 19.7, bend: -1 },
+          { id: 'shop-c', kind: 'grey',  x: 480,  y: 800, back: '#55544F', doneAt: 18.0, bend: 1 },
+        ];
+
+        // build boomerang arcs: out bends one way, back bends the other
+        const svg = q('#film-arcs');
+        const NS = 'http://www.w3.org/2000/svg';
+        function curve(a, b, k) {
+          const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+          const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
+          const cx = mx + (-dy / len) * len * 0.28 * k, cy = my + (dx / len) * len * 0.28 * k;
+          return `M${a.x} ${a.y} Q${cx} ${cy} ${b.x} ${b.y}`;
+        }
+        SHOPS.forEach((s) => {
+          const out = document.createElementNS(NS, 'path');
+          out.setAttribute('d', curve(YOU, s, s.bend)); out.setAttribute('class', 'out');
+          const back = document.createElementNS(NS, 'path');
+          back.setAttribute('d', curve(s, YOU, s.bend)); back.setAttribute('class', 'back'); back.setAttribute('stroke', s.back);
+          svg.appendChild(out); svg.appendChild(back);
+          s.out = out; s.back = back;
+          [out, back].forEach((p) => { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; p._L = L; });
+        });
+
+        const world = q('#film-world'), opener = q('#film-opener');
+
+        // initial states (seek-safe)
+        tl.set(world, { autoAlpha: 0, scale: 1.5 }, 0);
+        tl.set(qa('.shop'), { autoAlpha: 0 }, 0);
+        tl.set(qa('.shop .pin.s-calling, .shop .pin.s-green, .shop .pin.s-grey, .shop .pin.s-amber, .shop .ring'), { autoAlpha: 0 }, 0);
+        tl.set(qa('.shop .st.calling, .shop .st.green, .shop .st.grey, .shop .st.amber'), { autoAlpha: 0 }, 0);
+        tl.set(qa('.caption, #film-sample, #film-result, #film-end'), { autoAlpha: 0 }, 0);
+        tl.set(q('#film-you'), { autoAlpha: 0 }, 0);
+
+        // ── A · 0–4.4: the online price ──
+        tl.fromTo(q('.opener .label'), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 0.15);
+        tl.fromTo(q('.opener .price'), { autoAlpha: 0, y: 50, scale: 0.94 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.9, ease: 'expo.out' }, 0.35);
+        tl.fromTo(q('.opener .doubt'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power3.out' }, 1.9);
+        tl.to(opener, { scale: 1.03, duration: 2.4, ease: 'none' }, 1.9);
+
+        // ── B · 4.4–9.8: pull back onto the map ──
+        tl.to(opener, { autoAlpha: 0, scale: 0.35, y: 60, duration: 0.8, ease: 'power3.in' }, 4.0);
+        tl.to(world, { autoAlpha: 1, scale: 1, duration: 1.4, ease: 'power3.out' }, 4.4);
+        tl.fromTo(q('#film-you'), { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'back.out(2)' }, 4.6);
+        SHOPS.forEach((s, i) => {
+          tl.fromTo('#' + s.id, { autoAlpha: 0, y: -40 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'back.out(1.8)' }, 4.95 + i * 0.5);
+        });
+        tl.fromTo('#cap-1', { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power3.out' }, 5.2);
+        tl.to('#cap-1', { autoAlpha: 0, y: -10, duration: 0.35, ease: 'power2.in' }, 9.55);
+
+        // ── C · 10–17.6: calls go out ──
+        tl.fromTo('#cap-2', { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power3.out' }, 9.95);
+        tl.fromTo('#film-sample', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5 }, 10.1);
+        tl.to(world, { scale: 1.05, duration: 7.6, ease: 'none' }, 10.0);
+        SHOPS.forEach((s, i) => {
+          const t = 10.05 + i * 0.5;
+          const el = '#' + s.id;
+          tl.to(s.out, { strokeDashoffset: 0, duration: 0.55, ease: 'power2.out' }, t);
+          tl.to(el + ' .pin.s-calling', { autoAlpha: 1, duration: 0.15 }, t + 0.5);
+          tl.to(el + ' .st.listed', { autoAlpha: 0, duration: 0.15 }, t + 0.5);
+          tl.to(el + ' .st.calling', { autoAlpha: 1, duration: 0.2 }, t + 0.55);
+          // pulsing rings while ringing / talking, until the answer resolves
+          const rings = qa(el + ' .ring');
+          const pulses = Math.floor((s.doneAt - (t + 0.5)) / 1.0);
+          rings.forEach((r, k) => {
+            const at = t + 0.5 + k * 0.5;
+            tl.set(r, { autoAlpha: 0.9, scale: 1 }, at);
+            tl.to(r, { autoAlpha: 0, scale: 3.2, duration: 1.0, ease: 'power1.out', repeat: Math.max(0, pulses - 1) }, at);
+          });
+        });
+
+        // ── D · 17.6–21.9: answers come back ──
+        tl.to('#cap-2', { autoAlpha: 0, y: -10, duration: 0.35, ease: 'power2.in' }, 17.5);
+        tl.fromTo('#cap-3', { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power3.out' }, 17.9);
+        SHOPS.forEach((s) => {
+          const el = '#' + s.id;
+          const kind = s.kind;
+          tl.to(s.out, { autoAlpha: 0.15, duration: 0.3 }, s.doneAt);
+          tl.to(s.back, { strokeDashoffset: 0, duration: 0.7, ease: 'power2.inOut' }, s.doneAt);
+          tl.to(el + ' .pin.s-calling', { autoAlpha: 0, duration: 0.15 }, s.doneAt);
+          tl.to(el + ' .pin.s-' + kind, { autoAlpha: 1, duration: 0.15 }, s.doneAt);
+          tl.to(el + ' .st.calling', { autoAlpha: 0, duration: 0.15 }, s.doneAt);
+          tl.fromTo(el + ' .st.' + kind, { autoAlpha: 0, x: -10 }, { autoAlpha: 1, x: 0, duration: 0.3, ease: 'power2.out' }, s.doneAt + 0.05);
+          tl.fromTo(el + ' .card', { scale: 1 }, { scale: 1.06, duration: 0.15, yoyo: true, repeat: 1, ease: 'power2.out' }, s.doneAt);
+        });
+        tl.fromTo(q('#film-you .dot'), { scale: 1 }, { scale: 1.5, duration: 0.2, yoyo: true, repeat: 1 }, 21.3);
+
+        // ── E · 21.9–24.8: on the hit, the final price ──
+        tl.to(['#cap-3', '#film-sample'], { autoAlpha: 0, duration: 0.25 }, 21.75);
+        tl.to(world, { scale: 1.18, autoAlpha: 0.12, filter: 'blur(6px)', duration: 0.7, ease: 'power3.out' }, 21.9);
+        tl.set('#film-result', { autoAlpha: 1 }, 21.9);
+        tl.fromTo(q('.result .big'), { autoAlpha: 0, x: -60 }, { autoAlpha: 1, x: 0, duration: 0.6, ease: 'expo.out' }, 21.9);
+        tl.fromTo('#res-rows', { autoAlpha: 0, x: 60 }, { autoAlpha: 1, x: 0, duration: 0.6, ease: 'expo.out' }, 22.0);
+        tl.fromTo(qa('.result .row'), { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.35, stagger: 0.12, ease: 'power2.out' }, 22.15);
+        tl.fromTo('#res-strike', { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: 'power2.inOut' }, 22.3);
+        const counter = { v: 99900 };
+        const nowEl = q('#res-now');
+        tl.fromTo(counter, { v: 99900 }, {
+          v: 95900, duration: 1.1, ease: 'power3.out',
+          onUpdate: () => { nowEl.textContent = '₹' + (Math.round(counter.v / 100) * 100).toLocaleString('en-IN'); },
+        }, 22.4);
+        tl.fromTo(nowEl, { scale: 1 }, { scale: 1.04, duration: 0.2, yoyo: true, repeat: 1, ease: 'power2.out' }, 23.5);
+
+        // ── F · 24.8–28: end card ──
+        tl.to('#film-result', { autoAlpha: 0, y: -30, duration: 0.45, ease: 'power2.in' }, 24.5);
+        tl.set('#film-end', { autoAlpha: 1 }, 24.8);
+        tl.fromTo(q('.endcard img'), { autoAlpha: 0, scale: 0.85, rotation: -8 }, { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.7, ease: 'back.out(1.6)' }, 24.8);
+        tl.fromTo(q('.endcard .line'), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power3.out' }, 25.1);
+        tl.fromTo(q('.endcard .url'), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power3.out' }, 25.35);
+        tl.fromTo(q('.endcard .free'), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5 }, 25.6);
+        tl.to({}, { duration: 28 }, 0);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines['film'] = tl;
+      })();
+    </script>
+  </div>
+</template>

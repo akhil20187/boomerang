@@ -1,0 +1,236 @@
+<template id="f04bpk-template">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1a1a19;
+    }
+    #f04bpk-bg {
+      position: absolute;
+      inset: 0;
+      background-color: #19c2b0;
+      background-image: radial-gradient(rgba(26, 26, 25, 0.16) 1.4px, transparent 1.6px);
+      background-size: 24px 24px;
+    }
+    #f04bpk-stripe {
+      position: absolute;
+      left: -50px;
+      top: -40px;
+      width: 300px;
+      height: 170px;
+      border: 4px solid #1a1a19;
+      background-image: repeating-linear-gradient(45deg, #1a1a19 0 14px, #ffc21a 14px 30px);
+      transform: rotate(-8deg);
+    }
+    #f04bpk-star {
+      position: absolute;
+      right: 26px;
+      top: 18px;
+      width: 96px;
+      height: 96px;
+      background: #ff8a00;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+    #f04bpk-camera {
+      position: absolute;
+      inset: 0;
+      transform-origin: 960px 540px;
+    }
+    /* Browser window: 4px border, 40px chrome bar, 1080x792 screenshot at 1x CSS */
+    #f04bpk-window {
+      position: absolute;
+      left: 744px;
+      top: 52px;
+      width: 1080px;
+      height: 832px;
+      background: #ffffff;
+      border: 4px solid #1a1a19;
+      box-shadow: 8px 8px 0 #1a1a19;
+      overflow: hidden;
+    }
+    #f04bpk-chrome {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 40px;
+      background: #fff1d6;
+      border-bottom: 3px solid #1a1a19;
+      box-sizing: border-box;
+    }
+    .f04bpk-dot {
+      position: absolute;
+      top: 12px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 2px solid #1a1a19;
+      box-sizing: border-box;
+    }
+    #f04bpk-shot {
+      position: absolute;
+      left: 0;
+      top: 40px;
+      width: 1080px;
+      height: 792px;
+    }
+    #f04bpk-shot img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 792px;
+      display: block;
+    }
+    #f04bpk-scan {
+      position: absolute;
+      left: 0;
+      top: 40px;
+      width: 1080px;
+      height: 4px;
+      background: #1a1a19;
+    }
+    #f04bpk-ring,
+    #f04bpk-ring2 {
+      position: absolute;
+      /* button in screenshot: x 337-943, y 605-653 (CSS px); offset by shot origin (0,40) + 12px pad */
+      left: 325px;
+      top: 633px;
+      width: 630px;
+      height: 72px;
+      border: 6px solid #1a1a19;
+      border-radius: 16px;
+      box-sizing: border-box;
+      transform-origin: 50% 50%;
+    }
+    #f04bpk-head {
+      position: absolute;
+      left: 80px;
+      top: 210px;
+      padding: 26px 34px 22px;
+      background: #ffc21a;
+      border: 4px solid #1a1a19;
+      box-shadow: 8px 8px 0 #1a1a19;
+      font-weight: 800;
+      font-size: 96px;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      transform-origin: 30% 50%;
+    }
+    #f04bpk-sub {
+      position: absolute;
+      left: 96px;
+      top: 500px;
+      padding: 16px 24px;
+      background: #ffffff;
+      border: 3px solid #1a1a19;
+      box-shadow: 4px 4px 0 #1a1a19;
+      font-weight: 700;
+      font-size: 32px;
+      line-height: 1.2;
+    }
+    #f04bpk-sticker {
+      position: absolute;
+      left: 250px;
+      top: 650px;
+      padding: 18px 30px;
+      background: #ff3e9a;
+      border: 4px solid #1a1a19;
+      box-shadow: 8px 8px 0 #1a1a19;
+      font-weight: 800;
+      font-size: 38px;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transform-origin: 50% 50%;
+    }
+  </style>
+
+  <div data-hf-id="hf-x3hf" id="root" data-composition-id="04-bas-pick-karo" data-width="1920" data-height="1080" data-start="0" data-duration="4.36">
+    <div data-hf-id="hf-98t2" id="f04bpk-bg" class="clip" data-start="0" data-duration="4.36" data-track-index="0"></div>
+
+    <div data-hf-id="hf-7lba" id="f04bpk-camera" class="clip" data-start="0" data-duration="4.36" data-track-index="1" data-layout-allow-overflow="">
+      <div data-hf-id="hf-pres" id="f04bpk-stripe"></div>
+      <div data-hf-id="hf-cn4j" id="f04bpk-star"></div>
+
+      <div data-hf-id="hf-hqm7" id="f04bpk-window">
+        <div data-hf-id="hf-gm55" id="f04bpk-chrome">
+          <div data-hf-id="hf-ttp1" class="f04bpk-dot" style="left: 16px; background: #ff3e9a"></div>
+          <div data-hf-id="hf-jnf2" class="f04bpk-dot" style="left: 38px; background: #ffc21a"></div>
+          <div data-hf-id="hf-zmph" class="f04bpk-dot" style="left: 60px; background: #19c2b0"></div>
+        </div>
+        <div data-hf-id="hf-2qdr" id="f04bpk-shot">
+          <img data-hf-id="hf-276m" src="assets/screens/chat-window.png" alt="">
+        </div>
+        <div data-hf-id="hf-wlhk" id="f04bpk-scan"></div>
+        <div data-hf-id="hf-5odt" id="f04bpk-ring2"></div>
+        <div data-hf-id="hf-4km1" id="f04bpk-ring"></div>
+      </div>
+
+      <div data-hf-id="hf-xz6t" id="f04bpk-sticker">5 dukaan · near 500037</div>
+    </div>
+
+    <!-- headline + subline sit outside the camera layer so the push never crops them -->
+    <div data-hf-id="hf-pduh" id="f04bpk-head">Bas pick<br data-hf-id="hf-x5px">karo.</div>
+    <div data-hf-id="hf-mhx8" id="f04bpk-sub">Ask your AI. Pick the shops.</div>
+  </div>
+
+  <script>
+    (function () {
+      var P = "f04bpk-";
+      var $ = function (n) { return document.getElementById(P + n); };
+      var shot = $("shot"), scan = $("scan"), ring = $("ring"), ring2 = $("ring2");
+      var H = 792; // screenshot height (CSS px)
+      var tl = gsap.timeline({ paused: true });
+      // reveal edge y (in screenshot px) → clip-path bottom inset + scan line position
+      function reveal(y, at, dur) {
+        tl.to(shot, { clipPath: "inset(0px 0px " + (H - y) + "px 0px)", duration: dur, ease: "power2.out" }, at);
+        tl.to(scan, { y: y, duration: dur, ease: "power2.out" }, at);
+      }
+
+      // ---- Scene 1 (0.0–1.4): window whip-slide, staged mask reveal, headline slam, subline
+      tl.fromTo($("window"), { x: 760, rotation: 3, skewX: -8 }, { x: 0, rotation: 0, skewX: 0, duration: 0.32, ease: "power4.out" }, 0);
+      tl.fromTo($("stripe"), { scale: 0.4, rotation: -20 }, { scale: 1, rotation: -8, duration: 0.4, ease: "back.out(2)" }, 0.05);
+      tl.fromTo($("star"), { scale: 0, rotation: -60 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2.2)" }, 0.2);
+      // mask: header + user bubble first (y 140), then assistant line + card header (y 280)
+      tl.fromTo(shot, { clipPath: "inset(0px 0px " + H + "px 0px)" }, { clipPath: "inset(0px 0px " + (H - 140) + "px 0px)", duration: 0.4, ease: "power2.out" }, 0.04);
+      tl.fromTo(scan, { y: 0 }, { y: 140, duration: 0.4, ease: "power2.out" }, 0.04);
+      reveal(280, 0.47, 0.4);
+      tl.fromTo($("head"), { scale: 1.7, opacity: 0, rotation: -9 }, { scale: 1, opacity: 1, rotation: -3, duration: 0.22, ease: "power4.out" }, 0.47);
+      tl.fromTo($("sub"), { y: 36, opacity: 0 }, { y: 0, opacity: 1, rotation: 1.5, duration: 0.22, ease: "power4.out" }, 0.47);
+
+      // ---- Scene 2 (1.41–2.8): cascade down the five shop rows, one per half-beat
+      var rowEdges = [369, 425, 481, 537, 595]; // bottom of each row incl. "5 shops" label above row 1
+      for (var i = 0; i < rowEdges.length; i++) reveal(rowEdges[i], 1.41 + i * 0.235, 0.22);
+      // button + footer note, then the rest of the window
+      reveal(680, 2.48, 0.22);
+      reveal(H, 2.68, 0.14);
+      tl.to(scan, { opacity: 0, duration: 0.12, ease: "none" }, 2.7);
+      tl.fromTo($("sticker"), { scale: 0, rotation: -18 }, { scale: 1, rotation: -6, duration: 0.42, ease: "back.out(2.2)" }, 1.88);
+
+      // ---- Scene 3 (2.82–3.76): camera push to the "Call 5 shops" button + press-spring ring
+      // button centre on canvas: window (744+4, 52+4) + shot (0,40) + (640,629) = (1388, 725)
+      var S = 1.22, ox = 1388 - 960, oy = 725 - 540;
+      tl.fromTo($("camera"), { scale: 1, x: 0, y: 0 }, { scale: S, x: -ox * S * 0.6, y: -oy * S * 0.6, duration: 0.94, ease: "power2.in" }, 2.82);
+      [2.82, 3.29].forEach(function (t) {
+        // press: linear-ish compression, then spring release (adjacent positions for continuity)
+        tl.fromTo(ring, { scale: 1.12, opacity: 1 }, { scale: 0.96, opacity: 1, duration: 0.1, ease: "power1.in" }, t);
+        tl.to(ring, { scale: 1, duration: 0.36, ease: "back.out(2)" }, t + 0.1);
+        // ink burst ring expanding outward
+        tl.fromTo(ring2, { scale: 1, opacity: 0.9 }, { scale: 1.16, opacity: 0, duration: 0.4, ease: "power2.out" }, t + 0.1);
+      });
+      tl.set(ring, { opacity: 0 }, 0);
+      tl.set(ring2, { opacity: 0 }, 0);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["04-bas-pick-karo"] = tl;
+    })();
+  </script>
+</template>

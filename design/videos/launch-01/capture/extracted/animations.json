@@ -1,0 +1,182 @@
+{
+  "summary": {
+    "webAnimations": 4,
+    "cssDeclarations": 152,
+    "scrollTargets": 2,
+    "cdpAnimations": 106,
+    "canvases": 0
+  },
+  "namedAnimations": [
+    "ask-blink",
+    "settle",
+    "pulse"
+  ],
+  "scrollTriggeredElements": 2,
+  "representativeAnimations": [
+    {
+      "type": "CSSTransition",
+      "playState": "running",
+      "animationName": null,
+      "targetSelector": "#site-nav.nav",
+      "targetRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 65,
+        "top": 0,
+        "right": 1920,
+        "bottom": 65,
+        "left": 0
+      },
+      "keyframes": [
+        {
+          "offset": 0,
+          "easing": "linear",
+          "composite": "auto",
+          "backgroundColor": "oklab(0.999994 0.0000455678 0.0000200868 / 0.85)",
+          "computedOffset": 0
+        },
+        {
+          "offset": 1,
+          "easing": "linear",
+          "composite": "auto",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "computedOffset": 1
+        }
+      ],
+      "timing": {
+        "duration": 200,
+        "delay": 0,
+        "iterations": 1,
+        "easing": "ease",
+        "direction": "normal"
+      }
+    },
+    {
+      "type": "CSSTransition",
+      "playState": "running",
+      "animationName": null,
+      "targetSelector": "#site-nav.nav",
+      "targetRect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 65,
+        "top": 0,
+        "right": 1920,
+        "bottom": 65,
+        "left": 0
+      },
+      "keyframes": [
+        {
+          "offset": 0,
+          "easing": "linear",
+          "composite": "auto",
+          "borderBottomColor": "rgb(228, 226, 220)",
+          "computedOffset": 0
+        },
+        {
+          "offset": 1,
+          "easing": "linear",
+          "composite": "auto",
+          "borderBottomColor": "rgba(0, 0, 0, 0)",
+          "computedOffset": 1
+        }
+      ],
+      "timing": {
+        "duration": 200,
+        "delay": 0,
+        "iterations": 1,
+        "easing": "ease",
+        "direction": "normal"
+      }
+    },
+    {
+      "type": "CSSAnimation",
+      "playState": "running",
+      "animationName": "ask-blink",
+      "targetSelector": "#ask-caret.ask-caret",
+      "targetRect": {
+        "x": 1445,
+        "y": 217.390625,
+        "width": 2,
+        "height": 20,
+        "top": 217.390625,
+        "right": 1447,
+        "bottom": 237.390625,
+        "left": 1445
+      },
+      "keyframes": [
+        {
+          "offset": 0,
+          "easing": "steps(1)",
+          "composite": "replace",
+          "opacity": "1",
+          "computedOffset": 0
+        },
+        {
+          "offset": 0.5,
+          "easing": "steps(1)",
+          "composite": "auto",
+          "opacity": "0",
+          "computedOffset": 0.5
+        },
+        {
+          "offset": 1,
+          "easing": "steps(1)",
+          "composite": "replace",
+          "opacity": "1",
+          "computedOffset": 1
+        }
+      ],
+      "timing": {
+        "duration": 1000,
+        "delay": 0,
+        "iterations": null,
+        "easing": "linear",
+        "direction": "normal"
+      }
+    },
+    {
+      "type": "CSSAnimation",
+      "playState": "finished",
+      "animationName": "settle",
+      "targetSelector": "div.pick-part",
+      "targetRect": {
+        "x": 741,
+        "y": 1497.28125,
+        "width": 638,
+        "height": 419.65625,
+        "top": 1497.28125,
+        "right": 1379,
+        "bottom": 1916.9375,
+        "left": 741
+      },
+      "keyframes": [
+        {
+          "offset": 0,
+          "easing": "ease",
+          "composite": "auto",
+          "transform": "translateX(-4px)",
+          "opacity": "0",
+          "computedOffset": 0
+        },
+        {
+          "offset": 1,
+          "easing": "ease",
+          "composite": "auto",
+          "transform": "none",
+          "opacity": "1",
+          "computedOffset": 1
+        }
+      ],
+      "timing": {
+        "duration": 350,
+        "delay": 0,
+        "iterations": 1,
+        "easing": "linear",
+        "direction": "normal"
+      }
+    }
+  ]
+}

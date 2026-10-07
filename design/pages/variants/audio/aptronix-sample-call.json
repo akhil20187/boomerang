@@ -4,67 +4,68 @@
   "ai": "marin",
   "shop": "cedar"
  },
- "total": 44.22,
+ "total": 35.66,
  "lines": [
   {
    "who": "ai",
    "text": "Hello, is this Aptronix, Kukatpally?",
    "start": 0,
-   "end": 2.51
+   "end": 2.38
   },
   {
    "who": "shop",
    "text": "Yes, Aptronix. Tell me.",
-   "start": 2.79,
-   "end": 4.74
+   "start": 2.61,
+   "end": 4.6
   },
   {
    "who": "ai",
    "text": "Hi, I'm an AI assistant calling on behalf of a customer. Do you have the iPhone 17, 256 GB, in lavender?",
-   "start": 5.09,
-   "end": 14.37
+   "start": 4.88,
+   "end": 11.4
   },
   {
    "who": "shop",
    "text": "Yes sir, one piece is there.",
-   "start": 14.79,
-   "end": 16.9
+   "start": 11.74,
+   "end": 13.15
   },
   {
    "who": "ai",
    "text": "Great. What's the final price? Is there any card offer?",
-   "start": 17.39,
-   "end": 21.05
+   "start": 13.54,
+   "end": 16.54
   },
   {
    "who": "shop",
-   "text": "It's seventy-nine nine hundred. With ICICI card, four thousand off. So seventy-five nine hundred final.",
-   "start": 21.61,
-   "end": 28.63
+   "text": "It's ninety-nine nine hundred. With ICICI card, four thousand off. So ninety-five nine hundred final.",
+   "start": 16.99,
+   "end": 23.67
   },
   {
    "who": "ai",
-   "text": "Seventy-five thousand nine hundred with an ICICI card. Can you hold it for this evening?",
-   "start": 28.96,
-   "end": 34.51
+   "text": "Ninety-five thousand nine hundred with an ICICI card. Can you hold it for this evening?",
+   "start": 23.94,
+   "end": 28.33
   },
   {
    "who": "shop",
    "text": "Hold I can't promise, sir. Better to come early.",
-   "start": 34.91,
-   "end": 38.71
+   "start": 28.65,
+   "end": 31.21
   },
   {
    "who": "ai",
    "text": "Understood. Thank you, I'll pass this on to the customer.",
-   "start": 39.18,
-   "end": 42.18
+   "start": 31.58,
+   "end": 33.93
   },
   {
    "who": "shop",
    "text": "Okay, thank you.",
-   "start": 42.72,
-   "end": 43.91
+   "start": 34.36,
+   "end": 35.42
   }
- ]
+ ],
+ "speed": 1.25
 }

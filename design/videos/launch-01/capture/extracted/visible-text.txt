@@ -1,0 +1,266 @@
+[span] boomerang
+[a] How it works
+[a] Hear a call
+[a] What’s next
+[a] Sign in
+[a] Get started
+[h1] We call every shop near you.
+[p] Our AI agents phone the shops around you and come back with who has it and the final price after offers. You never pick up the phone.
+[span] Give this to your AI agent
+[title] Claude
+[title] OpenAI
+[title] Grok
+[title] Hermes
+[title] OpenClaw
+[code] Set up Boomerang using https://
+[code] little-kangaroo-718.convex.site
+[code] /SKILL.md
+[p] Works with Claude, ChatGPT/Codex, Grok, Hermes, OpenClaw and other agents that can read a skill. $1 free credit to try.
+[a] Using the ChatGPT or Claude app?
+[label] Try it: ask for a product
+[button] Replay
+[b] iPhone 17 · 256GB · Lavender
+[span] 5 shops called ·
+[span] 2 have it
+[b] You · 500037
+[span] Aptronix · Kukatpally
+[span] 3.8 km · ★ 4.6 (1,240)
+[span] In stock · ₹95,900
+[span] Vijay Sales · Kukatpally
+[span] 4.1 km · ★ 4.4 (3,105)
+[span] Prefers a personal call
+[span] Vijay Sales · Vivekananda Ngr
+[span] 5.0 km · ★ 4.3 (860)
+[span] In stock · ₹99,900
+[span] Reliance Digital · Kukatpally
+[span] 4.0 km · ★ 4.2 (2,410)
+[span] No answer · trying again
+[span] Croma · JNTU
+[span] 6.4 km · ★ 4.1 (1,120)
+[span] No stock
+[figcaption] Examples. Shop names in the iPhone example are real listings; other shops, answers and prices are sample data.
+[p] How it works
+[h2] Every shop near you gets a call.
+[p] You pick the shops. Our AI calls each one. Every shop stays on the list with what happened, so you know nothing was skipped. Try it below: tick the shops, then tap Call.
+[figcaption] What you’ll see in the chat
+[button] Web
+[button] App
+[span] New chat
+[span] Recent
+[span] Buy iPhone 17 today
+[span] Weekend trip plan
+[span] Fix sink leak
+[div] New chat
+[p] Need an iPhone 17, 256GB, lavender today near 500037. I'll pay with my ICICI card.
+[p] Here’s what I found near 500037. Pick the shops and I’ll have them called.
+[b] 5 shops near 500037 may have your iPhone 17
+[span] Pick the shops. Our AI calls them for stock and the final price after offers.
+[b] 5 shops
+[span] Highest rated · 50+ Google ratings
+[b] Aptronix · Kukatpally
+[span] 3.8 km · Open till 9:30 pm
+[span] ★ 4.6
+[i] (1,240)
+[b] Vijay Sales · Kukatpally
+[span] 4.1 km · Open till 10 pm
+[span] ★ 4.4
+[i] (3,105)
+[b] Vijay Sales · Vivekananda Ngr
+[span] 5.0 km · Open till 9:30 pm
+[span] ★ 4.3
+[i] (860)
+[b] Reliance Digital · Kukatpally
+[span] 4.0 km · Open till 10 pm
+[span] ★ 4.2
+[i] (2,410)
+[b] Croma · JNTU
+[span] 6.4 km · Open till 10 pm
+[span] ★ 4.1
+[i] (1,120)
+[button] Call 5 shops
+[span] Calls use your account credit. A listing doesn’t confirm stock.
+[span] Aptronix · Kukatpally
+[span] ★ 4.6 (1,240) · 3.8 km · Open till 9:30 pm
+[span] In stock · final price with ICICI card
+[span] ₹95,900
+[span] ▶ 0:36 · 4:07 pm
+[span] Vijay Sales · Kukatpally
+[span] ★ 4.4 (3,105) · 4.1 km · Open till 10 pm
+[span] Prefers a personal call
+[span] · not charged
+[span] ▶ 0:18 · 4:07 pm
+[span] Vijay Sales · Vivekananda Ngr
+[span] ★ 4.3 (860) · 5.0 km · Open till 9:30 pm
+[span] In stock
+[span] · card offers
+[span] Unconfirmed
+[span] ₹99,900
+[span] ▶ 1:05 · 4:08 pm
+[span] Reliance Digital · Kukatpally
+[span] ★ 4.2 (2,410) · 4.0 km · Open till 10 pm
+[span] No answer · tried again at 4:13 pm
+[span] · not charged
+[span] 2 tries
+[span] Croma · JNTU
+[span] ★ 4.1 (1,120) · 6.4 km · Open till 10 pm
+[span] No stock · expected Friday
+[span] ▶ 0:47 · 4:09 pm
+[button] Start over
+[div] Ask anything
+[p] Example. Shop names are real listings; answers and prices are sample data. Recreated sample call · AI voices.
+[h2] Don’t take our word for it. Hear the shop say it.
+[p] Every answer comes back with who called, when, and the recording of the call. Play the whole call, or tap a line to jump to it.
+[b] Aptronix · Kukatpally
+[span] ★ 4.6 (1,240) · 3.8 km · Opp. Reliance Digital, Kukatpally
+[span] ₹95,900
+[p] In stock · final price with ICICI card
+[span] Offer, in the shop’s words:
+[p] “With ICICI card, four thousand off. So seventy-five nine hundred final.”
+[span] 0:00 / 0:35
+[span] Called 4:07 pm
+[dt] Called by
+[dd] Boomerang AI agent, on your behalf
+[dt] When
+[dd] 4:07 pm · 56-second call
+[dt] Colour and storage
+[dd] Lavender, 256GB · confirmed on the call
+[dt] Can they hold it?
+[dd] Unconfirmed
+[b] From the call
+[button] English
+[button] हिंदी
+[span] 0:00
+[span] Hello, is this Aptronix, Kukatpally?
+[span] 0:02
+[span] Shop
+[span] Yes, Aptronix. Tell me.
+[span] 0:04
+[span] Hi, I’m an AI assistant calling on behalf of a customer. Do you have the iPhone 17, 256 GB, in lavender?
+[span] 0:11
+[span] Shop
+[span] Yes sir,
+[mark] one piece is there
+[span] 0:13
+[span] Great. What’s the final price? Is there any card offer?
+[span] 0:16
+[span] Shop
+[span] It’s ninety-nine nine hundred. With ICICI card, four thousand off. So
+[mark] ninety-five nine hundred final
+[span] 0:23
+[span] Ninety-five thousand nine hundred with an ICICI card. Can you hold it for this evening?
+[span] 0:28
+[span] Shop
+[span] Hold I can’t promise, sir. Better to come early.
+[span] 0:31
+[span] Understood. Thank you, I’ll pass this on to the customer.
+[span] 0:34
+[span] Shop
+[span] Okay, thank you.
+[span] Recreated sample call · AI voices
+[p] . Real answers carry the shop’s own recording.
+[h2] You don’t make a single call.
+[b] Ask in ChatGPT or Claude.
+[span] “iPhone 17, 256GB, lavender, near 500037. I’ll pay with ICICI.”
+[b] Pick the shops.
+[span] Boomerang lists shops near you, highest rated first. Tick the ones to call.
+[b] Read the answers.
+[span] Who has it, the final price, and the recording. Pay only for shops that answer.
+[p] What else it can do
+[h2] Any call you’d rather not make.
+[p] Shop calls work today. These are next, through the same assistant.
+[span] boomerang
+[span] Live
+[b] Find it in nearby shops
+[span] stock + final price
+[span] Coming soon
+[b] Hold it for me
+[span] reserve stock
+[span] Coming soon
+[b] Medicine near me
+[span] pharmacy stock
+[span] Coming soon
+[b] Repair quotes
+[span] AC · plumber · electrician
+[span] Coming soon
+[b] Doctor appointments
+[span] clinic slots
+[span] Coming soon
+[b] Table for tonight
+[span] restaurant booking
+[span] Coming soon
+[b] Car and bike service
+[span] service slots
+[span] Coming soon
+[b] Movers and packers
+[span] moving quotes
+[span] Coming soon
+[b] Rental enquiries
+[span] flats + PGs
+[span] Coming soon
+[b] School admissions
+[span] seats + fees
+[span] Coming soon
+[b] Event bookings
+[span] venues + caterers
+[span] Coming soon
+[b] Customer care for you
+[span] waits on hold
+[span] Coming soon
+[b] Human follow-up
+[span] when AI can’t finish
+[span] Coming soon
+[b] Expert second opinion
+[span] insurance · money · education
+[b] Add to ChatGPT or Claude
+[p] “Coming soon” tasks aren’t available yet. Today, Boomerang calls shops for stock and the final price.
+[p] Set it up in about 3 minutes
+[h2] Copy one address. Paste it. Ask.
+[span] Give this to your AI agent
+[title] Claude
+[title] OpenAI
+[title] Grok
+[title] Hermes
+[title] OpenClaw
+[code] Set up Boomerang using https://
+[code] little-kangaroo-718.convex.site
+[code] /SKILL.md
+[p] New here? Sign up and get $1 free credit.
+[p] Verify your email and you can start testing straight away.
+[a] Get started
+[p] Live for testing. Shop calling is in early testing, so some calls may not go through yet.
+[button] ChatGPT
+[button] Claude
+[b] Turn on Developer mode
+[span] Settings → Security and login
+[span] → Developer mode.
+[b] Add a new plugin
+[span] Go to
+[a] chatgpt.com/plugins
+[span] , select +, name it Boomerang and add a short description.
+[b] Paste the address
+[span] Under Connection, paste it and select Create.
+[code] https://little-kangaroo-718.convex.site/mcp
+[button] Copy
+[b] Sign in, then use it
+[span] In a new chat, add Boomerang from the tools menu.
+[p] Needs Developer mode: ChatGPT Business, Enterprise and Edu. On Pro, Boomerang can connect but may not be able to start calls. On Business, your admin may need to turn Developer mode on.
+[b] Open Connectors
+[span] Go to
+[a] Customize → Connectors
+[span] , then + Add → Add custom connector.
+[b] Paste the address
+[span] Name it Boomerang, paste the address, select Continue, then Continue again.
+[code] https://little-kangaroo-718.convex.site/mcp
+[button] Copy
+[b] Choose sign-in, then Add
+[span] Under Authentication, choose Sign in now. Under OAuth client, choose Register automatically. Select Add and sign in.
+[b] Turn it on in a chat
+[span] + → Connectors → switch on Boomerang.
+[p] Works on Free, Pro, Max, Team and Enterprise. On Team and Enterprise, an owner adds it under Organization settings → Connectors.
+[span] boomerang
+[p] We call shops near you and come back with who has it and the final price.
+[a] My tasks
+[a] Agent skill
+[span] © 2026 Boomerang
+[span] Prices, answers and recordings on this page are sample data.
+[span] Setup steps checked against OpenAI’s and Anthropic’s help pages on 5 October 2026.

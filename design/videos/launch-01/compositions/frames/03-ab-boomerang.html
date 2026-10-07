@@ -1,0 +1,165 @@
+<template id="03-ab-boomerang-template">
+  <div data-hf-id="hf-1lwh" id="root" data-composition-id="03-ab-boomerang" data-width="1920" data-height="1080" data-start="0" data-duration="1.87">
+    <style>
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        container-type: size;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      [data-composition-id="03-ab-boomerang"] [data-el="bg-clip"],
+      [data-composition-id="03-ab-boomerang"] [data-el="content-clip"],
+      [data-composition-id="03-ab-boomerang"] [data-el="flash-clip"] {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      [data-composition-id="03-ab-boomerang"] [data-el="bg-clip"] { background: #A8125E; }
+      [data-composition-id="03-ab-boomerang"] [data-el="truck"] {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform-origin: 50% 50%;
+      }
+      /* stage = the magenta centre of the truck-art frame (approx x 264-1653, y 212-855) */
+      [data-composition-id="03-ab-boomerang"] [data-el="stage"] {
+        position: absolute;
+        left: 13.75cqw;
+        top: 11.05cqw;
+        width: 72.4cqw;
+        height: 33.3cqw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.6cqw;
+        transform-origin: 50% 45%;
+      }
+      [data-composition-id="03-ab-boomerang"] [data-el="card"] {
+        background: #FFF1D6;
+        border: 0.4cqw solid #1A1A19;
+        box-shadow: 0.8cqw 0.8cqw 0 #1A1A19;
+        border-radius: 0;
+        padding: 2.2cqw 3.2cqw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform-origin: 50% 50%;
+      }
+      [data-composition-id="03-ab-boomerang"] [data-el="logo"] {
+        display: block;
+        width: 33cqw;
+        height: auto;
+        transform-origin: 18% 50%;
+      }
+      [data-composition-id="03-ab-boomerang"] [data-el="headline"] {
+        background: #FFC21A;
+        color: #1A1A19;
+        border: 0.4cqw solid #1A1A19;
+        box-shadow: 0.8cqw 0.8cqw 0 #1A1A19;
+        border-radius: 0;
+        padding: 0.7cqw 1.6cqw 0.6cqw;
+        font-size: 5cqw;
+        font-weight: 800;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        transform-origin: 50% 50%;
+      }
+      [data-composition-id="03-ab-boomerang"] [data-el="subline"] {
+        background: #FFF1D6;
+        color: #1A1A19;
+        border: 0.3cqw solid #1A1A19;
+        box-shadow: 0.4cqw 0.4cqw 0 #1A1A19;
+        border-radius: 9999px;
+        padding: 0.55cqw 1.8cqw;
+        font-size: 1.9cqw;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        transform-origin: 50% 50%;
+      }
+      [data-composition-id="03-ab-boomerang"] [data-el="flash"] {
+        position: absolute;
+        inset: 0;
+        background: #FFFFFF;
+        opacity: 1;
+      }
+    </style>
+
+    <!-- track 0: full-bleed truck-art ground -->
+    <div data-hf-id="hf-jwbj" id="ab-boomerang-bg" class="clip" data-el="bg-clip" data-start="0" data-duration="1.87" data-track-index="0">
+      <img data-hf-id="hf-0eth" data-el="truck" src="assets/gen/truck-art-frame.png" alt="">
+    </div>
+
+    <!-- track 1: card + headline + subline -->
+    <div data-hf-id="hf-ark0" id="ab-boomerang-content" class="clip" data-el="content-clip" data-start="0" data-duration="1.87" data-track-index="1">
+      <div data-hf-id="hf-lo4k" data-el="stage">
+        <div data-hf-id="hf-5sko" data-el="card">
+          <img data-hf-id="hf-3rb4" data-el="logo" src="assets/brand/boomerang-logo.svg" alt="Boomerang">
+        </div>
+        <div data-hf-id="hf-vvrs" data-el="headline">Ab Boomerang karega.</div>
+        <div data-hf-id="hf-mgxj" data-el="subline">Now you can.</div>
+      </div>
+    </div>
+
+    <!-- track 2: one-frame white flash on the drop -->
+    <div data-hf-id="hf-5ob1" id="ab-boomerang-flash" class="clip" data-el="flash-clip" data-start="0" data-duration="1.87" data-track-index="2">
+      <div data-hf-id="hf-dpw8" data-el="flash"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        var root = document.querySelector('[data-composition-id="03-ab-boomerang"]');
+        var q = function (name) { return root.querySelector('[data-el="' + name + '"]'); };
+        var truck = q("truck");
+        var stage = q("stage");
+        var card = q("card");
+        var logo = q("logo");
+        var headline = q("headline");
+        var subline = q("subline");
+        var flash = q("flash");
+
+        var tl = gsap.timeline({ paused: true });
+
+        // Scene 1 (0.00-0.50): DROP - truck frame slams in, one-frame white flash,
+        // cream card springs open from zero, logo blooms inside it.
+        tl.set(flash, { opacity: 1 }, 0);
+        tl.set(flash, { opacity: 0 }, 0.034);
+        tl.fromTo(truck, { scale: 1.15 }, { scale: 1, duration: 0.3, ease: "expo.out" }, 0);
+        tl.fromTo(card,
+          { scale: 0, rotation: -6 },
+          { scale: 1, rotation: 0, duration: 0.36, ease: "back.out(1.8)" }, 0.02);
+        tl.fromTo(logo,
+          { scale: 0, rotation: -14, opacity: 0 },
+          { scale: 1, rotation: 0, opacity: 1, duration: 0.38, ease: "back.out(2.2)" }, 0.12);
+
+        // Scene 2 (0.47): headline block slams in under the card.
+        tl.fromTo(headline,
+          { scale: 1.4, y: 24, opacity: 0 },
+          { scale: 1, y: 0, opacity: 1, duration: 0.16, ease: "power4.out" }, 0.47);
+        // impact nudge on the card as the headline lands
+        tl.fromTo(card, { y: 0 }, { y: -8, duration: 0.06, ease: "power2.out" }, 0.53);
+        tl.to(card, { y: 0, duration: 0.2, ease: "back.out(3)" }, 0.59);
+
+        // English subline lands together with the headline at 0.47, then holds.
+        tl.fromTo(subline,
+          { scale: 1.4, y: 24, rotation: -2, opacity: 0 },
+          { scale: 1, y: 0, rotation: -2, opacity: 1, duration: 0.16, ease: "power4.out" }, 0.47);
+
+        // Hold: near-imperceptible scale-up on the lockup group.
+        tl.fromTo(stage, { scale: 1 }, { scale: 1.02, duration: 1.37, ease: "none" }, 0.5);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["03-ab-boomerang"] = tl;
+      })();
+    </script>
+  </div>
+</template>

@@ -1,0 +1,42 @@
+{
+  "schema": "hyperframes.capture.icons.v1",
+  "headline": {
+    "file": "assets/favicon.svg",
+    "source": "assets/icon-icon-unsized.svg",
+    "rank": 0,
+    "shape": "badge",
+    "reason": "no bare-mark candidate among 3 icon(s); used the best-ranked badge"
+  },
+  "icons": [
+    {
+      "file": "assets/icon-icon-unsized.svg",
+      "url": "https://little-kangaroo-718.convex.site/favicon.svg",
+      "rel": "icon",
+      "sizes": null,
+      "type": "image/svg+xml",
+      "rank": 0,
+      "shape": "badge",
+      "shapeReason": "first painted element is a full-bleed rounded rect (100x100 of 100x100)"
+    },
+    {
+      "file": "assets/icon-apple-touch-icon-unsized.png",
+      "url": "https://little-kangaroo-718.convex.site/apple-touch-icon.png",
+      "rel": "apple-touch-icon",
+      "sizes": null,
+      "type": null,
+      "rank": 1,
+      "shape": "badge",
+      "shapeReason": "4 of 4 edge midpoints are opaque, so the drawing carries a backdrop"
+    },
+    {
+      "file": "assets/icon-icon-48x48.ico",
+      "url": "https://little-kangaroo-718.convex.site/favicon.ico",
+      "rel": "icon",
+      "sizes": "48x48",
+      "type": null,
+      "rank": 2,
+      "shape": "unknown",
+      "shapeReason": "image format could not be decoded for inspection"
+    }
+  ]
+}
