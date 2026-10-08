@@ -115,7 +115,7 @@ async function askModel(request: string, pincode: string | undefined, turns: Tur
         method: "POST",
         headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: process.env.OPENAI_INTAKE_MODEL ?? "gpt-4.1-mini",
+          model: process.env.OPENAI_INTAKE_MODEL ?? "gpt-4.1",
           messages,
           response_format: { type: "json_object" },
           max_tokens: 1200,
