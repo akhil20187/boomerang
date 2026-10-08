@@ -53,3 +53,34 @@ export const terminalStates = new Set([
   "incomplete_answer",
   "technical_error",
 ]);
+export const briefV = v.object({
+  task_type: v.string(),
+  task_context: v.object({
+    summary: v.string(),
+    known: v.record(v.string(), v.string()),
+    unknown: v.array(v.object({ fact: v.string(), fallback: v.string() })),
+    share_only_if_asked: v.array(v.string()),
+  }),
+  call_purpose: v.string(),
+  expected_outcome: v.object({
+    must_confirm: v.array(v.string()),
+    nice_to_have: v.array(v.string()),
+    deciding_question: v.union(v.string(), v.null()),
+  }),
+  representing: v.object({
+    name: v.string(),
+    kind: v.union(v.literal("personal"), v.literal("organisation")),
+    caller_name: v.string(),
+  }),
+  authority: v.object({
+    enquiry_only: v.literal(true),
+    may_share_customer_contact: v.literal(false),
+    may_schedule: v.literal(false),
+    follow_up: v.string(),
+  }),
+  in_call_rules: v.array(v.string()),
+  deadline: v.object({
+    date: v.union(v.string(), v.null()),
+    start_assumption: v.union(v.string(), v.null()),
+  }),
+});
