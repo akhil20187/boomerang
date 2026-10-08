@@ -1,9 +1,10 @@
 import { it, expect, vi, afterEach } from "vitest";
 import { convexTest } from "convex-test";
 import schema from "../convex/schema";
-import { api } from "../convex/_generated/api";
+import { api, internal } from "../convex/_generated/api";
 import { FALLBACK_QUESTION } from "../convex/intake";
 const modules = import.meta.glob(["../convex/**/*.{ts,js}", "!../convex/**/*.d.ts"]);
+vi.mock("../convex/workflows", () => ({ workflow: { start: vi.fn(async () => "wf-test") } }));
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); vi.useRealTimers(); });
 
 const readyBrief = {
@@ -95,4 +96,39 @@ it("rejects empty or long answers without calling the model, and foreign or expi
   await expect(t.query(api.briefs.get, { briefId: first.briefId })).rejects.toThrow();
   await t.run((ctx) => ctx.db.patch(first.briefId, { expiresAt: Date.now() - 1 }));
   await expect(user.action(api.briefs.prepare, { briefId: first.briefId, answer: "Chintal" })).rejects.toThrow("expired");
+});
+
+it("start_calls stores a ready brief on the task and calls.prepare uses it", async () => {
+  const { t, user, id } = await setup([{ status: "ready", summary: "Lined blouse, Chintal.", brief: readyBrief }]);
+  vi.stubEnv("LIVE_CALLS_ENABLED", "true"); vi.stubEnv("CALL_BRIDGE_URL", "https://bridge.example"); vi.stubEnv("CALL_BRIDGE_SECRET", "secret"); vi.stubEnv("ANSWER_PRICE_CENTS", "1000");
+  const ready = await user.action(api.briefs.prepare, { request: "Lined blouse in Chintal, by Thursday, price and turnaround" });
+  const shop = { placeId: "p1", name: "Chintal Tailors", address: "Chintal", phone: "+919876543210", ratingCount: 3, distanceKm: 1, mapsUrl: "https://maps.example/p1", fewRatings: true };
+  const draftId = await t.run((ctx) => ctx.db.insert("drafts", { userId: id, productInput: "x", product: { name: "Lined blouse" }, pincode: "500054", cards: [], comments: "", radiusKm: 10, shops: [shop], expiresAt: Date.now() + 100000 }));
+  await t.run((ctx) => ctx.db.insert("creditAccounts", { userId: id, balanceCents: 10000, reservedCents: 0 }));
+  const { taskId } = await user.mutation(api.tasks.start, { draftId, selectedPlaceIds: ["p1"], idempotencyKey: "brief-op-1", expectedAnswerPriceCents: 1000, briefId: ready.briefId });
+  const task = await t.run((ctx) => ctx.db.get(taskId));
+  expect(task?.brief?.task_type).toBe("blouse_stitching");
+  expect(task?.title).toBe("Lined blouse, Chintal.");
+  const job = await t.run(async (ctx) => (await ctx.db.query("shopJobs").withIndex("by_task", (q) => q.eq("taskId", taskId)).first())!);
+  const request = await t.mutation(internal.calls.prepare, { shopJobId: job._id });
+  expect(request?.briefMode).toBe(true);
+  expect(request?.productDescription).toBe("Lined blouse in Chintal by Thursday.");
+  expect(request?.instructions).toContain("price per blouse");
+  expect(request?.instructions).toContain("Say lined before price.");
+});
+
+it("start_calls rejects an unfinished brief", async () => {
+  const { t, user, id } = await setup([{ status: "question", question: "Which area?", choices: [] }]);
+  vi.stubEnv("LIVE_CALLS_ENABLED", "true"); vi.stubEnv("CALL_BRIDGE_URL", "https://bridge.example"); vi.stubEnv("CALL_BRIDGE_SECRET", "secret"); vi.stubEnv("ANSWER_PRICE_CENTS", "1000");
+  const open = await user.action(api.briefs.prepare, { request: "I need a tailor" });
+  const shop = { placeId: "p1", name: "Shop", address: "A", phone: "+919876543210", ratingCount: 3, distanceKm: 1, mapsUrl: "https://maps.example/p1", fewRatings: true };
+  const draftId = await t.run((ctx) => ctx.db.insert("drafts", { userId: id, productInput: "x", product: { name: "Blouse" }, pincode: "500054", cards: [], comments: "", radiusKm: 10, shops: [shop], expiresAt: Date.now() + 100000 }));
+  await expect(user.mutation(api.tasks.start, { draftId, selectedPlaceIds: ["p1"], idempotencyKey: "brief-op-2", expectedAnswerPriceCents: 1000, briefId: open.briefId })).rejects.toThrow("Finish the brief");
+});
+
+it("validates pincode and limits new briefs per hour", async () => {
+  const { t, user, id } = await setup(Array.from({ length: 25 }, () => ({ status: "question", question: "Q?", choices: [] })));
+  await expect(user.action(api.briefs.prepare, { request: "I need a tailor", pincode: "12" })).rejects.toThrow("pincode");
+  for (let i = 0; i < 20; i++) await t.run((ctx) => ctx.db.insert("briefs", { userId: id, request: "r", turns: [], status: "question", expiresAt: Date.now() + 1000 }));
+  await expect(user.action(api.briefs.prepare, { request: "I need a tailor" })).rejects.toThrow("Too many");
 });

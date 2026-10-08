@@ -1,3 +1,4 @@
+import { inquiryFromBrief } from "./intake";
 import {
   internalAction,
   internalMutation,
@@ -60,15 +61,19 @@ export const prepare = internalMutation({
       to: job.shop.phone,
       businessName: job.shop.name,
       customerName: user?.name?.split(" ")[0] ?? "our customer",
-      productDescription: task.product.description ?? task.product.name,
-      instructions: [
-        task.comments,
-        task.cards.length
-          ? `Ask about offers with these cards: ${task.cards.join(", ")}`
-          : "",
-      ]
-        .filter(Boolean)
-        .join("\n"),
+      ...(task.brief
+        ? { ...inquiryFromBrief(task.brief), briefMode: true }
+        : {
+            productDescription: task.product.description ?? task.product.name,
+            instructions: [
+              task.comments,
+              task.cards.length
+                ? `Ask about offers with these cards: ${task.cards.join(", ")}`
+                : "",
+            ]
+              .filter(Boolean)
+              .join("\n"),
+          }),
     };
   },
 });

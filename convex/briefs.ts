@@ -16,11 +16,22 @@ import {
 const TTL = 24 * 60 * 60 * 1000;
 const turnV = v.object({ question: v.string(), choices: v.array(v.string()), answer: v.optional(v.string()) });
 
+const HOURLY_BRIEF_LIMIT = 20;
+
 export const create = internalMutation({
   args: { userId: v.id("users"), request: v.string(), pincode: v.optional(v.string()) },
   returns: v.id("briefs"),
-  handler: async (ctx, args) =>
-    ctx.db.insert("briefs", { ...args, turns: [], status: "question", expiresAt: Date.now() + TTL }),
+  handler: async (ctx, args) => {
+    const recent = await ctx.db
+      .query("briefs")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .order("desc")
+      .take(HOURLY_BRIEF_LIMIT);
+    const hourAgo = Date.now() - 60 * 60 * 1000;
+    if (recent.length >= HOURLY_BRIEF_LIMIT && recent.every((b) => b._creationTime > hourAgo))
+      throw new ConvexError("Too many new requests in the last hour. Try again later.");
+    return ctx.db.insert("briefs", { ...args, turns: [], status: "question", expiresAt: Date.now() + TTL });
+  },
 });
 
 export const load = internalQuery({
@@ -120,6 +131,8 @@ export const prepare = action({
       if (request.length < 3 || request.length > 2000)
         throw new ConvexError("Describe what you want the call to find out.");
       pincode = args.pincode;
+      if (pincode !== undefined && !/^[1-9]\d{5}$/.test(pincode))
+        throw new ConvexError("Enter a valid six-digit Indian pincode.");
       turns = [];
       briefId = await ctx.runMutation(internal.briefs.create, { userId, request, pincode });
     } else {

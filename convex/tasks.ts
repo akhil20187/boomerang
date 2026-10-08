@@ -8,6 +8,7 @@ import {
 } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v, ConvexError } from "convex/values";
+import type { Doc } from "./_generated/dataModel";
 import { requireUser, requireEligible } from "./access";
 import { validateSelection } from "./domain";
 import { workflow } from "./workflows";
@@ -21,6 +22,7 @@ export const start = mutation({
     idempotencyKey: v.string(),
     accessToken: v.optional(v.string()),
     expectedAnswerPriceCents: v.optional(v.number()),
+    briefId: v.optional(v.id("briefs")),
   },
   returns: v.object({ taskId: v.id("tasks") }),
   handler: async (ctx, args): Promise<{ taskId: any }> => {
@@ -69,6 +71,13 @@ export const start = mutation({
       throw new ConvexError(
         `The price changed to ${formatINR(answerPriceCents)} per answer. Check and press Call again. No calls started and no credit was charged.`,
       );
+    let brief: Doc<"briefs"> | null = null;
+    if (args.briefId) {
+      brief = await ctx.db.get(args.briefId);
+      if (!brief || brief.userId !== userId) throw new ConvexError("Brief not found.");
+      if (brief.expiresAt < Date.now()) throw new ConvexError("This brief has expired. Start again.");
+      if (brief.status !== "ready" || !brief.brief) throw new ConvexError("Finish the brief first.");
+    }
     const customer = await requireEligible(ctx, userId);
     if (!(customer as any).name?.trim())
       throw new ConvexError(
@@ -92,8 +101,9 @@ export const start = mutation({
     const taskId = await ctx.db.insert("tasks", {
       userId,
       draftId: draft._id,
-      title: draft.product.name,
+      title: brief?.summary?.trim() || draft.product.name,
       type: "shop_calls",
+      ...(brief ? { briefId: brief._id, brief: brief.brief } : {}),
       detailsVersion: 1,
       product: draft.product,
       pincode: draft.pincode,

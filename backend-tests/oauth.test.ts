@@ -110,6 +110,7 @@ it("serves OAuth discovery and stateless MCP tools behind account bearer authent
   const result = await response.json();
   expect(result.result.tools.map((x: any) => x.name)).toEqual([
     "account_status",
+    "prepare_brief",
     "find_shops",
     "more_shops",
     "start_calls",

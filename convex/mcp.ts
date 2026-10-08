@@ -16,19 +16,40 @@ export const tools = [
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
   },
   {
+    name: "prepare_brief",
+    description:
+      "Start here for any call request. Boomerang asks the customer the questions a shop or service provider would ask, one at a time. Call with {request} first; then show the returned question and choices to the customer exactly as given, and call again with {briefId, answer} using the customer's reply verbatim. Never invent answers. When status is ready, show the summary, then call find_shops with the same briefId. Do not call start_calls without a ready briefId for non-product requests. Never starts a call or charges credit.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        request: { type: "string", minLength: 3, maxLength: 2000, description: "The customer's request in their words. Only on the first call." },
+        briefId: idSchema,
+        answer: { type: "string", minLength: 1, maxLength: 500, description: "The customer's reply to the last question, verbatim." },
+        pincode: { type: "string", pattern: "^[1-9][0-9]{5}$" },
+      },
+      additionalProperties: false,
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
+  },
+  {
     name: "find_shops",
     description:
-      "Find nearby shops that may sell a product. A listing does not confirm stock.",
+      "Find nearby shops that may sell a product or offer a service. A listing does not confirm stock. Pass briefId from a ready prepare_brief; productInput may then be omitted.",
     inputSchema: {
       type: "object",
       properties: {
         productInput: { type: "string", minLength: 3, maxLength: 2000 },
+        briefId: idSchema,
         pincode: { type: "string", pattern: "^[1-9][0-9]{5}$" },
         radiusKm: { type: "number", enum: [10, 20] },
         cards: { type: "array", items: textSchema },
         comments: textSchema,
       },
-      required: ["productInput", "pincode"],
+      required: ["pincode"],
       additionalProperties: false,
     },
     annotations: {
@@ -68,6 +89,7 @@ export const tools = [
           maxItems: 20,
         },
         idempotencyKey: { type: "string", minLength: 8, maxLength: 200 },
+        briefId: { ...idSchema, description: "Ready brief from prepare_brief. Required for service or non-product requests." },
         expectedAnswerPriceCents: { type: "integer", minimum: 1,description:'Optional service-call quote copied exactly from answerPriceCents in find_shops or more_shops after customer approval. Never infer this value or ask the customer to supply it; it is unrelated to the product price. Value is in paise. Omit when the service quote is null.' },
       },
       required: [
@@ -278,7 +300,7 @@ export const endpoint = httpAction(async (ctx, request) => {
       capabilities: { tools: {}, resources: {} },
       serverInfo: { name: "boomerang", version: "1.0.0" },
       instructions:
-        "Find potential nearby shops, let the customer confirm the product and select shops, then call only after explicit approval. Never infer stock from a listing. Sign in and link the customer account first.",
+        "For any call request, call prepare_brief first and relay its questions one at a time, verbatim, until it returns a ready brief. Then find potential nearby shops with that briefId, let the customer confirm and select shops, and call only after explicit approval. Never infer stock from a listing. Sign in and link the customer account first.",
     });
   if (body.method === "ping") return respond({});
   if (body.method === "tools/list") return respond({ tools });
@@ -362,7 +384,12 @@ export const endpoint = httpAction(async (ctx, request) => {
           availableBalance: account.availableBalance, creditBalance: account.creditBalance,
           reservedBalance: account.reservedBalance, availableCents: account.availableCents,
           reservedCents: account.reservedCents, ...callingQuote() };
-      } else if (name === "find_shops")
+      } else if (name === "prepare_brief")
+        result = await ctx.runAction(api.briefs.prepare, {
+          ...args,
+          accessToken: token,
+        });
+      else if (name === "find_shops")
         result = await ctx.runAction(api.discovery.search, {
           ...args,
           accessToken: token,

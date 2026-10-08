@@ -108,7 +108,8 @@ function distance(
 }
 export const search = action({
   args: {
-    productInput: v.string(),
+    productInput: v.optional(v.string()),
+    briefId: v.optional(v.id("briefs")),
     pincode: v.string(),
     cards: v.optional(v.array(v.string())),
     comments: v.optional(v.string()),
@@ -120,7 +121,12 @@ export const search = action({
     const userId = await ctx.runQuery(internal.users.resolve, {
       accessToken: args.accessToken,
     });
-    const input = args.productInput.trim();
+    let input = (args.productInput ?? "").trim();
+    if (args.briefId) {
+      const brief = await ctx.runQuery(internal.briefs.load, { briefId: args.briefId, userId });
+      if (brief.status !== "ready" || !brief.brief) throw new ConvexError("Finish the brief first.");
+      if (!input) input = brief.brief.task_context.summary;
+    }
     if (input.length < 3 || input.length > 2000)
       throw new ConvexError(
         "Enter the product, model and colour or a product link.",
