@@ -1,4 +1,6 @@
 import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 const website = 'https://askboomerang.vercel.app';
 const backend = 'https://little-kangaroo-718.convex.site';
@@ -32,6 +34,10 @@ result.frontend = {
   customerLinks: bundle.text.includes(website),
   creditHistory: bundle.text.includes('credits:history') && bundle.text.includes('Credit & charges'),
 };
+const widget = await get(`${backend}/widget.html`);
+const builtWidget = new URL('../web/dist/widget.html',import.meta.url);
+const widgetHash = createHash('sha256').update(widget.text).digest('hex');
+result.widget = {status:widget.response.status,rupeeVersion:widget.text.includes('credits:history') && widget.text.includes('Credit & charges'),matchesLocalBuild:existsSync(builtWidget)?widgetHash===createHash('sha256').update(readFileSync(builtWidget)).digest('hex'):null};
 result.pages = {};
 for (const route of ['/account', '/connect', '/status', '/tasks', '/credit', '/SKILL.md', '/_vercel/insights/script.js']) {
   const data = await get(website + route);

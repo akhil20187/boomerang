@@ -6,7 +6,7 @@ Convex backend and MCP remain on `little-kangaroo-718`.
 
 ## Deployment
 
-Automatic Git deployment is enabled for `main` only in `vercel.json`. Commit authors must belong to the connected `akhil20187` account. Backend changes still require a separate Convex deployment; money migrations must finish and pass reconciliation before the website is published.
+Automatic Git deployment is enabled for `main` only in `vercel.json`. Commit authors must belong to the connected `akhil20187` account. Backend changes still require a separate Convex deployment; money migrations must finish and pass reconciliation before the website is published. The assistant widget is served by Convex, so card changes also need `CONVEX_DEPLOYMENT=dev:little-kangaroo-718 npx static-hosting upload --dist web/dist` after building with the approved live URLs. Run `scripts/audit-public-endpoints.mjs` to verify both the website and widget.
 
 The local folder is linked through ignored `.vercel/project.json`.
 Only built public assets are uploaded; no credentials or backend source are needed.

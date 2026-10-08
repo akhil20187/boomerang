@@ -11,8 +11,10 @@ The live backend and website use the approved ₹10 useful-answer price. Existin
 - Published the rupee backend to `little-kangaroo-718`, the existing live deployment.
 - Ran both conversion jobs: four users and five priced tasks converted. Compared every original ledger/account/reservation/task money field with the backup at the approved rate. No missing original money rows, USD entries or account/history/hold mismatches remain. Repeating both jobs converted zero users/tasks.
 - Set `ANSWER_PRICE_CENTS=1000` (₹10). Existing two account rows retain ₹500 each; two users whose balances are computed from history retain ₹100 each. No welcome grant was repeated.
-- Restored `main` automatic deployment in [vercel.json](../../vercel.json). Push `212f28f` created Vercel production deployment `dpl_GjKL9FiGrhJbyRQ87mJvdYEkDLHn` with source `git`, state READY. The public alias [askboomerang.vercel.app](https://askboomerang.vercel.app) points to that deployment.
+- Restored `main` automatic deployment in [vercel.json](../../vercel.json). Push `212f28f` created Vercel production deployment `dpl_GjKL9FiGrhJbyRQ87mJvdYEkDLHn` with source `git`, state READY. At rollout verification, the public alias [askboomerang.vercel.app](https://askboomerang.vercel.app) pointed at that deployment.
+- Follow-up record push `6c371f0` automatically created READY production deployment `dpl_DengnPWrv6EA6tzfZt3Gygr3kCmh`, confirming deployment works for subsequent main commits too.
 - Verified the new frontend before restoring `LIVE_CALLS_ENABLED=true`. The old pending retry settled while calls were paused, releasing its hold; final ledger had 20 INR entries, eight reservations and zero outstanding holds/mismatches. No customer credit was charged by the rollout scripts.
+- A final assistant check found the Convex-hosted widget still served the previous build, separate from Vercel's website assets. Briefly paused new calls again, then published the approved `web/dist` assets to explicit `dev:little-kangaroo-718` (static deployment `c0f2da17-d96b-4840-a859-4b76aa62f4eb`). Live `/widget.html` is HTTP200, contains the rupee code, and its SHA256 matches the local build exactly. Public MCP/OAuth authentication checks passed. Calling was restored and money preservation rechecked after publishing.
 
 ## Verification
 
@@ -25,7 +27,7 @@ The live backend and website use the approved ₹10 useful-answer price. Existin
 
 ## Limits
 
-Actual signed-in browser rendering of credit history was not completed: Aside was signed out, and Safari verification was interrupted by the user's active browser work. Backend signed-in queries were checked with administrative read-only identity. No new real telephone call, sign-in email or embedded ChatGPT/Claude card trial was initiated for verification. Automatic website deployment does not deploy future Convex backend changes; those require a separate server release.
+Actual signed-in browser rendering of credit history was not completed: Aside was signed out, and Safari verification was interrupted by the user's active browser work. Backend signed-in queries were checked with administrative read-only identity. No new real telephone call, sign-in email or embedded ChatGPT/Claude card trial was initiated for verification. Automatic website deployment does not deploy future Convex backend changes or the Convex-hosted widget; those require separate server/static releases.
 
 ## Repeatable checks
 
