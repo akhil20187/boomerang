@@ -1,6 +1,7 @@
 import { internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { hashToken, requireUser } from "./access";
+import { isMcpResource } from './mcpAddresses';
 const random = () => `${crypto.randomUUID()}${crypto.randomUUID()}`;
 const scopeList = ["shops:read", "calls:write"];
 function scopes(input: any = "shops:read calls:write") {
@@ -94,8 +95,7 @@ export const operate = internalMutation({
   returns: v.any(),
   handler: async (ctx, { op, data }): Promise<any> => {
     try {
-      const resource = `${origin()}/mcp`,
-        now = Date.now();
+      const now = Date.now();
       const allowed = (
         process.env.MCP_OAUTH_REDIRECT_URIS ??
         "https://chatgpt.com/connector_platform_oauth_redirect,https://claude.ai/api/mcp/auth_callback"
@@ -177,7 +177,7 @@ export const operate = internalMutation({
           !redirectAllowed(data.redirect_uri) ||
           data.code_challenge_method !== "S256" ||
           !/^[-_a-zA-Z0-9]{43}$/.test(data.code_challenge ?? "") ||
-          data.resource !== resource ||
+          !isMcpResource(data.resource) ||
           (data.state && data.state.length > 2000)
         )
           throw new OAuthError("invalid_request");
@@ -197,7 +197,7 @@ export const operate = internalMutation({
           clientName: client.name,
           redirectUri: data.redirect_uri,
           challenge: data.code_challenge,
-          resource,
+          resource: data.resource,
           scope: scopes(data.scope),
           expiresAt: now + 600000,
           status: "pending",
@@ -275,7 +275,8 @@ export const operate = internalMutation({
             code.expiresAt <= now ||
             code.clientId !== data.client_id ||
             code.redirectUri !== data.redirect_uri ||
-            data.resource !== resource ||
+            !isMcpResource(data.resource) ||
+            data.resource !== code.resource ||
             typeof data.code_verifier !== "string" ||
             !/^[-._~a-zA-Z0-9]{43,128}$/.test(data.code_verifier) ||
             (await challenge(data.code_verifier)) !== code.challenge
@@ -304,7 +305,7 @@ export const operate = internalMutation({
             !refresh ||
             refresh.clientId !== data.client_id ||
             refresh.resource !== data.resource ||
-            data.resource !== resource ||
+            !isMcpResource(data.resource) ||
             refresh.expiresAt <= now ||
             refresh.revokedAt
           )

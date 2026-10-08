@@ -10,6 +10,20 @@ afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
+it('advertises the branded MCP resource while retaining the existing sign-in issuer', async () => {
+  vi.stubEnv('CONVEX_SITE_URL', 'https://app.convex.site');
+  vi.stubEnv('MCP_PUBLIC_URL', 'https://askboomerang.vercel.app');
+  const t = convexTest(schema, modules);
+  const metadata = await (await t.fetch('/.well-known/oauth-protected-resource/public')).json();
+  expect(metadata.resource).toBe('https://askboomerang.vercel.app/mcp');
+  expect(metadata.authorization_servers).toEqual(['https://app.convex.site']);
+  const response = await t.fetch('/mcp/public', { method: 'POST', body: '{}' });
+  expect(response.status).toBe(401);
+  expect(response.headers.get('WWW-Authenticate')).toContain('https://askboomerang.vercel.app/.well-known/oauth-protected-resource/mcp');
+  const legacy = await (await t.fetch('/.well-known/oauth-protected-resource/mcp')).json();
+  expect(legacy.resource).toBe('https://app.convex.site/mcp');
+  expect((await t.fetch('/mcp', {method:'POST',body:'{}'})).headers.get('WWW-Authenticate')).toContain('https://app.convex.site/.well-known/oauth-protected-resource/mcp');
+});
 it("serves the skill as readable text and rejects a missing-asset SPA fallback", async () => {
   vi.stubEnv("CONVEX_SITE_URL", "https://app.convex.site");
   const t = convexTest(schema, modules);
@@ -147,9 +161,10 @@ it("serves OAuth discovery and stateless MCP tools behind account bearer authent
     "This request could not be completed. Try again.",
   );
 });
-it.each(["https://chatgpt.com/connector_platform_oauth_redirect", "http://127.0.0.1:54321/callback", "http://localhost:54321/oauth/callback"])("binds approval to account and exact redirect %s, consumes codes, rotates refresh and revokes replay", async (callback) => {
+it.each(["https://chatgpt.com/connector_platform_oauth_redirect", "http://127.0.0.1:54321/callback", "http://localhost:54321/oauth/callback"].flatMap(callback => ['https://app.convex.site/mcp', 'https://askboomerang.vercel.app/mcp'].map(resource => ({callback, resource}))))("binds approval and tokens to $callback and $resource, consumes codes, rotates refresh and revokes replay", async ({callback, resource}) => {
   vi.stubEnv("CONVEX_SITE_URL", "https://app.convex.site");
   vi.stubEnv("SITE_URL", "https://app.convex.site");
+  vi.stubEnv('MCP_PUBLIC_URL', 'https://askboomerang.vercel.app');
   const t = convexTest(schema, modules);
   const userId = await t.run((ctx) =>
     ctx.db.insert("users", { email: "owner@example.com" }),
@@ -175,10 +190,11 @@ it.each(["https://chatgpt.com/connector_platform_oauth_redirect", "http://127.0.
     response_type: "code",
     code_challenge: challenge,
     code_challenge_method: "S256",
-    resource: "https://app.convex.site/mcp",
+    resource,
     scope: "shops:read",
     state: "client-state",
   });
+  expect(request.status).toBe(302);
   const requestId = new URL(request.body.redirectUrl).searchParams.get(
     "oauth_request",
   )!;
@@ -196,7 +212,7 @@ it.each(["https://chatgpt.com/connector_platform_oauth_redirect", "http://127.0.
     grant_type: "authorization_code",
     client_id: clientId,
     redirect_uri: callback,
-    resource: "https://app.convex.site/mcp",
+    resource,
     code,
     code_verifier: verifier,
   };
@@ -204,9 +220,14 @@ it.each(["https://chatgpt.com/connector_platform_oauth_redirect", "http://127.0.
     (await call("token", { ...exchange, code_verifier: "b".repeat(43) }))
       .status,
   ).toBe(400);
+  const otherResource = resource.includes('convex.site') ? 'https://askboomerang.vercel.app/mcp' : 'https://app.convex.site/mcp';
+  expect((await call('token', {...exchange, resource: otherResource})).status).toBe(400);
   const token = await call("token", exchange);
   expect(token.status).toBe(200);
   expect(token.body.scope).toBe("shops:read");
+  const initialized = await t.fetch(resource.includes('convex.site') ? '/mcp' : '/mcp/public', {method:'POST', headers:{Authorization:`Bearer ${token.body.access_token}`}, body:JSON.stringify({jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-11-25'}})});
+  expect(initialized.status).toBe(200);
+  expect((await initialized.json()).result.serverInfo.name).toBe('boomerang');
   await expect(
     t.query(internal.users.resolve, {
       accessToken: token.body.access_token,
@@ -221,13 +242,14 @@ it.each(["https://chatgpt.com/connector_platform_oauth_redirect", "http://127.0.
   const refresh = {
     grant_type: "refresh_token",
     client_id: clientId,
-    resource: "https://app.convex.site/mcp",
+    resource,
     refresh_token: token.body.refresh_token,
   };
   expect(
     (await call("token", { ...refresh, scope: "shops:read calls:write" }))
       .status,
   ).toBe(400);
+  expect((await call('token', {...refresh, resource: otherResource})).status).toBe(400);
   const rotated = await call("token", refresh);
   expect(rotated.status).toBe(200);
   expect((await call("token", refresh)).status).toBe(400);

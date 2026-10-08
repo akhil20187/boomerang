@@ -2,7 +2,8 @@
 
 Project: `akhil20187s-projects/boomerang`.
 Preferred frontend URL: https://askboomerang.vercel.app
-Convex backend and MCP remain on `little-kangaroo-718`.
+Public MCP URL: https://askboomerang.vercel.app/mcp
+Convex runs the backend on `little-kangaroo-718`; Vercel forwards the public MCP endpoint and resource discovery to it. The OAuth sign-in issuer remains Convex, preserving existing grants and callbacks. Existing Convex connections remain supported.
 
 ## Deployment
 
@@ -12,7 +13,7 @@ The local folder is linked through ignored `.vercel/project.json`.
 Only built public assets are uploaded; no credentials or backend source are needed.
 
 ```sh
-VITE_CONVEX_URL=https://little-kangaroo-718.convex.cloud VITE_MCP_PUBLIC_URL=https://little-kangaroo-718.convex.site VITE_APP_PUBLIC_URL=https://askboomerang.vercel.app vercel build --prod
+VITE_CONVEX_URL=https://little-kangaroo-718.convex.cloud VITE_MCP_PUBLIC_URL=https://askboomerang.vercel.app VITE_APP_PUBLIC_URL=https://askboomerang.vercel.app vercel build --prod
 node scripts/verify-vercel-build.mjs
 deploy_stage=$(mktemp -d /tmp/boomerang-vercel.XXXXXX)
 mkdir -p "$deploy_stage/.vercel"
@@ -21,7 +22,9 @@ cp -R .vercel/output "$deploy_stage/.vercel/output"
 vercel deploy --prebuilt --prod --yes --cwd "$deploy_stage"
 ```
 
-Routes in `vercel.json` serve the landing page at `/`, React pages at `/app`, `/account`, `/tasks`, `/status`, `/connect`, `/demo`, and sample audio from `/sample-audio`. Backend API requests are forwarded to the existing Convex deployment. MCP clients retain their existing Convex endpoint.
+Routes in `vercel.json` serve the landing page at `/`, React pages at `/app`, `/account`, `/tasks`, `/status`, `/connect`, `/demo`, and sample audio from `/sample-audio`. Backend API requests, `/mcp`, protected-resource discovery, and browser connection request/approval are forwarded to the existing Convex deployment. Set `MCP_PUBLIC_URL=https://askboomerang.vercel.app` on that deployment and `VITE_MCP_PUBLIC_URL=https://askboomerang.vercel.app` for the website build. New MCP connections use the public Vercel address; existing Convex connections remain valid. Authorization codes and refresh tokens stay bound to the exact resource they were issued for.
+
+The public address follows Vercel's [external forwarding](https://vercel.com/docs/routing/rewrites) and MCP's [protected-resource discovery](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization). MCP permits a separate sign-in issuer; changing the public connection address does not require changing account authentication.
 
 ## Analytics — 7 October 2026
 

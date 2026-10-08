@@ -66,6 +66,7 @@ for (const path of ["/setup", "/setup.html"])
 for (const path of [
   "/.well-known/oauth-protected-resource",
   "/.well-known/oauth-protected-resource/mcp",
+  "/.well-known/oauth-protected-resource/public",
   "/.well-known/oauth-authorization-server",
   "/.well-known/oauth-authorization-server/mcp",
   "/oauth/authorize",
@@ -83,6 +84,10 @@ for (const path of ["/oauth/request", "/oauth/approve"])
   http.route({ path, method: "OPTIONS", handler: oauthHttp });
 http.route({ path: "/mcp", method: "POST", handler: endpoint });
 http.route({ path: "/mcp", method: "GET", handler: endpoint });
+// Vercel forwards its public address here; the explicit path keeps legacy
+// resource discovery correct without trusting arbitrary forwarded-host headers.
+http.route({ path: "/mcp/public", method: "POST", handler: endpoint });
+http.route({ path: "/mcp/public", method: "GET", handler: endpoint });
 http.route({
   path: "/api/call-event",
   method: "POST",

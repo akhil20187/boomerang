@@ -20,6 +20,7 @@ import type * as drafts from "../drafts.js";
 import type * as http from "../http.js";
 import type * as maintenance from "../maintenance.js";
 import type * as mcp from "../mcp.js";
+import type * as mcpAddresses from "../mcpAddresses.js";
 import type * as notifications from "../notifications.js";
 import type * as oauth from "../oauth.js";
 import type * as onboarding from "../onboarding.js";
@@ -51,6 +52,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   maintenance: typeof maintenance;
   mcp: typeof mcp;
+  mcpAddresses: typeof mcpAddresses;
   notifications: typeof notifications;
   oauth: typeof oauth;
   onboarding: typeof onboarding;
