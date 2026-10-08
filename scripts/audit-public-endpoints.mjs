@@ -30,9 +30,10 @@ result.frontend = {
   convexConnection: bundle.text.includes('https://little-kangaroo-718.convex.cloud'),
   mcpConnection: bundle.text.includes(backend),
   customerLinks: bundle.text.includes(website),
+  creditHistory: bundle.text.includes('credits:history') && bundle.text.includes('Credit & charges'),
 };
 result.pages = {};
-for (const route of ['/account', '/connect', '/status', '/tasks', '/SKILL.md', '/_vercel/insights/script.js']) {
+for (const route of ['/account', '/connect', '/status', '/tasks', '/credit', '/SKILL.md', '/_vercel/insights/script.js']) {
   const data = await get(website + route);
   result.pages[route] = data.response.status;
   if (route === '/SKILL.md') result.skill = { accountUsesVercel: data.text.includes(website + '/account'), mcpUsesConvex: data.text.includes(backend + '/mcp') };
