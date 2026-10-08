@@ -19,6 +19,7 @@
 - Display: `1000` → "₹10", `1050` → "₹10.50", `1000000` → "₹10,000", `0` → "₹0".
 - No "Add credit" button. No payment route.
 - The only Convex deployment, `little-kangaroo-718`, is the live one. **Do not deploy, set env vars or run the conversion without the user's explicit go-ahead.**
+- Git automatic deployment is disabled in `vercel.json` for the merge. Keep it disabled until the controlled rollout is complete. Every reported conversion mismatch must be reconciled before deploying the website or resuming calls; see the spec's rollout gates.
 - Copy rule sentence (exact): "You pay only when a shop answers and tells us something useful, even if they can't confirm everything. No charge if a shop doesn't pick up, can't help, or the call fails."
 
 ## Review Focus

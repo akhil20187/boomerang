@@ -84,8 +84,8 @@ Task-level totals use the same words:
   
 - **Inline/chat card footer:** a one-line total once finished, e.g. "Charged ₹20 for 2 of 3 shops."
   
-Charge lines are always small grey text: green means only "the shop has it" (DESIGN.md, D72).
 
+Charge lines are always small grey text: green means only "the shop has it" (DESIGN.md, D72).
 ## 4. Credit & charges page (`/credit`)
 A new signed-in page. Top section:
 
@@ -151,6 +151,10 @@ Written before the code (test-first):
 
 Then a run-through on the development server: search → see the price block → call a test task → see per-shop lines → open `/credit`. I'll also check the page at phone width (320px) and desktop width in a browser.
 ## Rollout
+**Merge gate (8 October 2026):** GitHub merging is separate from the live rollout. `vercel.json` disables automatic Git deployments; keep this guard until the backend, data and website are ready together. Manual deployment remains available. [Vercel configuration reference](https://vercel.com/docs/project-configuration/git-configuration#turning-off-all-automatic-deployments).
+
+**Conversion gate:** Stop rollout if any conversion batch reports `mismatched`. Keep calls paused and do not deploy the new website or resume calls until every affected account is reconciled and both conversions finish with no unresolved mismatches. Skipped USD accounts are not safe to use with the new INR server: their balances/history would display in the wrong units and new reservations, charges or refunds could mix currencies. Batch completion alone does not prove successful conversion. Verify all remaining USD entries and all unconverted paid tasks before proceeding; do not overwrite mismatched balances to force completion.
+
 1. Build and test on the development server.
   
 2. **Ask you before** touching the live server: pause calls, run the conversion, set the price to 1000, deploy the website to Vercel, turn calls back on.
