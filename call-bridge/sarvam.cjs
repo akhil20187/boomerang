@@ -5,9 +5,14 @@ function validateSarvamEnv(env){
  if(!Number.isSafeInteger(Number(env.SARVAM_AGENT_VERSION))||Number(env.SARVAM_AGENT_VERSION)<1)throw Error('Invalid SARVAM_AGENT_VERSION');
  phoneNumber(env.SARVAM_FROM_NUMBER);
 }
+const LIMITS='This is an enquiry only. Do not purchase, book, reserve, hold stock, or promise payment. Unknown details must stay unconfirmed.';
+function inquiryDetails(record){
+ if(record.briefMode===true)return `Task: ${record.productDescription}\n${record.instructions||''}\n${LIMITS}`.trim();
+ return `Ask about this exact product: ${record.productDescription}\nCheck availability, exact variant, final price including taxes, and applicable offers.\nCustomer requirements: ${record.instructions||'None'}\n${LIMITS}`;
+}
 function buildSarvamPayload(record,env){
  validateSarvamEnv(env);
- return {app_config:{app_id:env.SARVAM_AGENT_ID,app_version:Number(env.SARVAM_AGENT_VERSION),app_type:'agent',connection_config:{connection_id:env.SARVAM_CONNECTION_ID,agent_phone_number:phoneNumber(env.SARVAM_FROM_NUMBER)},agent_variables:{user_name:record.customerName,business_name:record.businessName||'your shop',gender:'female',inquiry_details:`Ask about this exact product: ${record.productDescription}\nCheck availability, exact variant, final price including taxes, and applicable offers.\nCustomer requirements: ${record.instructions||'None'}\nThis is an enquiry only. Do not purchase, book, reserve, hold stock, or promise payment. Unknown details must stay unconfirmed.`}},user_config:{user_phone_number:phoneNumber(record.to)}};
+ return {app_config:{app_id:env.SARVAM_AGENT_ID,app_version:Number(env.SARVAM_AGENT_VERSION),app_type:'agent',connection_config:{connection_id:env.SARVAM_CONNECTION_ID,agent_phone_number:phoneNumber(env.SARVAM_FROM_NUMBER)},agent_variables:{user_name:record.customerName,business_name:record.businessName||'your shop',gender:'female',inquiry_details:inquiryDetails(record)}},user_config:{user_phone_number:phoneNumber(record.to)}};
 }
 function createSarvamProvider({env=process.env,fetchImpl=fetch,now=Date.now}={}){
  const headers={'X-API-Key':env.SARVAM_VOICE_API_KEY};

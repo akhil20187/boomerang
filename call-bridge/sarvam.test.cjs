@@ -35,3 +35,10 @@ test('missing or mismatched results stay uncertain; missing transcript is retrie
 test('recordings use only the authenticated fixed API, not an arbitrary provider URL',async()=>{
  const p=createSarvamProvider({env,fetchImpl:async(u,o)=>{assert.match(String(u),/apps\.sarvam\.ai\/api\/analytics\/v1\/org\/workspace\/agent\/recordings\/date%2Fid$/);assert.equal(o.headers['X-API-Key'],'private-key');assert.equal(o.redirect,'error');return new Response('wave',{headers:{'content-type':'audio/wav'}});}});const r=await p.recording({...record,sarvam:{attemptId:'remote',interactionId:'date/id'},recording:{url:'http://127.0.0.1/private'}});assert.equal(await r.text(),'wave');
 });
+test('brief mode sends the brief text and drops the fixed product checklist',()=>{
+ const p=buildSarvamPayload({...record,briefMode:true,productDescription:'Lined blouse in Chintal by Thursday.',instructions:'Purpose: confirm lined blouse stitching.\nFind out:\n- price per blouse'},env);
+ const d=p.app_config.agent_variables.inquiry_details;
+ assert.doesNotMatch(d,/Ask about this exact product/);assert.doesNotMatch(d,/exact variant/);
+ assert.match(d,/Lined blouse in Chintal/);assert.match(d,/price per blouse/);assert.match(d,/enquiry only/i);
+ assert.match(buildSarvamPayload(record,env).app_config.agent_variables.inquiry_details,/Ask about this exact product/);
+});
