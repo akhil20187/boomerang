@@ -55,7 +55,7 @@ export const tools = [
   {
     name: "start_calls",
     description:
-      "Call only shops explicitly selected and approved by the customer. This is currently unavailable when the shop-search answerPriceCents is null: report that the service price has not been set and do not ask the customer for a product price or an internal cents value. When a service quote exists, show its unit price and maximum total, get approval, and copy that exact quote into expectedAnswerPriceCents. Requires an approved account, credit and enabled calling.",
+      "Call only shops explicitly selected and approved by the customer. This is currently unavailable when the shop-search answerPriceCents is null: report that the service price has not been set and do not ask the customer for a product price or an internal cents value. When a service quote exists: Service prices are in paise (₹1 = 100 paise): show answerPriceLabel (for example ₹10) to the customer, never the raw number. show its unit price and maximum total, get approval, and copy that exact quote into expectedAnswerPriceCents. Requires an approved account, credit and enabled calling.",
     inputSchema: {
       type: "object",
       properties: {
@@ -67,7 +67,7 @@ export const tools = [
           maxItems: 20,
         },
         idempotencyKey: { type: "string", minLength: 8, maxLength: 200 },
-        expectedAnswerPriceCents: { type: "integer", minimum: 1,description:'Optional service-call quote copied exactly from answerPriceCents in find_shops or more_shops after customer approval. Never infer this value or ask the customer to supply it; it is unrelated to the product price. Omit when the service quote is null.' },
+        expectedAnswerPriceCents: { type: "integer", minimum: 1,description:'Optional service-call quote copied exactly from answerPriceCents in find_shops or more_shops after customer approval. Never infer this value or ask the customer to supply it; it is unrelated to the product price. Value is in paise. Omit when the service quote is null.' },
       },
       required: [
         "draftId",
@@ -357,8 +357,8 @@ export const endpoint = httpAction(async (ctx, request) => {
         if (!account) throw new Error("Sign in required");
         result = { email: account.email, eligible: account.eligible,
           availableBalance: account.availableBalance, creditBalance: account.creditBalance,
-          reservedBalance: account.reservedBalance, currency: account.currency,
-          ...callingQuote() };
+          reservedBalance: account.reservedBalance, availableCents: account.availableCents,
+          reservedCents: account.reservedCents, ...callingQuote() };
       } else if (name === "find_shops")
         result = await ctx.runAction(api.discovery.search, {
           ...args,

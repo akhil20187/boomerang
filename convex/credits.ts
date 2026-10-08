@@ -1,5 +1,8 @@
 import { ConvexError, v } from "convex/values";
-import { internalMutation } from "./_generated/server";
+import { internalMutation, internalQuery, query } from "./_generated/server";
+import { paginationOptsValidator } from "convex/server";
+import { requireUser } from "./access";
+import { notChargedReason } from "./domain";
 import type { QueryCtx, MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 export function configuredPrice() {
@@ -15,6 +18,11 @@ export function configuredPrice() {
     );
   return Number(raw);
 }
+// Amounts are stored in paise (₹1 = 100 paise) in the existing *Cents fields.
+export function formatINR(paise: number) {
+  const rupees = paise / 100;
+  return "₹" + rupees.toLocaleString("en-IN", {minimumFractionDigits: Number.isInteger(rupees) ? 0 : 2, maximumFractionDigits: 2});
+}
 export function callingQuote() {
   let answerPriceCents: number | null = null;
   try { answerPriceCents = configuredPrice(); } catch {}
@@ -23,7 +31,7 @@ export function callingQuote() {
     !process.env.CALL_BRIDGE_URL || !process.env.CALL_BRIDGE_SECRET ? 'calling_not_ready' : null;
   const message = reason === 'pricing_not_configured' ? 'Shop calling is unavailable because the service price has not been set.' :
     reason ? 'Shop calling is currently unavailable. You can still discover shops.' : null;
-  return {answerPriceCents, callingAvailable: reason === null, callingUnavailableReason: reason, callingUnavailableMessage: message};
+  return {answerPriceCents, currency: 'INR' as const, answerPriceLabel: answerPriceCents === null ? null : formatINR(answerPriceCents), callingAvailable: reason === null, callingUnavailableReason: reason, callingUnavailableMessage: message};
 }
 export async function balances(
   ctx: QueryCtx | MutationCtx,
@@ -77,13 +85,13 @@ export async function reserve(
 ) {
   const account = await accountForWrite(ctx, userId);
   const total = price * shopJobIds.length;
-  if (
-    !Number.isSafeInteger(total) ||
-    account.balanceCents - account.reservedCents < total
-  )
+  const available = account.balanceCents - account.reservedCents;
+  if (!Number.isSafeInteger(total) || available < total) {
+    const affordable = Math.max(0, Math.floor(available / price));
     throw new ConvexError(
-      "Your available credit cannot cover these shops. Add credit or pick fewer shops.",
+      `You have ${formatINR(Math.max(0, available))}, enough for ${affordable} ${affordable === 1 ? "shop" : "shops"}. Pick fewer shops.`,
     );
+  }
   await ctx.db.patch(account._id, {
     reservedCents: account.reservedCents + total,
   });
@@ -101,7 +109,7 @@ export async function reserve(
       shopJobId,
       amount: 0,
       amountCents: price,
-      currency: "USD",
+      currency: "INR",
       type: "reservation",
       reason: "Credit held for one final shop answer",
       operationId: `reserve:${shopJobId}`,
@@ -143,7 +151,7 @@ export async function settle(
     shopJobId,
     amount: chargeable ? -price / 100 : 0,
     amountCents: chargeable ? -price : price,
-    currency: "USD",
+    currency: "INR",
     type: chargeable ? "charge" : "release",
     reason: chargeable
       ? "Final caller answer supplied; notes-only evidence is accepted"
@@ -192,11 +200,65 @@ export const refund = internalMutation({
       shopJobId: r.shopJobId,
       amount: r.amountCents / 100,
       amountCents: r.amountCents,
-      currency: "USD",
+      currency: "INR",
       type: "refund",
       reason: args.reason,
       operationId: `refund:${r.shopJobId}`,
     });
     return null;
+  },
+});
+// One-off move from dollar cents to paise (D135: ₹100 per $1). A user converts
+// in one transaction; rows already in INR are never touched again.
+export async function convertUserToRupees(ctx: MutationCtx, userId: Id<"users">) {
+  const entries = await ctx.db.query("creditEntries").withIndex("by_user", q => q.eq("userId", userId)).take(10001);
+  if (entries.length > 10000) return "mismatched" as const;
+  const old = entries.filter(e => e.currency === "USD");
+  if (!old.length) return "skipped" as const;
+  const account = await ctx.db.query("creditAccounts").withIndex("by_user", q => q.eq("userId", userId)).unique();
+  const historyCents = entries
+    .filter(e => !["reservation", "release"].includes(e.type))
+    .reduce((sum, e) => sum + (e.amountCents ?? Math.round(e.amount * 100)), 0);
+  if (old.length !== entries.length || (account && account.balanceCents !== historyCents)) return "mismatched" as const;
+  for (const e of entries)
+    await ctx.db.patch(e._id, {
+      amount: e.amount * 100,
+      ...(e.amountCents === undefined ? {} : { amountCents: e.amountCents * 100 }),
+      currency: "INR",
+    });
+  if (account)
+    await ctx.db.patch(account._id, { balanceCents: account.balanceCents * 100, reservedCents: account.reservedCents * 100 });
+  const reservations = await ctx.db.query("creditReservations").withIndex("by_user", q => q.eq("userId", userId)).collect();
+  for (const r of reservations) await ctx.db.patch(r._id, { amountCents: r.amountCents * 100 });
+  return "converted" as const;
+}
+export const availableFor = internalQuery({
+  args: { userId: v.union(v.id("users"), v.null()) },
+  returns: v.union(v.number(), v.null()),
+  handler: async (ctx, args) => args.userId ? (await balances(ctx, args.userId)).availableCents : null,
+});
+// Money movements for the signed-in user. Holds are left out: a call appears
+// once, when it settles; money currently held is shown separately.
+export const history = query({
+  args: { paginationOpts: paginationOptsValidator, accessToken: v.optional(v.string()) },
+  returns: v.any(),
+  handler: async (ctx, args) => {
+    const userId = await requireUser(ctx, args.accessToken);
+    const result = await ctx.db.query("creditEntries")
+      .withIndex("by_user", q => q.eq("userId", userId))
+      .order("desc")
+      .filter(q => q.neq(q.field("type"), "reservation"))
+      .paginate(args.paginationOpts);
+    const page = await Promise.all(result.page.map(async e => {
+      const task = e.taskId ? await ctx.db.get(e.taskId) : null;
+      const job = e.shopJobId ? await ctx.db.get(e.shopJobId) : null;
+      return {
+        _id: e._id, _creationTime: e._creationTime, type: e.type, currency: e.currency,
+        amountCents: e.amountCents ?? Math.round(e.amount * 100),
+        taskId: e.taskId, productName: task?.product.name, shopName: job?.shop.name,
+        note: e.type === "release" ? notChargedReason(job?.state) : undefined,
+      };
+    }));
+    return { ...result, page };
   },
 });

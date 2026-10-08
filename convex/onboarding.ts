@@ -8,6 +8,6 @@ export async function approveWithWelcomeCredit(ctx: MutationCtx, userId: Id<'use
   const operationId = `welcome:${userId}`;
   const previous = await ctx.db.query('creditEntries').withIndex('by_operation', q => q.eq('operationId', operationId)).unique();
   if (previous) return;
-  await ctx.db.insert('creditEntries', { userId, amount: 1, amountCents: 100, currency: 'USD', type: 'grant', reason: '$1 signup test credit', operationId });
-  await addGrantToAccount(ctx, userId, 100);
+  await ctx.db.insert('creditEntries', { userId, amount: 100, amountCents: 10000, currency: 'INR', type: 'grant', reason: '₹100 welcome credit', operationId });
+  await addGrantToAccount(ctx, userId, 10000);
 }

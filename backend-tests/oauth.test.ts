@@ -119,7 +119,7 @@ it("serves OAuth discovery and stateless MCP tools behind account bearer authent
   const account = await rpc("tools/call", { name: "account_status", arguments: {} });
   expect(account.result.structuredContent.email).toBe("test@example.com");
   expect(account.result.structuredContent.availableBalance).toBe(0);
-  expect(account.result.structuredContent.currency).toBe("USD");
+  expect(account.result.structuredContent.currency).toBe("INR");
   expect(account.result.structuredContent).not.toHaveProperty("id");
   expect((await rpc("resources/read", { uri: "ui://wrong" })).error.code).toBe(
     -32002,

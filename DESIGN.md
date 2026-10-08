@@ -143,7 +143,9 @@ For choosing which shops we call.
   
 4. The main button.
   
-5. Small print: "Calls use your account credit. A listing doesn't confirm stock."
+5. Price, just above the main button (D135): "**Up to ₹30** for 3 shops · ₹10 per shop that answers", then "You have ₹100", then the charging rule in small grey text: "You pay only when a shop answers and tells us something useful, even if they can't confirm everything. No charge if a shop doesn't pick up, can't help, or the call fails." If the credit is short, the balance line turns amber: "You have ₹20, enough for 2 shops. Pick fewer shops." and the button is disabled. Under the button: "A listing doesn't confirm stock."
+  
+6. Charges after calling: each shop row carries one small grey line, "₹10 on hold", "Charged ₹10", "Not charged · shop didn't answer" or "Refunded ₹10". Charge lines are never green; green stays "the shop has it" (D72).
   
 
 **Main action:** "Call 3 shops" (the count follows the ticks) → the same card becomes the call card.

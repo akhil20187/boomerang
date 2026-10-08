@@ -1,3 +1,5 @@
+import type { Id } from "./_generated/dataModel";
+import { notChargedReason } from "./domain";
 import {
   mutation,
   query,
@@ -9,7 +11,7 @@ import { v, ConvexError } from "convex/values";
 import { requireUser, requireEligible } from "./access";
 import { validateSelection } from "./domain";
 import { workflow } from "./workflows";
-import { configuredPrice, reserve, balances } from "./credits";
+import { configuredPrice, reserve, balances, formatINR } from "./credits";
 import { paginationOptsValidator } from "convex/server";
 import { terminalStates } from "./validators";
 export const start = mutation({
@@ -65,7 +67,7 @@ export const start = mutation({
     const answerPriceCents = configuredPrice();
     if (args.expectedAnswerPriceCents !== answerPriceCents)
       throw new ConvexError(
-        "Review the current service-call price shown in the shop search and approve the total again. No calls started and no credit was charged.",
+        `The price changed to ${formatINR(answerPriceCents)} per answer. Check and press Call again. No calls started and no credit was charged.`,
       );
     const customer = await requireEligible(ctx, userId);
     if (!(customer as any).name?.trim())
@@ -101,6 +103,7 @@ export const start = mutation({
       approvedAt: Date.now(),
       idempotencyKey: args.idempotencyKey,
       answerPriceCents,
+      currency: "INR",
     });
     const shopJobIds = [];
     for (const shop of selected)
@@ -172,12 +175,13 @@ export const get = query({
           calledAt: attempt?.startedAt,
           recordingStatus:attempts.find(a=>a._id===j.latestAttemptId)?.recordingStatus??'unavailable',
           chargedCents:reservations.filter(r=>r.shopJobId===j._id&&r.state==='charged').reduce((n,r)=>n+r.amountCents,0),
+          chargeNote:chargeNote(task,j.state,reservations.find(r=>r.shopJobId===j._id)),
           attempts,
         };
       }),
     );
     return {
-      task:{...task,chargedCents:reservations.filter(r=>r.state==='charged').reduce((n,r)=>n+r.amountCents,0)},
+      task:{...task,currency:task.currency??'USD',...billingTotals(reservations)},
       credit: await balances(ctx, userId),
       product: task.product,
       shops,
@@ -209,7 +213,7 @@ export const history=query({
     const page=await Promise.all(result.page.map(async task=>{
       const jobs=await ctx.db.query('shopJobs').withIndex('by_task',q=>q.eq('taskId',task._id)).take(21);
       const reservations=await ctx.db.query('creditReservations').withIndex('by_task',q=>q.eq('taskId',task._id)).take(21);
-      return {...task,summary:{shopCount:jobs.length,resolvedCount:jobs.filter(j=>terminalStates.has(j.state)).length,availableCount:jobs.filter(j=>j.answer?.stock==='available').length,unreachableCount:jobs.filter(j=>j.state==='unreachable').length,unconfirmedCount:jobs.filter(j=>j.state==='incomplete_answer'||j.answer?.stock==='unconfirmed').length,chargedCents:reservations.filter(r=>r.state==='charged').reduce((n,r)=>n+r.amountCents,0),active:task.status==='queued'||task.status==='running'}};
+      return {...task,summary:{shopCount:jobs.length,resolvedCount:jobs.filter(j=>terminalStates.has(j.state)).length,availableCount:jobs.filter(j=>j.answer?.stock==='available').length,unreachableCount:jobs.filter(j=>j.state==='unreachable').length,unconfirmedCount:jobs.filter(j=>j.state==='incomplete_answer'||j.answer?.stock==='unconfirmed').length,...billingTotals(reservations),notChargedCount:reservations.filter(r=>r.state==='released').length,currency:'INR',active:task.status==='queued'||task.status==='running'}};
     }));
     return {...result,page};
   }
@@ -242,3 +246,13 @@ export const markRunning = internalMutation({
     return null;
   },
 });
+
+type Reservation={shopJobId:Id<'shopJobs'>;amountCents:number;state:'reserved'|'charged'|'released'|'refunded'};
+const sumCents=(rows:Reservation[],state?:Reservation['state'])=>rows.filter(r=>!state||r.state===state).reduce((n,r)=>n+r.amountCents,0);
+function billingTotals(rows:Reservation[]){return {chargedCents:sumCents(rows,'charged'),heldCents:sumCents(rows,'reserved'),releasedCents:sumCents(rows,'released'),refundedCents:sumCents(rows,'refunded'),maxCents:sumCents(rows)}}
+function chargeNote(task:{selfTest?:boolean;verification?:boolean},state:string,r?:Reservation){
+  if(task.selfTest||task.verification)return {kind:'free',amountCents:0};
+  if(!r)return null;
+  if(r.state==='released')return {kind:'not_charged',amountCents:r.amountCents,reason:notChargedReason(state)};
+  return {kind:r.state==='reserved'?'held':r.state,amountCents:r.amountCents};
+}

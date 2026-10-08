@@ -48,3 +48,8 @@ export function validateSelection(selected: string[], allowed: string[]) {
     throw new Error("A selected shop does not belong to this search.");
   return selected;
 }
+
+// Why a shop's held credit was returned. Same wording as web/src/taskPresentation.ts.
+export function notChargedReason(state?: string) {
+  return state === 'unreachable' ? 'shop didn’t answer' : state === 'personal_call_needed' ? 'shop prefers a personal call' : state === 'technical_error' || state === 'failed' ? 'call didn’t finish' : 'no useful answer';
+}

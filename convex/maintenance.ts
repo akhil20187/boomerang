@@ -1,5 +1,7 @@
 import { internalMutation } from "./_generated/server";
 import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
+import { convertUserToRupees } from "./credits";
 export const cleanup = internalMutation({
   args: {},
   returns: v.null(),
@@ -16,5 +18,40 @@ export const cleanup = internalMutation({
       .take(100);
     for (const grant of grants) await ctx.db.delete(grant._id);
     return null;
+  },
+});
+// One-off D135 conversion. Run convertCreditsToRupees until isDone, then
+// convertTaskPricesToRupees until isDone. Both are safe to repeat.
+export const convertCreditsToRupees = internalMutation({
+  args: { cursor: v.union(v.string(), v.null()) },
+  returns: v.any(),
+  handler: async (ctx, args) => {
+    const page = await ctx.db.query("creditEntries").paginate({ cursor: args.cursor, numItems: 10 });
+    const users = [...new Set(page.page.filter(e => e.currency === "USD").map(e => e.userId))];
+    const mismatched: Id<"users">[] = [];
+    let converted = 0;
+    for (const userId of users) {
+      const result = await convertUserToRupees(ctx, userId);
+      if (result === "converted") converted++;
+      if (result === "mismatched") mismatched.push(userId);
+    }
+    return { converted, mismatched, continueCursor: page.continueCursor, isDone: page.isDone };
+  },
+});
+export const convertTaskPricesToRupees = internalMutation({
+  args: { cursor: v.union(v.string(), v.null()) },
+  returns: v.any(),
+  handler: async (ctx, args) => {
+    const page = await ctx.db.query("tasks").paginate({ cursor: args.cursor, numItems: 100 });
+    let converted = 0;
+    for (const task of page.page) {
+      if (task.currency || task.answerPriceCents === undefined) continue;
+      // Leave a task alone while its owner's credit is still unconverted (a reported mismatch).
+      const stillUsd = (await ctx.db.query("creditEntries").withIndex("by_user", q => q.eq("userId", task.userId)).take(10000)).some(e => e.currency === "USD");
+      if (stillUsd) continue;
+      await ctx.db.patch(task._id, { answerPriceCents: task.answerPriceCents * 100, currency: "INR" });
+      converted++;
+    }
+    return { converted, continueCursor: page.continueCursor, isDone: page.isDone };
   },
 });

@@ -98,7 +98,7 @@ Where this agent supports local skills, save this complete file as `boomerang/SK
 
 ## Sign-in and credit
 
-Verified email signups are automatically approved and receive a one-time $1 test credit. Existing credit is preserved. Check the actual balance; never assume a returning customer gets another grant. Setup does not charge credit or start calls. Insufficient credit pauses new calls. Direct customers to their account for available funding options; do not invent a checkout or automatically purchase credit.
+Verified email signups are automatically approved and receive a one-time ₹100 welcome credit. Existing credit is preserved. Check the actual balance; never assume a returning customer gets another grant. Setup does not charge credit or start calls. Insufficient credit pauses new calls. Direct customers to their account for available funding options; do not invent a checkout or automatically purchase credit.
 
 ## Use Boomerang
 
@@ -107,7 +107,7 @@ Read the connected tools' current schemas before using them; they are the source
 1. Ask for an Amazon product URL or a product description and a six-digit Indian pincode. Ask for one missing detail at a time. Keep the exact model, colour and variant; ask the customer to confirm ambiguous details. Optional comments and card-offer preferences can accompany the search.
 2. Call `find_shops` with `productInput` and `pincode`. Show the returned shops and sources, preserving relevance and rating order. Hours and stock may be unknown. Use `more_shops` with the saved `draftId` for more results; preserve selections.
 3. Let the customer choose shops. Check `callingAvailable` and the returned `answerPriceCents`. If calling is unavailable or the quote is null, explain the returned reason and stop before starting calls. Never substitute the product price or invent a service price.
-4. Show the service price per charged shop answer and the maximum total for the selected shops, in the quoted currency. Get approval for those shops and that amount. Sign-in approval alone is not approval to call shops or spend credit.
+4. Show the service price per charged shop answer and the maximum total for the selected shops, in rupees. `answerPriceCents` and balances ending in `Cents` are in paise (₹1 = 100 paise); show `answerPriceLabel` (for example ₹10) rather than the raw number. A shop is charged only when it answers with something useful; no answer, a refusal or a failed call is not charged. Get approval for those shops and that amount. Sign-in approval alone is not approval to call shops or spend credit.
 5. Call `start_calls` with the saved `draftId`, selected `selectedPlaceIds`, one unique `idempotencyKey`, and the approved service quote as `expectedAnswerPriceCents`. Reuse the same key for a retry of the same request. After a timeout, check saved status before creating another request; never start duplicate calls with a fresh key.
 6. Keep the returned `taskId` and status-page link. Read `task_status` to return progress and shop-by-shop answers. Poll at reasonable intervals while the chat is active; do not promise background updates or notifications the agent cannot deliver. Show the saved-task link if the customer leaves.
 7. Mark missing stock, prices and offers as unconfirmed. Keep unanswered shops visible with their actual status. Retrieve recordings only when available and requested, using `get_recording`; playback links are private and expire.

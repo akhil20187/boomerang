@@ -4,12 +4,13 @@ import workflowTest from "@convex-dev/workflow/test";
 import schema from "../convex/schema";
 import { api, internal } from "../convex/_generated/api";
 import { approveWithWelcomeCredit } from '../convex/onboarding';
+import { settle } from '../convex/credits';
 const modules = import.meta.glob([
   "../convex/**/*.{ts,js}",
   "!../convex/**/*.d.ts",
 ]);
 afterEach(() => vi.unstubAllEnvs());
-it("welcome credit is exactly one dollar and repeated approval cannot duplicate it", async () => {
+it("welcome credit is exactly ₹100 in INR and repeated approval cannot duplicate it", async () => {
   const t = convexTest(schema, modules);
   const email = "welcome-test@example.com";
   const userId = await t.run(ctx => ctx.db.insert("users", { email }));
@@ -19,11 +20,14 @@ it("welcome credit is exactly one dollar and repeated approval cannot duplicate 
     await t.mutation(internal.admin.approve, { email, grantWelcomeCredit: true });
   const account = await user.query(api.users.me, {});
   expect(account.eligible).toBe(true);
-  expect(account.creditBalance).toBe(1);
-  expect(account.availableBalance).toBe(1);
+  expect(account.creditBalance).toBe(100);
+  expect(account.availableBalance).toBe(100);
+  expect(account.availableCents).toBe(10000);
   expect(account.reservedBalance).toBe(0);
+  expect(account.currency).toBe("INR");
   const grants = await t.run(ctx => ctx.db.query("creditEntries").collect());
   expect(grants.filter(entry => entry.type === "grant")).toHaveLength(1);
+  expect(grants[0]).toMatchObject({amountCents: 10000, currency: "INR"});
 });
 it('verified signup onboarding approves and grants once, preserving existing welcome grants', async () => {
   const t = convexTest(schema, modules);
@@ -32,7 +36,7 @@ it('verified signup onboarding approves and grants once, preserving existing wel
   await t.run(ctx => approveWithWelcomeCredit(ctx, userId));
   const account = await t.withIdentity({subject:`${userId}|session`}).query(api.users.me, {});
   expect(account.eligible).toBe(true);
-  expect(account.availableBalance).toBe(1);
+  expect(account.availableBalance).toBe(100);
   const existing = await t.run(async ctx => {
     const id = await ctx.db.insert('users', {email:'legacy@example.com'});
     await ctx.db.insert('creditEntries', {userId:id,amount:5,currency:'USD',type:'grant',reason:'Legacy welcome credit',operationId:`welcome:${id}`});
@@ -150,7 +154,7 @@ it("rejects a changed or missing customer quote before saving any task or held c
         idempotencyKey: "price-review",
         expectedAnswerPriceCents,
       }),
-    ).rejects.toThrow("service-call price");
+    ).rejects.toThrow("The price changed to ₹2 per answer");
   const balance = await s.user.query(api.users.me, {});
   expect(balance.reservedBalance).toBe(0);
   expect(balance.availableBalance).toBe(5);
@@ -334,4 +338,79 @@ it("can charge substantive caller notes without a recording or final price", asy
   expect(
     (await s.user.query(api.tasks.get, { taskId })).shops[0].billingState,
   ).toBe("charged");
+});
+it("explains a credit shortfall in rupees with how many shops are affordable", async () => {
+  const s = await setup("300");
+  await s.t.run(async ctx => {
+    const shops = [1, 2].map(i => ({placeId:`p${i}`,name:`Shop ${i}`,address:"Road",phone:"+919999999999",ratingCount:100,distanceKm:1,mapsUrl:"https://maps.google.com",fewRatings:false}));
+    await ctx.db.patch(s.draftId, {shops});
+  });
+  await expect(s.user.mutation(api.tasks.start, {draftId:s.draftId,selectedPlaceIds:["p1","p2"],idempotencyKey:"too-many",expectedAnswerPriceCents:300}))
+    .rejects.toThrow("You have ₹5, enough for 1 shop. Pick fewer shops.");
+  expect((await s.user.query(api.users.me, {})).reservedBalance).toBe(0);
+});
+it("saves new tasks in INR", async () => {
+  const s = await setup("300");
+  const {taskId} = await s.user.mutation(api.tasks.start, {draftId:s.draftId,selectedPlaceIds:["p1"],idempotencyKey:"inr-task",expectedAnswerPriceCents:300});
+  expect((await s.user.query(api.tasks.get, {taskId})).task.currency).toBe("INR");
+  const entries = await s.t.run(ctx => ctx.db.query("creditEntries").collect());
+  expect(entries.find(e => e.type === "reservation")?.currency).toBe("INR");
+});
+it("explains each shop's charge and totals the task", async () => {
+  const s = await setup("1000");
+  await s.t.run(async ctx => {
+    await ctx.db.insert("creditEntries", {userId:s.userId,amount:100,amountCents:10000,currency:"INR",type:"grant",reason:"more",operationId:"more"});
+    const shops = [1, 2, 3].map(i => ({placeId:`p${i}`,name:`Shop ${i}`,address:"Road",phone:"+919999999999",ratingCount:100,distanceKm:1,mapsUrl:"https://maps.google.com",fewRatings:false}));
+    await ctx.db.patch(s.draftId, {shops});
+  });
+  const {taskId} = await s.user.mutation(api.tasks.start, {draftId:s.draftId,selectedPlaceIds:["p1","p2","p3"],idempotencyKey:"charge-notes",expectedAnswerPriceCents:1000});
+  let task = await s.user.query(api.tasks.get, {taskId});
+  expect(task.shops.map((x: any) => x.chargeNote)).toEqual(Array(3).fill({kind:"held",amountCents:1000}));
+  expect(task.task).toMatchObject({heldCents:3000,maxCents:3000,currency:"INR"});
+  expect(task.task.refundedCents).toBe(0);
+  const [a, b, c] = task.shops.map((x: any) => x._id);
+  await s.t.run(async ctx => {
+    await ctx.db.patch(a, {state:"answered",answer:{stock:"available",variantMatch:"yes",notes:"ok"}} as any);
+    await ctx.db.patch(b, {state:"unreachable"});
+    await ctx.db.patch(c, {state:"answered"});
+    await settle(ctx, a, true); await settle(ctx, b, false); await settle(ctx, c, false);
+  });
+  task = await s.user.query(api.tasks.get, {taskId});
+  expect(task.shops.map((x: any) => x.chargeNote)).toEqual([
+    {kind:"charged",amountCents:1000},
+    {kind:"not_charged",amountCents:1000,reason:"shop didn’t answer"},
+    {kind:"not_charged",amountCents:1000,reason:"no useful answer"},
+  ]);
+  expect(task.task).toMatchObject({chargedCents:1000,releasedCents:2000,heldCents:0});
+  const history = await s.user.query(api.tasks.history, {paginationOpts:{numItems:5,cursor:null}});
+  expect(history.page[0].summary).toMatchObject({chargedCents:1000,notChargedCount:2,maxCents:3000,currency:"INR"});
+  await s.t.mutation(internal.credits.refund, {shopJobId:a,reason:"approved"});
+  task = await s.user.query(api.tasks.get, {taskId});
+  expect(task.shops[0].chargeNote).toEqual({kind:"refunded",amountCents:1000});
+});
+it("credit history lists only the signed-in user's money movements, newest first, without holds", async () => {
+  const s = await setup("1000");
+  const {taskId} = await s.user.mutation(api.tasks.start, {draftId:s.draftId,selectedPlaceIds:["p1"],idempotencyKey:"history-1",expectedAnswerPriceCents:300}).catch(() => ({taskId:null}));
+  expect(taskId).toBeNull();
+  await s.t.run(ctx => ctx.db.insert("creditEntries", {userId:s.userId,amount:100,amountCents:10000,currency:"INR",type:"grant",reason:"top",operationId:"top"}));
+  const started = await s.user.mutation(api.tasks.start, {draftId:s.draftId,selectedPlaceIds:["p1"],idempotencyKey:"history-2",expectedAnswerPriceCents:1000});
+  const task = await s.user.query(api.tasks.get, {taskId:started.taskId});
+  await s.t.run(ctx => settle(ctx, task.shops[0]._id, true));
+  const other = await s.t.run(async ctx => {
+    const id = await ctx.db.insert("users", {email:"other@example.com"});
+    await ctx.db.insert("creditEntries", {userId:id,amount:100,amountCents:10000,currency:"INR",type:"grant",reason:"theirs",operationId:"theirs"});
+    return id;
+  });
+  const page = await s.user.query(api.credits.history, {paginationOpts:{numItems:10,cursor:null}});
+  expect(page.page.map((r: any) => r.type)).toEqual(["charge", "grant", "grant"]);
+  expect(page.page[0]).toMatchObject({amountCents:-1000,taskId:started.taskId,productName:"phone",shopName:"Shop"});
+  expect(page.page.some((r: any) => "operationId" in r)).toBe(false);
+  const theirs = await s.t.withIdentity({subject:`${other}|session`}).query(api.credits.history, {paginationOpts:{numItems:10,cursor:null}});
+  expect(theirs.page).toHaveLength(1);
+  await expect(s.t.query(api.credits.history, {paginationOpts:{numItems:10,cursor:null}})).rejects.toThrow();
+});
+it("a saved search includes the price label and available credit", async () => {
+  const s = await setup("1000");
+  const draft = await s.user.query(api.drafts.get, {draftId:s.draftId});
+  expect(draft).toMatchObject({answerPriceCents:1000,answerPriceLabel:"₹10",currency:"INR",availableCents:500});
 });
