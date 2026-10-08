@@ -14,6 +14,16 @@ test('voicemail is unanswered and never supplies billable human evidence',async(
  const p=createSarvamProvider({env,fetchImpl:async()=>Response.json({items:[{attempt_id:'remote',end_datetime:'2026-10-07T00:00:00',connectivity_status:'connected',ended_by:'VOICEMAIL',interaction_id:'date/id',duration_in_seconds:15}]})});
  const x=await p.lookup({...record,sarvam:{attemptId:'remote'}});assert.equal(x.status,'completed');assert.equal(x.result.transportStatus,'no-answer');assert.deepEqual(x.result.transcript,[]);
 });
+test('busy attempt without conversation timestamps finishes without billable evidence or placeholder recording ID',async()=>{
+ let reads=0;
+ const p=createSarvamProvider({env,fetchImpl:async(u,o)=>{reads++;assert.ok(!o?.method||o.method==='GET');return Response.json({items:[{attempt_id:'remote',interaction_id:'NO_INTERACTION_ID',connectivity_status:'busy',start_datetime:null,end_datetime:null,ended_by:'NO_END_REASON',failure_reason:'NO_FAILURE_REASON',duration_in_seconds:0,num_messages:0}]});}});
+ const x=await p.lookup({...record,sarvam:{attemptId:'remote'}});
+ assert.equal(x.status,'completed');assert.equal(x.result.transportStatus,'no-answer');assert.deepEqual(x.result.transcript,[]);assert.equal(x.result.providerCallId,undefined);assert.equal(x.sarvam.interactionId,undefined);assert.equal(reads,1);
+});
+test('connected attempt without an end timestamp remains uncertain',async()=>{
+ const p=createSarvamProvider({env,fetchImpl:async()=>Response.json({items:[{attempt_id:'remote',connectivity_status:'connected',end_datetime:null,interaction_id:'date/id'}]})});
+ const x=await p.lookup({...record,sarvam:{attemptId:'remote'}});assert.equal(x.status,'reconciliation_required');assert.equal(x.reconciliation.reason,'provider_call_still_active');
+});
 test('completed call preserves Telugu and English human transcript with exact identity',async()=>{
  const p=createSarvamProvider({env,fetchImpl:async u=>String(u).includes('/transcripts/')?Response.json({interaction_id:'date/id',messages:[{role:'assistant',content:'Price?'},{role:'user',content:'అవును, seventy thousand rupees.'}]}):Response.json({items:[{attempt_id:'other',ended_by:'VOICEMAIL'},{attempt_id:'remote',end_datetime:'2026-10-07',connectivity_status:'connected',ended_by:'AGENT_ENDS',interaction_id:'date/id',duration_in_seconds:55}]})});
  const x=await p.lookup({...record,sarvam:{attemptId:'remote'}});assert.equal(x.result.transcript[1].speaker,'caller');assert.match(x.result.transcript[1].text,/అవును/);assert.equal(x.result.providerRequestId,'remote');assert.equal(x.result.providerCallId,'date/id');

@@ -37,20 +37,23 @@ function createSarvamProvider({env=process.env,fetchImpl=fetch,now=Date.now}={})
    const r=await get(u);if(!r.ok)return pending('provider_lookup_failed');
    const d=await r.json(),a=d.items?.find(x=>x.attempt_id===record.sarvam.attemptId);
    if(!a)return pending('provider_record_not_available');
-   if(!a.end_datetime)return pending('provider_call_still_active');
    const state=String(a.connectivity_status||'').toLowerCase(),reason=String(a.ended_by||a.failure_reason||'unknown');
+   // Sarvam's busy attempts have no conversation start/end timestamps.
+   // Only that explicit terminal result may bypass a missing end time.
+   if(!a.end_datetime&&state!=='busy')return pending('provider_call_still_active');
+   const interactionId=a.interaction_id&&a.interaction_id!=='NO_INTERACTION_ID'?a.interaction_id:null;
    const voicemail=/VOICEMAIL/i.test(reason),unanswered=voicemail||/busy|no.?answer|unanswered|not.?connected/.test(state);
    let transcript=[];
    if(!unanswered&&state==='connected'){
-    if(!a.interaction_id)return pending('missing_interaction_id');
-    const t=await get(base(record)+'/transcripts/'+encodeURIComponent(a.interaction_id));if(!t.ok)return pending('transcript_not_available');
-    const data=await t.json();if(data.interaction_id!==a.interaction_id||!Array.isArray(data.messages))return pending('transcript_identity_mismatch');
+    if(!interactionId)return pending('missing_interaction_id');
+    const t=await get(base(record)+'/transcripts/'+encodeURIComponent(interactionId));if(!t.ok)return pending('transcript_not_available');
+    const data=await t.json();if(data.interaction_id!==interactionId||!Array.isArray(data.messages))return pending('transcript_identity_mismatch');
     transcript=data.messages.filter(m=>['user','assistant'].includes(m.role)&&typeof m.content==='string'&&m.content.trim()).slice(0,500).map(m=>({speaker:m.role==='user'?'caller':'agent',text:m.content.slice(0,6000)}));
    }
    const transportStatus=unanswered?'no-answer':state==='connected'?'completed':/failed|error|cancel|invalid/.test(state)?'failed':null;
    if(!transportStatus)return pending('unrecognized_provider_status');
    const duration=Number(a.duration_in_seconds);
-   return {status:'completed',sarvam:{...record.sarvam,...(a.interaction_id?{interactionId:a.interaction_id}:{})},result:{providerRequestId:record.sarvam.attemptId,...(a.interaction_id?{providerCallId:a.interaction_id}:{}),transportStatus,endReason:reason,transcript,...(Number.isFinite(duration)&&duration>=0?{durationSeconds:duration}:{})},reconciliation:{checkedAt:now(),source:'sarvam',reason:'provider_call_finished',providerStatus:state}};
+   return {status:'completed',sarvam:{...record.sarvam,...(interactionId?{interactionId}:{})},result:{providerRequestId:record.sarvam.attemptId,...(interactionId?{providerCallId:interactionId}:{}),transportStatus,endReason:reason,transcript,...(Number.isFinite(duration)&&duration>=0?{durationSeconds:duration}:{})},reconciliation:{checkedAt:now(),source:'sarvam',reason:'provider_call_finished',providerStatus:state}};
   }catch{return pending('provider_lookup_failed');}
  }
  async function recording(record){

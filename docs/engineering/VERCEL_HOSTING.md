@@ -6,6 +6,8 @@ Convex backend and MCP remain on `little-kangaroo-718`.
 
 ## Deployment
 
+Automatic Git deployment is enabled for `main` only in `vercel.json`. Commit authors must belong to the connected `akhil20187` account. Backend changes still require a separate Convex deployment; money migrations must finish and pass reconciliation before the website is published.
+
 The local folder is linked through ignored `.vercel/project.json`.
 Only built public assets are uploaded; no credentials or backend source are needed.
 
