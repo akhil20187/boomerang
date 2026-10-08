@@ -1,7 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { productV, shopV, answerV, jobStateV } from "./validators";
+import { productV, shopV, answerV, jobStateV, briefV } from "./validators";
 export default defineSchema({
   oauthClients: defineTable({
     clientId: v.string(),
@@ -108,7 +108,23 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_expiry", ["expiresAt"]),
+  briefs: defineTable({
+    userId: v.id("users"),
+    request: v.string(),
+    pincode: v.optional(v.string()),
+    turns: v.array(
+      v.object({ question: v.string(), choices: v.array(v.string()), answer: v.optional(v.string()) }),
+    ),
+    status: v.union(v.literal("question"), v.literal("ready")),
+    summary: v.optional(v.string()),
+    brief: v.optional(briefV),
+    expiresAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_expiry", ["expiresAt"]),
   tasks: defineTable({
+    briefId: v.optional(v.id("briefs")),
+    brief: v.optional(briefV),
     selfTest: v.optional(v.boolean()),
     answerPriceCents: v.optional(v.number()),
     currency: v.optional(v.literal("INR")),

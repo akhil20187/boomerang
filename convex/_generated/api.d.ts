@@ -11,6 +11,7 @@
 import type * as access from "../access.js";
 import type * as admin from "../admin.js";
 import type * as auth from "../auth.js";
+import type * as briefs from "../briefs.js";
 import type * as calls from "../calls.js";
 import type * as credits from "../credits.js";
 import type * as crons from "../crons.js";
@@ -18,6 +19,7 @@ import type * as discovery from "../discovery.js";
 import type * as domain from "../domain.js";
 import type * as drafts from "../drafts.js";
 import type * as http from "../http.js";
+import type * as intake from "../intake.js";
 import type * as maintenance from "../maintenance.js";
 import type * as mcp from "../mcp.js";
 import type * as mcpAddresses from "../mcpAddresses.js";
@@ -43,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   access: typeof access;
   admin: typeof admin;
   auth: typeof auth;
+  briefs: typeof briefs;
   calls: typeof calls;
   credits: typeof credits;
   crons: typeof crons;
@@ -50,6 +53,7 @@ declare const fullApi: ApiFromModules<{
   domain: typeof domain;
   drafts: typeof drafts;
   http: typeof http;
+  intake: typeof intake;
   maintenance: typeof maintenance;
   mcp: typeof mcp;
   mcpAddresses: typeof mcpAddresses;
