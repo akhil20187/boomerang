@@ -10,6 +10,12 @@ Public skill examples and production build configuration use Vercel. The build r
 
 Local verification: 99 local tests, 69 backend tests and typecheck pass; new tests cover both addresses through approval, token exchange, authenticated initialization, refresh, replay rejection and resource mismatch rejection. The build checks both skill copies and the landing setup link. Independent code review found no critical or important issues; its minor audit concern was fixed by checking the actual MCP response and both resource documents.
 
-Deployment and live verification are pending. Run `node scripts/verify-public-mcp.mjs` for anonymous discovery and the native SDK's resource selection. The optional authenticated checks require an existing private `MCP_TEST_TOKEN`; do not claim real customer sign-in was tested without completing it.
+Merged [PR #3](https://github.com/akhil20187/boomerang/pull/3) as `akhil20187` into main at `f9f83bd7503fb962a8874fc9b3b99cb25c6ecd6d`. Automatic Vercel deployment `dpl_CdX9jgAPBvtwDAs7Vi8um3bQ55tb` is READY. Backend code is published to `little-kangaroo-718`, with `MCP_PUBLIC_URL` set to Vercel; the production website build's `VITE_MCP_PUBLIC_URL` is also Vercel. Static deployment `d70da997-b1d8-4727-b649-2dbba75837df` updates the widget and second hosted skill copy.
+
+Live checks passed: both skill copies use the branded address, native SDK discovery and resource selection work, the public endpoint requires authentication (401), public metadata names Vercel and legacy metadata names Convex, approval preflight returns 204, invalid approval is rejected, and the published widget matches the checked build. The existing voice bridge remains ready with no active or unreconciled calls.
+
+Run `node scripts/verify-public-mcp.mjs` for anonymous discovery and the native SDK's resource selection. The optional authenticated checks require an existing private `MCP_TEST_TOKEN`. Real customer sign-in and authenticated live MCP requests remain untested; no new email or phone call was sent. Local authenticated-flow tests passed.
+
+The user's requested `gh` CLI account switch to `akhil20187` was completed and checked via `gh api user`; saved credentials stayed private.
 
 Implementation follows [Vercel external forwarding](https://vercel.com/docs/routing/rewrites) and [MCP authorization/resource discovery](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization). MCP permits a separate authorization server.
