@@ -30,7 +30,6 @@ const bundle = await get(new URL(asset[1], website));
 result.frontend = {
   status: app.response.status,
   convexConnection: bundle.text.includes('https://little-kangaroo-718.convex.cloud'),
-  mcpConnection: bundle.text.includes(backend),
   customerLinks: bundle.text.includes(website),
   creditHistory: bundle.text.includes('credits:history') && bundle.text.includes('Credit & charges'),
 };
@@ -39,9 +38,19 @@ const builtWidget = new URL('../web/dist/widget.html',import.meta.url);
 const widgetHash = createHash('sha256').update(widget.text).digest('hex');
 result.widget = {status:widget.response.status,rupeeVersion:widget.text.includes('credits:history') && widget.text.includes('Credit & charges'),matchesLocalBuild:existsSync(builtWidget)?widgetHash===createHash('sha256').update(readFileSync(builtWidget)).digest('hex'):null};
 result.pages = {};
+const protectedResource = await get(`${website}/.well-known/oauth-protected-resource/mcp`);
+const legacyResource = await get(`${backend}/.well-known/oauth-protected-resource/mcp`);
+const mcpChallenge = await fetch(`${website}/mcp`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({jsonrpc:'2.0',id:1,method:'initialize'}), signal:AbortSignal.timeout(15000), redirect:'manual'});
+result.mcp = {
+  status:mcpChallenge.status,
+  publicResource:JSON.parse(protectedResource.text).resource,
+  legacyResource:JSON.parse(legacyResource.text).resource,
+  challenge:mcpChallenge.headers.get('www-authenticate'),
+};
+if(result.mcp.status!==401 || result.mcp.publicResource!==`${website}/mcp` || result.mcp.legacyResource!==`${backend}/mcp` || !result.mcp.challenge?.includes(`${website}/.well-known/oauth-protected-resource/mcp`)) throw new Error('MCP forwarding or public/legacy resource discovery is incorrect');
 for (const route of ['/account', '/connect', '/status', '/tasks', '/credit', '/SKILL.md', '/_vercel/insights/script.js']) {
   const data = await get(website + route);
   result.pages[route] = data.response.status;
-  if (route === '/SKILL.md') result.skill = { accountUsesVercel: data.text.includes(website + '/account'), mcpUsesConvex: data.text.includes(backend + '/mcp') };
+  if (route === '/SKILL.md') result.skill = { accountUsesVercel: data.text.includes(website + '/account'), mcpUsesVercel: data.text.includes(website + '/mcp') };
 }
 console.log(JSON.stringify(result, null, 2));

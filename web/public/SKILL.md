@@ -9,13 +9,15 @@ Boomerang finds nearby shops and calls the shops the customer selects to check s
 
 ## Addresses
 
-- Service: https://little-kangaroo-718.convex.site
-- Remote MCP connection (HTTP): https://little-kangaroo-718.convex.site/mcp
-- Sign-in and credit: https://little-kangaroo-718.convex.site/account
-- Saved tasks: https://little-kangaroo-718.convex.site/tasks
-- Latest skill: https://little-kangaroo-718.convex.site/SKILL.md
+- Service: https://askboomerang.vercel.app
+- Remote MCP connection (HTTP): https://askboomerang.vercel.app/mcp
+- Sign-in and credit: https://askboomerang.vercel.app/account
+- Saved tasks: https://askboomerang.vercel.app/tasks
+- Latest skill: https://askboomerang.vercel.app/SKILL.md
 
 MCP is the connection through which your agent uses Boomerang. Use native remote HTTP support; no Boomerang package or paid subscription is needed to install the connection.
+
+Use the public MCP address above for new connections. Follow the server's sign-in discovery automatically; its authentication service may use a different address. Existing connections using the original Convex address remain supported.
 
 ## Set up
 
@@ -33,7 +35,7 @@ Run only in a Codex environment with its CLI available:
 
 ```sh
 codex mcp get boomerang
-codex mcp add boomerang --url https://little-kangaroo-718.convex.site/mcp
+codex mcp add boomerang --url https://askboomerang.vercel.app/mcp
 ```
 
 Run `add` only if the connection is missing. It may begin sign-in automatically. Otherwise run:
@@ -50,7 +52,7 @@ Run only in a Claude Code environment:
 
 ```sh
 claude mcp get boomerang
-claude mcp add --scope user --transport http boomerang https://little-kangaroo-718.convex.site/mcp
+claude mcp add --scope user --transport http boomerang https://askboomerang.vercel.app/mcp
 ```
 
 Run `add` only if missing. The user scope keeps it available across projects. Use the installed CLI's documented sign-in command if available; otherwise guide the customer to enter `/mcp`, choose Boomerang, and select Authenticate. Let the customer finish browser sign-in and connection approval.
@@ -62,7 +64,7 @@ Run only in a Hermes Agent environment. Add the server to `~/.hermes/config.yaml
 ```yaml
 mcp_servers:
   boomerang:
-    url: "https://little-kangaroo-718.convex.site/mcp"
+    url: "https://askboomerang.vercel.app/mcp"
     auth: oauth
 ```
 
@@ -73,7 +75,7 @@ Then run `/reload-mcp` (or restart Hermes). On first connect Hermes prints the s
 Run only in an OpenClaw environment:
 
 ```sh
-openclaw mcp add boomerang --url https://little-kangaroo-718.convex.site/mcp --transport streamable-http --auth oauth
+openclaw mcp add boomerang --url https://askboomerang.vercel.app/mcp --transport streamable-http --auth oauth
 openclaw mcp login boomerang
 openclaw mcp doctor boomerang --probe
 ```
@@ -82,15 +84,15 @@ Run `add` only if the connection is missing. `login` prints the sign-in URL; the
 
 ### Grok
 
-- **Grok Build (CLI):** run `grok mcp add --transport http boomerang https://little-kangaroo-718.convex.site/mcp`. Sign-in opens in the browser on first use. Check it with `grok mcp doctor boomerang`.
+- **Grok Build (CLI):** run `grok mcp add --transport http boomerang https://askboomerang.vercel.app/mcp`. Sign-in opens in the browser on first use. Check it with `grok mcp doctor boomerang`.
 - **grok.com:** this chat cannot install connections itself. Guide the customer to grok.com/connectors → New Connector → Custom, enter the MCP URL above and complete sign-in. Custom connectors may depend on the customer's Grok plan.
-- **xAI API:** remote MCP there takes a bearer token, not browser sign-in. Do not ask the customer for tokens in chat; offer https://little-kangaroo-718.convex.site/app instead.
+- **xAI API:** remote MCP there takes a bearer token, not browser sign-in. Do not ask the customer for tokens in chat; offer https://askboomerang.vercel.app/app instead.
 
 ### ChatGPT, Claude web/desktop, and other agents
 
 If this agent exposes a supported connector-install action, use it. Otherwise explain that this chat cannot install connections itself and guide the customer one step at a time through its custom-connector settings. Add the remote MCP URL above with sign-in enabled. On Claude, use automatic OAuth client registration when offered. On ChatGPT, custom connectors require an eligible account and Developer mode; if unavailable, offer the service's /app page. Do not invent settings, claim that reading this file installed a connector, or alter an unrelated coding agent's configuration.
 
-For another coding agent, consult its installed help or official remote-MCP instructions. Configure only this server using its native HTTP and browser sign-in support. If it does not support them, offer https://little-kangaroo-718.convex.site/app.
+For another coding agent, consult its installed help or official remote-MCP instructions. Configure only this server using its native HTTP and browser sign-in support. If it does not support them, offer https://askboomerang.vercel.app/app.
 
 ### Keep the skill available
 

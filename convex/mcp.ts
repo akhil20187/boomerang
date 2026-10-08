@@ -4,6 +4,7 @@ import { ConvexError } from "convex/values";
 import { metadata } from "./oauth";
 import { callingQuote } from "./credits";
 import { websiteOrigins } from "./websiteOrigins";
+import { publicMcpOrigin, publicMcpResource } from './mcpAddresses';
 const uiUri = "ui://boomerang/shops-v3.html";
 const textSchema = { type: "string" },
   idSchema = { type: "string", minLength: 1 };
@@ -169,7 +170,8 @@ export const oauthHttp = httpAction(async (ctx, request) => {
       route.includes("oauth-authorization-server")
         ? metadata()
         : {
-            resource: `${process.env.CONVEX_SITE_URL}/mcp`,
+            resource: route === '/.well-known/oauth-protected-resource/public'
+              ? publicMcpResource() : `${process.env.CONVEX_SITE_URL}/mcp`,
             authorization_servers: [process.env.CONVEX_SITE_URL],
             scopes_supported: ["shops:read", "calls:write"],
             bearer_methods_supported: ["header"],
@@ -207,8 +209,9 @@ export const oauthHttp = httpAction(async (ctx, request) => {
   }
 });
 export const endpoint = httpAction(async (ctx, request) => {
-  const site = process.env.CONVEX_SITE_URL!,
-    www = `Bearer resource_metadata="${site}/.well-known/oauth-protected-resource", error="invalid_token"`;
+  const site = process.env.CONVEX_SITE_URL!;
+  const resourceOrigin = new URL(request.url).pathname === '/mcp/public' ? publicMcpOrigin() : site;
+  const www = `Bearer resource_metadata="${resourceOrigin}/.well-known/oauth-protected-resource/mcp", error="invalid_token"`;
   const token = /^Bearer\s+(\S+)$/i.exec(
     request.headers.get("Authorization") ?? "",
   )?.[1];

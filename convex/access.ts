@@ -2,6 +2,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError } from "convex/values";
 import type { QueryCtx, MutationCtx } from "./_generated/server";
 import { balances } from "./credits";
+import { isMcpResource } from './mcpAddresses';
 export async function hashToken(token: string) {
   const buffer = await crypto.subtle.digest(
     "SHA-256",
@@ -29,8 +30,7 @@ export async function requireUser(
       (!requiredScope ||
         !token.scope ||
         token.scope.split(" ").includes(requiredScope)) &&
-      (!token.resource ||
-        token.resource === `${process.env.CONVEX_SITE_URL}/mcp`)
+      (!token.resource || isMcpResource(token.resource))
     ) {
       if (token.familyId) {
         const familyId = token.familyId;
