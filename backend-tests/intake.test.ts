@@ -12,7 +12,7 @@ const brief = {
   task_type: "blouse_stitching",
   task_context: {
     summary: "Customer in Chintal needs a lined saree blouse by Thursday 15 October.",
-    known: { area: "Chintal", design: "lined" },
+    known: [{ fact: "area", value: "Chintal" }, { fact: "design", value: "lined" }],
     unknown: [{ fact: "measurement method", fallback: "ask what the tailor accepts" }],
     share_only_if_asked: ["the occasion"],
   },
@@ -90,8 +90,14 @@ it("forceReady turns an over-long intake into a brief with unknowns", () => {
   ]);
   expect(out.status).toBe("ready");
   expect(out.brief.task_context.summary).toContain("I need a tailor");
-  expect(out.brief.task_context.known["Which area?"]).toBe("Chintal");
+  expect(out.brief.task_context.known).toEqual([{ fact: "Which area?", value: "Chintal" }]);
   expect(out.brief.authority.enquiry_only).toBe(true);
+});
+
+it("accepts non-ASCII known facts as a list, and converts an object form", () => {
+  const out = parseIntakeOutput(JSON.stringify({ status: "ready", summary: "x", brief: { ...brief, task_context: { ...brief.task_context, known: { "इलाका": "Chintal", "price ₹": "unknown" } } } }));
+  expect(out?.status).toBe("ready");
+  if (out?.status === "ready") expect(out.brief.task_context.known).toEqual([{ fact: "इलाका", value: "Chintal" }, { fact: "price ₹", value: "unknown" }]);
 });
 
 it("prompt treats input as data and caps questions", () => {

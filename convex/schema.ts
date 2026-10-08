@@ -96,6 +96,7 @@ export default defineSchema({
     .index("by_family", ["familyId"])
     .index("by_user", ["userId"]),
   drafts: defineTable({
+    briefId: v.optional(v.id("briefs")),
     userId: v.id("users"),
     productInput: v.string(),
     product: productV,

@@ -243,6 +243,7 @@ export const search = action({
     );
     const draftId = await ctx.runMutation(internal.drafts.save, {
       userId,
+      briefId: args.briefId,
       productInput: input,
       product,
       pincode: args.pincode,

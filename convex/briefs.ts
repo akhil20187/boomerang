@@ -45,16 +45,41 @@ export const load = internalQuery({
   },
 });
 
+/** Records the customer's answer to the open question before any model call, so a repeated or concurrent answer is refused. */
+export const answer = internalMutation({
+  args: { briefId: v.id("briefs"), userId: v.id("users"), answer: v.string() },
+  returns: v.any(),
+  handler: async (ctx, args) => {
+    const brief = await ctx.db.get(args.briefId);
+    if (!brief || brief.userId !== args.userId) throw new ConvexError("Brief not found.");
+    if (brief.expiresAt < Date.now()) throw new ConvexError("This brief has expired. Start again.");
+    if (brief.status === "ready") return brief;
+    const turns = brief.turns.map((t) => ({ ...t }));
+    const open = turns[turns.length - 1];
+    if (!open || open.answer !== undefined)
+      throw new ConvexError("That question was already answered. Wait for the next one.");
+    open.answer = args.answer;
+    await ctx.db.patch(args.briefId, { turns });
+    return { ...brief, turns };
+  },
+});
+
 export const record = internalMutation({
   args: {
     briefId: v.id("briefs"),
+    expectedTurns: v.number(),
     turns: v.array(turnV),
     status: v.union(v.literal("question"), v.literal("ready")),
     summary: v.optional(v.string()),
     brief: v.optional(briefV),
   },
   returns: v.null(),
-  handler: async (ctx, { briefId, ...rest }) => {
+  handler: async (ctx, { briefId, expectedTurns, ...rest }) => {
+    const current = await ctx.db.get(briefId);
+    if (!current) throw new ConvexError("Brief not found.");
+    if (current.status === "ready") return null;
+    if (current.turns.length !== expectedTurns)
+      throw new ConvexError("This brief changed while the question was being prepared. Ask again.");
     await ctx.db.patch(briefId, rest);
     return null;
   },
@@ -136,18 +161,19 @@ export const prepare = action({
       turns = [];
       briefId = await ctx.runMutation(internal.briefs.create, { userId, request, pincode });
     } else {
-      const stored = await ctx.runQuery(internal.briefs.load, { briefId, userId });
-      if (stored.status === "ready")
-        return { status: "ready", briefId, summary: stored.summary, brief: stored.brief, asked: stored.turns.length, maxQuestions: MAX_QUESTIONS };
       const answer = (args.answer ?? "").trim();
       if (!answer || answer.length > 500)
         throw new ConvexError("Give a short answer to the question.");
+      if (args.pincode !== undefined && !/^[1-9]\d{5}$/.test(args.pincode))
+        throw new ConvexError("Enter a valid six-digit Indian pincode.");
+      const stored = await ctx.runMutation(internal.briefs.answer, { briefId, userId, answer });
+      if (stored.status === "ready")
+        return { status: "ready", briefId, summary: stored.summary, brief: stored.brief, asked: stored.turns.length, maxQuestions: MAX_QUESTIONS };
       request = stored.request;
       pincode = stored.pincode ?? args.pincode;
       turns = stored.turns.map((t: Turn) => ({ ...t }));
-      const open = turns[turns.length - 1];
-      if (open && open.answer === undefined) open.answer = answer;
     }
+    const expectedTurns = turns.length;
     const answered = turns.filter((t) => t.answer !== undefined).length;
     const finish = answered >= MAX_QUESTIONS;
     let out = await askModel(request, pincode, turns, finish);
@@ -155,10 +181,10 @@ export const prepare = action({
     if (!out) out = { status: "question", question: FALLBACK_QUESTION, choices: [] };
     if (out.status === "question") {
       turns.push({ question: out.question, choices: out.choices });
-      await ctx.runMutation(internal.briefs.record, { briefId, turns, status: "question" });
+      await ctx.runMutation(internal.briefs.record, { briefId, expectedTurns, turns, status: "question" });
       return { status: "question", briefId, question: out.question, choices: out.choices, allowFreeText: true, asked: turns.length, maxQuestions: MAX_QUESTIONS };
     }
-    await ctx.runMutation(internal.briefs.record, { briefId, turns, status: "ready", summary: out.summary, brief: out.brief });
-    return { status: "ready", briefId, summary: out.summary, brief: out.brief, asked: answered, maxQuestions: MAX_QUESTIONS };
+    await ctx.runMutation(internal.briefs.record, { briefId, expectedTurns, turns, status: "ready", summary: out.summary, brief: out.brief });
+    return { status: "ready", briefId, summary: out.summary, brief: out.brief, asked: turns.length, maxQuestions: MAX_QUESTIONS };
   },
 });

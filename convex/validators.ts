@@ -57,7 +57,7 @@ export const briefV = v.object({
   task_type: v.string(),
   task_context: v.object({
     summary: v.string(),
-    known: v.record(v.string(), v.string()),
+    known: v.array(v.object({ fact: v.string(), value: v.string() })),
     unknown: v.array(v.object({ fact: v.string(), fallback: v.string() })),
     share_only_if_asked: v.array(v.string()),
   }),

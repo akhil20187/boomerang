@@ -113,8 +113,7 @@ function createBridge({env=process.env,secret=env.CALL_BRIDGE_SECRET,publicUrl=e
   let agent;
   try{
    agent=agentFactory({env:{...env,PHONE_TEST_MAX_SECONDS:String(maxSeconds)},publicUrl,to:record.to,port:0,openingInstructions:`Give a brief greeting: identify yourself as an automated assistant calling on behalf of ${record.customerName}. Ask the shop about availability of ${record.productDescription}, using a short natural summary without adding facts. If a screening service answers, give only your identity and reason, then wait silently.`,instructions:`You are the buyer's representative: an automated assistant calling a shop on behalf of ${record.customerName}. You are not a seller, support agent or order taker.
-Customer's requested product: ${record.productDescription}
-Customer's additional requirements: ${record.instructions||'None'}
+${record.briefMode===true?`Customer's task brief: ${record.productDescription}\n${record.instructions||''}`:`Customer's requested product: ${record.productDescription}\nCustomer's additional requirements: ${record.instructions||'None'}`}
 Speak English unless the person clearly requests another language. Keep each spoken turn to one or two short sentences and ask one question at a time.
 First establish that you are speaking to the shop. For call screening, give your identity and purchase-enquiry reason once. When asked to hold or stay on the line, acknowledge once and wait silently until a person addresses you. Do not ask product questions during screening or hold announcements.
 Ask the shop whether it sells the requested product. For uncertain compatibility, quote the model exactly as supplied and ask the shop to identify the compatible item. Never invent a cartridge number, model, compatibility, stock, price or offer. A hello, yes, noise or unclear word is not evidence for a specific identifier. If the shop supplies a number, repeat it once to confirm; do not propose an unprovided number.

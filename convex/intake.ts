@@ -14,7 +14,7 @@ export type Brief = {
   task_type: string;
   task_context: {
     summary: string;
-    known: Record<string, string>;
+    known: { fact: string; value: string }[];
     unknown: { fact: string; fallback: string }[];
     share_only_if_asked: string[];
   };
@@ -44,8 +44,9 @@ export const INTAKE_SYSTEM_PROMPT = `You are Boomerang's intake assistant. A cus
 RULES
 1. Ask only what the recipient will ask before giving a useful answer. Work out, for this type of business, what it needs to know before it can answer (a painter asks area, scope, wall condition, who buys paint, room size; a tailor asks the job, design, measurement method, deadline). Ask the customer those things. Nothing else.
 2. One question per turn. Give 2-4 concrete choices where possible. Plain words.
-3. Never re-ask what the customer already said. Use the request and the earlier answers. Zero questions is valid: if the request already covers what the recipient will ask, return the brief immediately.
-4. If the request is vague, narrow it to the actual job first. Then ask what they want from the call (outcome).
+3. Before every question, list to yourself what the request and earlier answers already state. Never ask for any of it again, even in a different form. Zero questions is valid: if the request already covers what the recipient will ask, return the brief immediately.
+4. Order: first the actual job if the request is vague (for "tailor for my saree": blouse stitching, fall and pico, or alteration); then what they want from the call (availability, rough price, or more); then the area; then the recipient's remaining questions, most decisive first.
+4a. The area is always required. The customer is in India; a word like Kondapur, Chintal or Balanagar in the request is their locality, not a product or fabric. If no area or pincode is known, ask "Which area?" as an open question with no choices. Do not return the brief without an area.
 5. Accept "don't know" or "not decided". Record it as unknown with a fallback the agent uses on the call.
 6. Facts only the recipient knows (price, stock, hours, whether they need a visit) are call questions, not customer questions. Do not ask the customer for them.
 7. Stop once the recipient's likely questions are covered. Ask at most ${MAX_QUESTIONS} questions in total; when told to finish, return the brief with remaining facts as unknowns.
@@ -56,7 +57,7 @@ RULES
 OUTPUT
 Respond with exactly one JSON object and nothing else.
 Question: {"status":"question","question":"...","choices":["...","..."]}
-Ready: {"status":"ready","summary":"one short paragraph for the customer","brief":{"task_type":"string","task_context":{"summary":"string","known":{"fact":"value"},"unknown":[{"fact":"string","fallback":"string"}],"share_only_if_asked":["string"]},"call_purpose":"string","expected_outcome":{"must_confirm":["string"],"nice_to_have":["string"],"deciding_question":"string or null"},"representing":{"name":"string","kind":"personal|organisation","caller_name":"Gayatri"},"authority":{"enquiry_only":true,"may_share_customer_contact":false,"may_schedule":false,"follow_up":"string"},"in_call_rules":["task-specific rules only"],"deadline":{"date":"YYYY-MM-DD or null","start_assumption":"string or null"}}}
+Ready: {"status":"ready","summary":"one short paragraph for the customer","brief":{"task_type":"string","task_context":{"summary":"string","known":[{"fact":"string","value":"string"}],"unknown":[{"fact":"string","fallback":"string"}],"share_only_if_asked":["string"]},"call_purpose":"string","expected_outcome":{"must_confirm":["string"],"nice_to_have":["string"],"deciding_question":"string or null"},"representing":{"name":"string","kind":"personal|organisation","caller_name":"Gayatri"},"authority":{"enquiry_only":true,"may_share_customer_contact":false,"may_schedule":false,"follow_up":"string"},"in_call_rules":["task-specific rules only"],"deadline":{"date":"YYYY-MM-DD or null","start_assumption":"string or null"}}}
 Leave unknowns as unknown entries with a fallback; do not invent values.`;
 
 const isStr = (x: unknown): x is string => typeof x === "string";
@@ -75,9 +76,12 @@ function parseBrief(raw: unknown): Brief | null {
   if (!out || !rep || !auth) return null;
   if (auth.enquiry_only !== true || auth.may_share_customer_contact !== false || auth.may_schedule !== false)
     return null;
-  const known: Record<string, string> = {};
-  if (ctx.known && typeof ctx.known === "object")
-    for (const [k, v] of Object.entries(ctx.known)) if (isStr(k) && isStr(v)) known[k] = v;
+  const known: { fact: string; value: string }[] = [];
+  if (Array.isArray(ctx.known)) {
+    for (const k of ctx.known) if (k && isStr(k.fact) && isStr(k.value)) known.push({ fact: k.fact.slice(0, 120), value: k.value.slice(0, 300) });
+  } else if (ctx.known && typeof ctx.known === "object") {
+    for (const [k, val] of Object.entries(ctx.known)) if (isStr(val)) known.push({ fact: k.slice(0, 120), value: val.slice(0, 300) });
+  }
   const unknown = Array.isArray(ctx.unknown)
     ? ctx.unknown
         .filter((u: any) => u && isStr(u.fact))
@@ -138,8 +142,8 @@ export function parseIntakeOutput(raw: string): IntakeOutput | null {
 
 /** When the model keeps asking past the limit, build a brief from what was gathered. */
 export function forceReady(request: string, turns: Turn[]): Extract<IntakeOutput, { status: "ready" }> {
-  const known: Record<string, string> = {};
-  for (const t of turns) if (t.answer) known[t.question] = t.answer;
+  const known: { fact: string; value: string }[] = [];
+  for (const t of turns) if (t.answer) known.push({ fact: t.question.slice(0, 120), value: t.answer.slice(0, 300) });
   const summary = [request.trim(), ...turns.filter((t) => t.answer).map((t) => `${t.question} ${t.answer}`)]
     .join(" ")
     .slice(0, 1000);

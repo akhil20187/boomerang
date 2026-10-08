@@ -72,8 +72,11 @@ export const start = mutation({
         `The price changed to ${formatINR(answerPriceCents)} per answer. Check and press Call again. No calls started and no credit was charged.`,
       );
     let brief: Doc<"briefs"> | null = null;
-    if (args.briefId) {
-      brief = await ctx.db.get(args.briefId);
+    if (args.briefId && draft.briefId && args.briefId !== draft.briefId)
+      throw new ConvexError("This brief belongs to another search. Find shops again with the right brief.");
+    const briefId = args.briefId ?? draft.briefId;
+    if (briefId) {
+      brief = await ctx.db.get(briefId);
       if (!brief || brief.userId !== userId) throw new ConvexError("Brief not found.");
       if (brief.expiresAt < Date.now()) throw new ConvexError("This brief has expired. Start again.");
       if (brief.status !== "ready" || !brief.brief) throw new ConvexError("Finish the brief first.");

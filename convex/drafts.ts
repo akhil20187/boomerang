@@ -6,6 +6,7 @@ import { productV, shopV } from "./validators";
 export const save = internalMutation({
   args: {
     userId: v.id("users"),
+    briefId: v.optional(v.id("briefs")),
     productInput: v.string(),
     product: productV,
     pincode: v.string(),

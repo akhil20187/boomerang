@@ -9,7 +9,7 @@ afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); vi.useRealTimers();
 
 const readyBrief = {
   task_type: "blouse_stitching",
-  task_context: { summary: "Lined blouse in Chintal by Thursday.", known: { area: "Chintal" }, unknown: [], share_only_if_asked: [] },
+  task_context: { summary: "Lined blouse in Chintal by Thursday.", known: [{ fact: "area", value: "Chintal" }], unknown: [], share_only_if_asked: [] },
   call_purpose: "Confirm lined blouse stitching and Thursday delivery.",
   expected_outcome: { must_confirm: ["price per blouse"], nice_to_have: [], deciding_question: "Ready by Thursday if dropped tomorrow?" },
   representing: { name: "Akhil", kind: "personal", caller_name: "Gayatri" },
@@ -81,7 +81,7 @@ it("forces a brief after the sixth answered question", async () => {
     out = await user.action(api.briefs.prepare, { briefId: out.briefId, answer: `A${i}` });
   }
   expect(out.status).toBe("ready");
-  expect(out.brief.task_context.known["Q6?"]).toBe("A6");
+  expect(out.brief.task_context.known).toContainEqual({ fact: "Q6?", value: "A6" });
 });
 
 it("rejects empty or long answers without calling the model, and foreign or expired briefs", async () => {
@@ -131,4 +131,36 @@ it("validates pincode and limits new briefs per hour", async () => {
   await expect(user.action(api.briefs.prepare, { request: "I need a tailor", pincode: "12" })).rejects.toThrow("pincode");
   for (let i = 0; i < 20; i++) await t.run((ctx) => ctx.db.insert("briefs", { userId: id, request: "r", turns: [], status: "question", expiresAt: Date.now() + 1000 }));
   await expect(user.action(api.briefs.prepare, { request: "I need a tailor" })).rejects.toThrow("Too many");
+});
+
+it("rejects a second answer to the same question and a stale save", async () => {
+  const { t, user, calls } = await setup([
+    { status: "question", question: "Which area?", choices: [] },
+    { status: "question", question: "Scope?", choices: [] },
+  ]);
+  const first = await user.action(api.briefs.prepare, { request: "I need a painter" });
+  const second = await user.action(api.briefs.prepare, { briefId: first.briefId, answer: "Kondapur" });
+  expect(second.status).toBe("question");
+  expect(second.asked).toBe(2);
+  await expect(user.action(api.briefs.prepare, { briefId: first.briefId, answer: "Kondapur", pincode: "nope" })).rejects.toThrow("pincode");
+  expect(calls).toHaveLength(2);
+  await expect(t.mutation(internal.briefs.record, { briefId: first.briefId, expectedTurns: 1, turns: [], status: "question" })).rejects.toThrow("changed");
+  await expect(t.mutation(internal.briefs.answer, { briefId: first.briefId, userId: (await t.run((ctx) => ctx.db.get(first.briefId)))!.userId, answer: "again" })).resolves.toBeTruthy();
+  await expect(t.mutation(internal.briefs.answer, { briefId: first.briefId, userId: (await t.run((ctx) => ctx.db.get(first.briefId)))!.userId, answer: "again" })).rejects.toThrow("already answered");
+});
+
+it("ties a brief to its search: start_calls refuses a brief from another search", async () => {
+  const { t, user, id } = await setup([
+    { status: "ready", summary: "Brief A.", brief: readyBrief },
+    { status: "ready", summary: "Brief B.", brief: readyBrief },
+  ]);
+  vi.stubEnv("LIVE_CALLS_ENABLED", "true"); vi.stubEnv("CALL_BRIDGE_URL", "https://bridge.example"); vi.stubEnv("CALL_BRIDGE_SECRET", "secret"); vi.stubEnv("ANSWER_PRICE_CENTS", "1000");
+  const a = await user.action(api.briefs.prepare, { request: "Lined blouse in Chintal by Thursday, price" });
+  const b = await user.action(api.briefs.prepare, { request: "Painter for two rooms in Kondapur, labour rate" });
+  const shop = { placeId: "p1", name: "Shop", address: "A", phone: "+919876543210", ratingCount: 3, distanceKm: 1, mapsUrl: "https://maps.example/p1", fewRatings: true };
+  const draftId = await t.run((ctx) => ctx.db.insert("drafts", { userId: id, productInput: "x", product: { name: "Blouse" }, pincode: "500054", cards: [], comments: "", radiusKm: 10, shops: [shop], expiresAt: Date.now() + 100000, briefId: a.briefId }));
+  await t.run((ctx) => ctx.db.insert("creditAccounts", { userId: id, balanceCents: 10000, reservedCents: 0 }));
+  await expect(user.mutation(api.tasks.start, { draftId, selectedPlaceIds: ["p1"], idempotencyKey: "brief-op-3", expectedAnswerPriceCents: 1000, briefId: b.briefId })).rejects.toThrow("another search");
+  const { taskId } = await user.mutation(api.tasks.start, { draftId, selectedPlaceIds: ["p1"], idempotencyKey: "brief-op-4", expectedAnswerPriceCents: 1000 });
+  expect((await t.run((ctx) => ctx.db.get(taskId)))?.briefId).toBe(a.briefId);
 });
