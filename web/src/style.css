@@ -21,3 +21,4 @@
 @media(max-width:600px){.topbar{height:auto;min-height:56px;gap:10px;flex-wrap:wrap;padding:14px 16px}.topbar nav{gap:14px;flex-wrap:wrap}.topbar>a{flex-shrink:0}}
 .price-block{display:grid;gap:4px}.price-block p{font-size:13px;line-height:18px;color:#1a1a19}.price-block strong{font-weight:600}.card-footer .price-block .price-rule{font-size:11px;line-height:15px;color:#6b6a66}
 .charge-line{display:block;font-size:11px;line-height:15px;color:#6b6a66;margin-top:2px}.status-footer .charge-summary{color:#1a1a19}
+.shop-phone{display:flex;align-items:center;min-height:44px;margin-top:-6px;padding:0 16px 8px;font-size:13px;color:#55544f}.shop-phone a{display:inline-flex;align-items:center;min-height:44px;text-underline-offset:3px}.shop-phone a:focus-visible{outline:2px solid currentColor;outline-offset:3px;border-radius:2px}@media(max-width:600px){.task-detail-shop>.shop-phone{padding-left:12px;padding-right:12px}}

@@ -112,6 +112,8 @@ Reference list and files: [design-reference/](./design-reference/README.md). Liv
 - "Crisp": 8px corners, flat, thin grey borders (`#DAD7D0`), no shadows, no gradients.
   
 - Icon buttons are square-ish outlines at 34px, inside 44px tap areas.
+
+- Use Lucide outline icons through the shared `web/src/Icon.tsx` component on website results, chat cards and the demo. Default size 18px, stroke width 2; do not substitute text symbols for phone or directions actions.
   
 **Logo (D108):** the "returning b": a lowercase b, tilted as if mid-throw, whose stroke curves back toward a green dot. Files: [design/brand/final/](design/brand/final/).
 
@@ -187,6 +189,8 @@ For following the calls and reading the answers.
 - **Line 3:** a status line in its colour, plus a small "AI", "Human" or "4 tries" tag
   
 - **On the right:** small call and map icons
+
+- **Below the summary:** the saved shop phone number, always visible as a tap-to-call link for follow-up, including when the row is collapsed (D146). Show "Phone number unavailable" when missing. Applies to the chat card and website results.
   
 
 5. Tap a row to open it:
