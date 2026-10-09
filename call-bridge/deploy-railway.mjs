@@ -19,7 +19,7 @@ function run(command, args, input) {
 if (mode === 'configure-sarvam') {
   const keys = ['SARVAM_VOICE_API_KEY','SARVAM_ORG_ID','SARVAM_WORKSPACE_ID','SARVAM_AGENT_ID','SARVAM_AGENT_VERSION','SARVAM_CONNECTION_ID'];
   for (const key of keys) if (!process.env[key]) throw new Error(`Missing ${key}`);
-  if (process.env.SARVAM_AGENT_VERSION !== '2') throw new Error('Only reviewed agent v2 is approved for this rollout');
+  if (!['2','3'].includes(process.env.SARVAM_AGENT_VERSION)) throw new Error('Only reviewed agent v2 or v3 is approved for this rollout');
   const variables = Object.fromEntries(keys.map(key => [key, process.env[key]]));
   variables.SARVAM_FROM_NUMBER = process.env.SARVAM_FROM_NUMBER || process.env.VOBIZ_FROM_NUMBER;
   if (variables.SARVAM_FROM_NUMBER !== '+917965480585') throw new Error('Unexpected Sarvam caller');
