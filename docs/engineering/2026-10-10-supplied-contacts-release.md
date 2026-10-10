@@ -15,7 +15,13 @@ The contact picker, chat results, website results and task history recognize sup
 
 ## Release
 
-Convex functions and the new draft lookup index are deployed to `little-kangaroo-718`. Chat widget/static deployment `c665f97c-56e8-44d4-b99a-f66b3c3a2fd9` is published. Website rollout and public endpoint verification are in progress.
+Feature commit: `a2c9055` on local `main`, authored as `akhil20187`.
+
+Convex functions and the new draft lookup index are deployed to `little-kangaroo-718`. Chat widget/static deployment `c665f97c-56e8-44d4-b99a-f66b3c3a2fd9` is published. Vercel deployment `dpl_2aeb9kSKwAyoUJ8vV1DPzRDUeQqK` is READY at https://askboomerang.vercel.app. The official Vercel build used locally supplied public URLs; no remote environment variables were downloaded, and only compiled public artifacts were uploaded.
+
+Public website bundle and widget match the tested local build byte-for-byte. Website pages, analytics, updated `SKILL.md`, MCP authentication gate and public resource discovery pass. Bridge health is ready with zero active/reconciliation calls. Production Chrome demo search → selection → simulated result works at mobile width with visible dummy numbers and no browser errors.
+
+GitHub rejected `git push origin main` with “Repository not found”. Automatic approval review then blocked inspection of the saved GitHub account/credential-helper settings as credential probing. Account-check/switch approval was requested; the push remains pending. Website deployment succeeded separately through the existing Vercel project. Unrelated working files were left unstaged.
 
 ## Limits
 
