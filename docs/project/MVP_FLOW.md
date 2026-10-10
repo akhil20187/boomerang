@@ -2,6 +2,8 @@
 
 Recorded 4 October 2026. Agreed direction, not a tested service.
 
+**8 October 2026 calling preparation update:** The agreed [call task flow](CALL_TASK_FLOW.md) adds understanding intent, asking for missing required details and preparing a five-field brief before authorised calls, then returning a factual summary. It complements the shop discovery, selection and call-start rules below. Use `memory.md` for later pricing, access and implementation decisions; this document's original rollout details are historical.
+
 ## Customer flow
 
 1. **Paste the product link and enter a pincode.** The customer opens the website on their phone. An Amazon product link is the example starting input. No login is needed to discover stores.
