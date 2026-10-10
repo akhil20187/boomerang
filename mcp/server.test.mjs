@@ -30,7 +30,7 @@ test('assistant discovers tools, renders resource and reads saved task through M
   const [a,b]=InMemoryTransport.createLinkedPair();
   await server.connect(a);await client.connect(b);
   try {
-    const list=await client.listTools();assert.equal(list.tools.length,5);
+    const list=await client.listTools();assert.equal(list.tools.length,7);
     assert.equal(list.tools.find(t=>t.name==='start_calls').annotations.readOnlyHint,false);
     const resource=await client.readResource({uri:'ui://boomerang/shops-v3.html'});
     assert.match(resource.contents[0].text,/Shops/);

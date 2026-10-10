@@ -123,6 +123,9 @@ Reference list and files: [design-reference/](./design-reference/README.md). Liv
 - Chat cards still carry no logo (section 6).
 
 ## 4. Screens
+### Supplied business contacts (D148)
+ChatGPT supplies researched or customer-provided business contacts. Use the existing card style with “Businesses” / “Business results”, exact phone numbers and source links (“Provided by you” for customer contacts). No Google attribution, invented ratings, distance, hours or “Near …” line when those details are absent. Show directions only for an actual address/maps URL. Confirm names, numbers, enquiry and maximum charge before calling. One task contains one job per business, including that business's retry attempts.
+
 V1 is one card that changes (D70). It starts as the shop picker and becomes the call card after "Call N shops". This goes against OpenAI's "no multiple views in a card" guideline, so if app review objects, the fallback is a new call card under the picker, with the same screens.
 ### Shop picker
 For choosing which shops we call.

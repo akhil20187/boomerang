@@ -1,7 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { productV, shopV, answerV, jobStateV, briefV } from "./validators";
+import { productV, shopV, answerV, jobStateV, briefV, contactV, recipientSourceV } from "./validators";
 export default defineSchema({
   oauthClients: defineTable({
     clientId: v.string(),
@@ -96,20 +96,23 @@ export default defineSchema({
     .index("by_family", ["familyId"])
     .index("by_user", ["userId"]),
   drafts: defineTable({
+    source: v.optional(recipientSourceV),
     briefId: v.optional(v.id("briefs")),
     userId: v.id("users"),
     productInput: v.string(),
     product: productV,
-    pincode: v.string(),
+    pincode: v.optional(v.string()),
     cards: v.array(v.string()),
     comments: v.string(),
-    radiusKm: v.number(),
+    radiusKm: v.optional(v.number()),
     shops: v.array(shopV),
     expiresAt: v.number(),
   })
+    .index("by_brief_source", ["briefId", "source"])
     .index("by_user", ["userId"])
     .index("by_expiry", ["expiresAt"]),
   briefs: defineTable({
+    contacts: v.optional(v.array(contactV)),
     userId: v.id("users"),
     request: v.string(),
     pincode: v.optional(v.string()),
@@ -124,6 +127,7 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_expiry", ["expiresAt"]),
   tasks: defineTable({
+    source: v.optional(recipientSourceV),
     briefId: v.optional(v.id("briefs")),
     brief: v.optional(briefV),
     selfTest: v.optional(v.boolean()),
@@ -136,7 +140,7 @@ export default defineSchema({
     type: v.literal("shop_calls"),
     detailsVersion: v.number(),
     product: productV,
-    pincode: v.string(),
+    pincode: v.optional(v.string()),
     cards: v.array(v.string()),
     comments: v.string(),
     status: v.union(

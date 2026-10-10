@@ -36,6 +36,8 @@ export const start = mutation({
       )
       .unique();
     if (existing) {
+      if (args.briefId && args.briefId !== existing.briefId)
+        throw new ConvexError('This request identifier belongs to another brief.');
       if (existing.draftId !== args.draftId)
         throw new ConvexError(
           "This request identifier belongs to another search.",
@@ -75,11 +77,15 @@ export const start = mutation({
     if (args.briefId && draft.briefId && args.briefId !== draft.briefId)
       throw new ConvexError("This brief belongs to another search. Find shops again with the right brief.");
     const briefId = args.briefId ?? draft.briefId;
+    if (draft.source === 'supplied' && !draft.briefId)
+      throw new ConvexError('Finish the brief and prepare the business contacts first.');
     if (briefId) {
       brief = await ctx.db.get(briefId);
       if (!brief || brief.userId !== userId) throw new ConvexError("Brief not found.");
       if (brief.expiresAt < Date.now()) throw new ConvexError("This brief has expired. Start again.");
       if (brief.status !== "ready" || !brief.brief) throw new ConvexError("Finish the brief first.");
+      if (brief.contacts?.length && (draft.source !== 'supplied' || draft.briefId !== brief._id))
+        throw new ConvexError('This brief has specific business contacts. Prepare those contacts instead of using another search.');
     }
     const customer = await requireEligible(ctx, userId);
     if (!(customer as any).name?.trim())
@@ -109,6 +115,7 @@ export const start = mutation({
       ...(brief ? { briefId: brief._id, brief: brief.brief } : {}),
       detailsVersion: 1,
       product: draft.product,
+      ...(draft.source ? {source:draft.source} : {}),
       pincode: draft.pincode,
       cards: draft.cards,
       comments: draft.comments,
@@ -135,7 +142,7 @@ export const start = mutation({
       taskId,
       eventId: `${taskId}:approved`,
       type: "approved",
-      text: `${selected.length} shops picked`,
+      text: `${selected.length} ${draft.source === 'supplied' ? 'businesses' : 'shops'} picked`,
       timestamp: Date.now(),
     });
     const workflowId = await workflow.start(ctx, internal.workflows.runTask, {

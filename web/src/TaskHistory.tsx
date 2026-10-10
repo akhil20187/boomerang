@@ -1,4 +1,5 @@
 import {Icon} from './Icon';
+import {businessCopy} from './ContactSource';
 import {useState} from 'react';
 import {useQuery,usePaginatedQuery} from 'convex/react';
 import {makeFunctionReference} from 'convex/server';
@@ -15,7 +16,8 @@ export function TaskHistory(){
 function HistoryGroup({heading,tasks}:{heading:string;tasks:TaskSummary[]}){
  if(!tasks.length)return null;
  return <section className="task-group"><h2>{heading}</h2><div className="task-history-rows">{tasks.map(task=>{
-  const [outcome,color]=task.selfTest?[task.summary.active?'Test call in progress':'Test call finished',task.summary.active?'blue':'grey']:taskOutcome(task.summary);
-  return <a className="task-history-row" href={task.selfTest?`/app?test=${encodeURIComponent(task._id)}`:`/status?task=${encodeURIComponent(task._id)}`} key={task._id}><div><h3>{taskLabel(task.product?.name||task.title)}</h3><p>{task.selfTest?'Personal rehearsal':task.summary.active?`${task.summary.shopCount} shops selected`:`${task.summary.shopCount} ${task.summary.shopCount===1?'shop':'shops'} checked`} · {taskDate(task.approvedAt??task._creationTime)}</p><p className={`task-row-outcome ${color}`}><span className="task-status-dot"/>{outcome}</p><p className="task-row-charge">{task.selfTest?'Free test call · no credit charged':task.verification?'Test task · no real shops called':taskChargeText(task.summary)}</p></div><span className="task-chevron"><Icon name="right" size={24}/></span></a>;
+  const [rawOutcome,color]=task.selfTest?[task.summary.active?'Test call in progress':'Test call finished',task.summary.active?'blue':'grey']:taskOutcome(task.summary);
+  const outcome=businessCopy(rawOutcome,task.source==='supplied');
+  return <a className="task-history-row" href={task.selfTest?`/app?test=${encodeURIComponent(task._id)}`:`/status?task=${encodeURIComponent(task._id)}`} key={task._id}><div><h3>{taskLabel(task.product?.name||task.title)}</h3><p>{task.selfTest?'Personal rehearsal':task.summary.active?`${task.summary.shopCount} ${task.source==='supplied'?'businesses':'shops'} selected`:`${task.summary.shopCount} ${task.source==='supplied'?(task.summary.shopCount===1?'business':'businesses'):(task.summary.shopCount===1?'shop':'shops')} checked`} · {taskDate(task.approvedAt??task._creationTime)}</p><p className={`task-row-outcome ${color}`}><span className="task-status-dot"/>{outcome}</p><p className="task-row-charge">{task.selfTest?'Free test call · no credit charged':task.verification?'Test task · no real shops called':businessCopy(taskChargeText(task.summary),task.source==='supplied')}</p></div><span className="task-chevron"><Icon name="right" size={24}/></span></a>;
  })}</div></section>;
 }

@@ -125,6 +125,7 @@ export const search = action({
     if (args.briefId) {
       const brief = await ctx.runQuery(internal.briefs.load, { briefId: args.briefId, userId });
       if (brief.status !== "ready" || !brief.brief) throw new ConvexError("Finish the brief first.");
+      if (brief.contacts?.length) throw new ConvexError('This brief already has business contacts. Use prepare_contacts instead of searching for other shops.');
       if (!input) input = brief.brief.task_context.summary;
     }
     if (input.length < 3 || input.length > 2000)

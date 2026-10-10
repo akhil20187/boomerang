@@ -9,6 +9,8 @@ export function createTools(client, accessToken) {
     return client[method](makeFunctionReference(name), {...args, accessToken:token});
   };
   return {
+    prepare_brief: args => request('action','briefs:prepare',args,'prepare_brief'),
+    prepare_contacts: args => request('mutation','contacts:prepare',args,'prepare_contacts'),
     find_shops: args => request('action','discovery:search',args,'find_shops'),
     more_shops: async args => {const draft=await request('query','drafts:get',args,'more_shops');return {...draft,draftId:draft._id??draft.draftId};},
     start_calls: args => request('mutation','tasks:start',args,'start_calls'),

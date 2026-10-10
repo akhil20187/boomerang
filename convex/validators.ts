@@ -1,4 +1,15 @@
 import { v } from "convex/values";
+export const contactV = v.object({
+  name: v.string(),
+  phone: v.string(),
+  source: v.union(v.literal("customer"), v.literal("assistant")),
+  sourceUrl: v.optional(v.string()),
+  website: v.optional(v.string()),
+  address: v.optional(v.string()),
+  area: v.optional(v.string()),
+  context: v.optional(v.string()),
+});
+export const recipientSourceV = v.union(v.literal("google"), v.literal("supplied"));
 export const productV = v.object({
   name: v.string(),
   description: v.optional(v.string()),
@@ -9,15 +20,19 @@ export const productV = v.object({
 export const shopV = v.object({
   placeId: v.string(),
   name: v.string(),
-  address: v.string(),
+  address: v.optional(v.string()),
   area: v.optional(v.string()),
   phone: v.optional(v.string()),
   rating: v.optional(v.number()),
-  ratingCount: v.number(),
-  distanceKm: v.number(),
+  ratingCount: v.optional(v.number()),
+  distanceKm: v.optional(v.number()),
   hours: v.optional(v.string()),
-  mapsUrl: v.string(),
-  fewRatings: v.boolean(),
+  mapsUrl: v.optional(v.string()),
+  fewRatings: v.optional(v.boolean()),
+  source: v.optional(v.union(v.literal("customer"), v.literal("assistant"))),
+  sourceUrl: v.optional(v.string()),
+  website: v.optional(v.string()),
+  context: v.optional(v.string()),
 });
 export const answerV = v.object({
   stock: v.union(

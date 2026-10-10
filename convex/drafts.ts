@@ -33,6 +33,6 @@ export const get = query({
       throw new Error(
         "This shop search has expired. Search again for current listings.",
       );
-    return { ...draft, attribution: "Google Maps", ...callingQuote(), availableCents: (await balances(ctx, userId)).availableCents };
+    return { ...draft, ...(draft.source === 'supplied' ? {} : {attribution: "Google Maps"}), ...callingQuote(), availableCents: (await balances(ctx, userId)).availableCents };
   },
 });
