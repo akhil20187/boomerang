@@ -21,7 +21,7 @@ Convex functions and the new draft lookup index are deployed to `little-kangaroo
 
 Public website bundle and widget match the tested local build byte-for-byte. Website pages, analytics, updated `SKILL.md`, MCP authentication gate and public resource discovery pass. Bridge health is ready with zero active/reconciliation calls. Production Chrome demo search → selection → simulated result works at mobile width with visible dummy numbers and no browser errors.
 
-GitHub rejected `git push origin main` with “Repository not found”. Automatic approval review then blocked inspection of the saved GitHub account/credential-helper settings as credential probing. Account-check/switch approval was requested; the push remains pending. Website deployment succeeded separately through the existing Vercel project. Unrelated working files were left unstaged.
+GitHub initially rejected the push with “Repository not found”; automatic approval review blocked the account inspection. The user subsequently explicitly authorised switching to `akhil20187` and pushing. `gh auth switch --user akhil20187` succeeded, and commits `a2c9055` and `bd0c489` were pushed to `origin/main` on 10 October 2026. The blocker is resolved. Website deployment had already succeeded separately through Vercel. Unrelated working files were left unstaged.
 
 ## Limits
 
