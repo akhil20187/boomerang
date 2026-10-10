@@ -24,7 +24,7 @@ function validateRuntimeEnv(env=process.env){
  return {publicUrl:publicEndpoint.origin,callbackUrl:callbackEndpoint.href};
 }
 
-function createBridge({env=process.env,secret=env.CALL_BRIDGE_SECRET,publicUrl=env.CALL_BRIDGE_PUBLIC_URL,callbackUrl=env.CONVEX_CALLBACK_URL,journalPath=env.CALL_BRIDGE_JOURNAL || path.join(__dirname,'data','attempts.json'),bindHost=env.CALL_BRIDGE_BIND_HOST || '127.0.0.1',maxConcurrent=Number(env.CALL_BRIDGE_MAX_CONCURRENT || 1),maxSeconds=Number(env.CALL_BRIDGE_MAX_SECONDS || 180),agentFactory=createPhoneAgent,fetchImpl=fetch}={}){
+function createBridge({env=process.env,secret=env.CALL_BRIDGE_SECRET,publicUrl=env.CALL_BRIDGE_PUBLIC_URL,callbackUrl=env.CONVEX_CALLBACK_URL,journalPath=env.CALL_BRIDGE_JOURNAL || path.join(__dirname,'data','attempts.json'),bindHost=env.CALL_BRIDGE_BIND_HOST || '127.0.0.1',maxConcurrent=Number(env.CALL_BRIDGE_MAX_CONCURRENT || 1),lineReleaseMs=Math.max(60,Number(env.CALL_BRIDGE_LINE_RELEASE_SECONDS)||360)*1000,maxSeconds=Number(env.CALL_BRIDGE_MAX_SECONDS || 180),agentFactory=createPhoneAgent,fetchImpl=fetch}={}){
  if(!secret || secret.length<32)throw Error('CALL_BRIDGE_SECRET must contain at least 32 characters');
  if(!publicUrl || new URL(publicUrl).protocol!=='https:')throw Error('CALL_BRIDGE_PUBLIC_URL must use HTTPS');
  if(!Number.isInteger(maxConcurrent)||maxConcurrent<1||maxConcurrent>10)throw Error('Concurrency must be 1–10');
@@ -151,7 +151,8 @@ If the shop wants a person, refuses, says goodbye or asks to end, call end_call 
   const fingerprint=crypto.createHash('sha256').update(JSON.stringify([data.taskId,data.shopJobId,data.to,data.productDescription,data.customerName,data.instructions||'',...(data.businessName?[data.businessName]:[]),...(data.briefMode?['brief']:[]),...(data.items?.length?[JSON.stringify(data.items)]:[])])).digest('hex');
   const existing=attempts.get(data.attemptId);
   if(existing)return reply(res,existing.fingerprint===fingerprint?200:409,{attemptId:existing.attemptId,status:existing.status});
-  const unresolved=[...attempts.values()].filter(r=>(r.status==='reconciliation_required'||r.provider==='sarvam'&&['calling','requested','answered'].includes(r.status))&&!agents.has(r.attemptId)).length;
+  // A call the provider has not closed after lineReleaseMs stops holding the line; its result is still collected when it arrives.
+  const unresolved=[...attempts.values()].filter(r=>(r.status==='reconciliation_required'||r.provider==='sarvam'&&['calling','requested','answered'].includes(r.status))&&!agents.has(r.attemptId)&&!(r.createdAt&&Date.now()-r.createdAt>=lineReleaseMs)).length;
   if(agents.size+unresolved>=maxConcurrent)return reply(res,429,{error:'Call capacity reached'});
   const record={...data,provider:env.CALL_PROVIDER||'openai',fingerprint,status:'dispatching',createdAt:Date.now()};attempts.set(data.attemptId,record);persist();
   // Reserve before awaiting anything, including provider model preflight.

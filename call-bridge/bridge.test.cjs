@@ -37,3 +37,9 @@ test('brief items are accepted, fingerprinted and validated at dispatch',async t
  assert.equal((await s.dispatch({...payload,briefMode:true,items})).status,202);
  assert.equal((await s.dispatch({...payload,briefMode:true,items:[items[0]]})).status,409);
  assert.equal((await s.dispatch({...payload,briefMode:true,items})).status,200);assert.equal(s.calls,1);});
+test('a provider call still open after six minutes frees the line but keeps its record',async t=>{const fs=require('node:fs'),os=require('node:os'),path=require('node:path');const dir=fs.mkdtempSync(path.join(os.tmpdir(),'bridge-release-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));const journalPath=path.join(dir,'attempts.json');
+ const old={...payload,attemptId:'stuck',provider:'sarvam',status:'calling',createdAt:Date.now()-6*60000-1000,sarvam:{attemptId:'s1'},result:{transcript:[]}};
+ const fresh={...old,attemptId:'recent',createdAt:Date.now()-5*60000};
+ fs.writeFileSync(journalPath,JSON.stringify([fresh]));let s=await setup(t,{journalPath});assert.equal((await s.dispatch({...payload,attemptId:'next-1'})).status,429);await s.bridge.close();
+ fs.writeFileSync(journalPath,JSON.stringify([old]));s=await setup(t,{journalPath});assert.equal((await s.dispatch({...payload,attemptId:'next-2'})).status,202);assert.equal(s.calls,1);
+ const kept=await(await fetch(s.bridge.localUrl+'/attempts/stuck',{headers:{authorization:'Bearer '+'a'.repeat(32)}})).json();assert.equal(kept.attemptId,'stuck');});
