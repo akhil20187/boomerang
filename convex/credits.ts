@@ -154,8 +154,8 @@ export async function settle(
     currency: "INR",
     type: chargeable ? "charge" : "release",
     reason: chargeable
-      ? "Final caller answer supplied; notes-only evidence is accepted"
-      : "No chargeable final answer; held credit released",
+      ? "Shop answered what was asked, at least in part; notes-only evidence is accepted"
+      : "Shop answered none of what was asked; held credit released",
     operationId: `settle:${shopJobId}`,
   });
 }

@@ -34,6 +34,18 @@ export const shopV = v.object({
   website: v.optional(v.string()),
   context: v.optional(v.string()),
 });
+export const itemKindV = v.union(v.literal("must_confirm"), v.literal("deciding"), v.literal("nice_to_have"));
+/** A question from the brief that the call had to answer. */
+export const briefItemV = v.object({ id: v.string(), text: v.string(), kind: itemKindV });
+/** What the shop said for one brief item. */
+export const itemResultV = v.object({
+  id: v.string(),
+  text: v.string(),
+  kind: itemKindV,
+  status: v.union(v.literal("answered"), v.literal("conditional"), v.literal("not_answered")),
+  answer: v.optional(v.string()),
+  quote: v.optional(v.string()),
+});
 export const answerV = v.object({
   stock: v.union(
     v.literal("available"),
@@ -47,6 +59,7 @@ export const answerV = v.object({
   variantMatch: v.optional(
     v.union(v.literal("yes"), v.literal("no"), v.literal("unconfirmed")),
   ),
+  items: v.optional(v.array(itemResultV)),
 });
 export const jobStateV = v.union(
   ...[

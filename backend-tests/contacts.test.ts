@@ -140,7 +140,8 @@ it('keeps retries in the same business job and settles the main task only when b
   const {taskId}=await user.mutation(api.tasks.start,{draftId:draft.draftId,selectedPlaceIds:draft.shops.map((s:any)=>s.placeId),idempotencyKey:'contacts-settlement',expectedAnswerPriceCents:1000});
   const jobs=await t.run(ctx=>ctx.db.query('shopJobs').withIndex('by_task',q=>q.eq('taskId',taskId)).collect());
   const first=await t.mutation(internal.calls.prepare,{shopJobId:jobs[0]._id});
-  const completion={eventId:'business-one-complete',attemptId:first.attemptId,taskId,shopJobId:jobs[0]._id,status:'completed',answer:{stock:'unconfirmed',notes:'They manufacture custom rash guards. Minimum order is 50.'}};
+  const completion={eventId:'business-one-complete',attemptId:first.attemptId,taskId,shopJobId:jobs[0]._id,status:'completed',answer:{stock:'unconfirmed',notes:'They manufacture custom rash guards. Minimum order is 50.',items:(first.items??[]).slice(0,1).map((i:any)=>({id:i.id,status:'answered',answer:'Minimum order is 50',quote:'Minimum order is 50.'}))}};
+  expect(first.items?.length).toBeGreaterThan(0);
   await t.mutation(internal.calls.receive,completion);expect((await t.mutation(internal.calls.receive,completion)).duplicate).toBe(true);
   expect((await t.run(ctx=>ctx.db.get(taskId)))?.status).not.toBe('finished');
   const second=await t.mutation(internal.calls.prepare,{shopJobId:jobs[1]._id});

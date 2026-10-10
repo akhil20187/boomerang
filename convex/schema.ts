@@ -1,7 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { productV, shopV, answerV, jobStateV, briefV, contactV, recipientSourceV } from "./validators";
+import { productV, shopV, answerV, briefItemV, jobStateV, briefV, contactV, recipientSourceV } from "./validators";
 export default defineSchema({
   oauthClients: defineTable({
     clientId: v.string(),
@@ -188,6 +188,7 @@ export default defineSchema({
     providerRequestId: v.optional(v.string()),
     endReason: v.optional(v.string()),
     answer: v.optional(answerV),
+    items: v.optional(v.array(briefItemV)),
     recordingId: v.optional(v.id("_storage")),
     recordingStatus: v.optional(v.string()),
     durationSeconds: v.optional(v.number()),

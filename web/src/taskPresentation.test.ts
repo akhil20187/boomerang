@@ -26,7 +26,7 @@ test('not-charged reasons follow the final shop state',()=>{
  assert.equal(notChargedReason('unreachable'),'shop didn’t answer');
  assert.equal(notChargedReason('personal_call_needed'),'shop prefers a personal call');
  assert.equal(notChargedReason('technical_error'),'call didn’t finish');
- assert.equal(notChargedReason('answered'),'no useful answer');
+ assert.equal(notChargedReason('answered'),'didn’t answer what you asked');
 });
 test('one charge line per shop',()=>{
  assert.equal(chargeText({kind:'held',amountCents:1000}),'₹10 on hold');

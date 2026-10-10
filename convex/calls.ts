@@ -6,7 +6,7 @@ import {
 } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
-import { nextOutcome } from "./domain";
+import { nextOutcome, briefItems, isChargeable, objectiveComplete, type ItemResult } from "./domain";
 import { terminalStates } from "./validators";
 import { settle } from "./credits";
 const transcriptV = v.array(
@@ -30,7 +30,9 @@ export const prepare = internalMutation({
     const user = await ctx.db.get(task.userId);
     const number = job.attemptCount + 1;
     if (number > (task.selfTest ? 1 : 2)) return null;
+    const items = briefItems(task.brief);
     const attemptId = await ctx.db.insert("callAttempts", {
+      ...(items.length ? { items } : {}),
       taskId: task._id,
       shopJobId: job._id,
       number,
@@ -68,7 +70,7 @@ export const prepare = internalMutation({
       businessName: job.shop.name,
       customerName: user?.name?.split(" ")[0] ?? "our customer",
       ...(task.brief
-        ? { ...inquiry, briefMode: true }
+        ? { ...inquiry, briefMode: true, ...(items.length ? { items } : {}) }
         : {
             productDescription: task.product.description ?? task.product.name,
             instructions: [
@@ -361,6 +363,27 @@ export const receive = internalMutation({
           : {}),
       };
     }
+    // D150: the shop's answers to the brief's questions. Ids, wording and kind come from
+    // what this attempt sent, never from the callback; unknown or missing ids stay not answered.
+    const sent = a.items ?? [];
+    if (sent.length && answer) {
+      const reported = new Map<string, any>();
+      if (Array.isArray(raw?.items))
+        for (const r of raw.items)
+          if (r && typeof r.id === "string" && !reported.has(r.id)) reported.set(r.id, r);
+      answer.items = sent.map((item): ItemResult => {
+        const r = reported.get(item.id);
+        const status =
+          r?.status === "answered" || r?.status === "conditional" ? r.status : "not_answered";
+        if (status === "not_answered") return { ...item, status };
+        return {
+          ...item,
+          status,
+          ...(typeof r.answer === "string" && r.answer.trim() ? { answer: r.answer.trim().slice(0, 500) } : {}),
+          ...(typeof r.quote === "string" && r.quote.trim() ? { quote: r.quote.trim().slice(0, 500) } : {}),
+        };
+      });
+    }
     let outcome = args.transportStatus ?? args.status;
     if (raw?.personalCallNeeded) outcome = "refused";
     else if (["no-answer", "busy", "unanswered"].includes(outcome))
@@ -379,8 +402,13 @@ export const receive = internalMutation({
     )
       outcome = "technical_error";
     else if (args.status === "completed")
-      outcome =
-        answer && answer.stock !== "unconfirmed" ? "completed" : "incomplete";
+      outcome = sent.length
+        ? answer?.items && objectiveComplete(answer.items)
+          ? "completed"
+          : "incomplete"
+        : answer && answer.stock !== "unconfirmed"
+          ? "completed"
+          : "incomplete";
     const task = await ctx.db.get(a.taskId);
     const state = nextOutcome(outcome, task?.selfTest ? 2 : a.number);
     await ctx.db.patch(a._id, {
@@ -420,20 +448,11 @@ export const receive = internalMutation({
           shopJobId: j._id,
         });
       if (terminalStates.has(state))
-        await settle(
-          ctx,
-          j._id,
-          (state === "answered" || state === "incomplete_answer") &&
-            !!answer &&
-            (answer.stock !== "unconfirmed" ||
-              answer.finalPrice !== undefined ||
-              !!answer.notes?.trim() ||
-              !!answer.offers?.trim()),
-        );
+        await settle(ctx, j._id, isChargeable(state, answer, sent.length > 0));
     }
     const text =
       state === "answered"
-        ? "Shop answered"
+        ? sent.length ? "Answered your questions" : "Shop answered"
         : state === "retry_scheduled"
           ? "No answer · retry in five minutes"
           : state === "personal_call_needed"
@@ -441,7 +460,11 @@ export const receive = internalMutation({
             : state === "unreachable"
               ? "Couldn't reach the shop"
               : state === "incomplete_answer"
-                ? "Partial answer · remaining details unconfirmed"
+                ? sent.length
+                  ? isChargeable(state, answer, true)
+                    ? "Answered some of your questions · rest open"
+                    : "Answered none of your questions · no charge"
+                  : "Partial answer · remaining details unconfirmed"
                 : "Call needs review";
     await ctx.db.insert("taskEvents", {
       taskId: a.taskId,

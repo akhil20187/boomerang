@@ -379,7 +379,7 @@ it("explains each shop's charge and totals the task", async () => {
   expect(task.shops.map((x: any) => x.chargeNote)).toEqual([
     {kind:"charged",amountCents:1000},
     {kind:"not_charged",amountCents:1000,reason:"shop didn’t answer"},
-    {kind:"not_charged",amountCents:1000,reason:"no useful answer"},
+    {kind:"not_charged",amountCents:1000,reason:"didn’t answer what you asked"},
   ]);
   expect(task.task).toMatchObject({chargedCents:1000,releasedCents:2000,heldCents:0});
   const history = await s.user.query(api.tasks.history, {paginationOpts:{numItems:5,cursor:null}});

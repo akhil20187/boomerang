@@ -126,7 +126,7 @@ export const tools = [
   {
     name: "task_status",
     description:
-      "Read the saved call progress, answers and proof. Unknown facts stay unconfirmed.",
+      "Read the saved call progress, answers and proof. For brief tasks, each shop answer has items: one per brief question with status answered, conditional or not_answered, the shop's answer and a quote; report them in that order. Unknown facts stay unconfirmed.",
     inputSchema: {
       type: "object",
       properties: { taskId: idSchema },
