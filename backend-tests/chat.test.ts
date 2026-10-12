@@ -2,7 +2,7 @@ import { it, expect, vi, afterEach } from "vitest";
 import { convexTest } from "convex-test";
 import schema from "../convex/schema";
 import { api } from "../convex/_generated/api";
-import { CHAT_SYSTEM_PROMPT, TOOL_NAMES, cleanNoun, singular, isSmallTalk } from "../convex/chat";
+import { CHAT_SYSTEM_PROMPT, TOOL_NAMES, cleanNoun, singular, isSmallTalk, pickerRepeat } from "../convex/chat";
 const modules = import.meta.glob(["../convex/**/*.{ts,js}", "!../convex/**/*.d.ts"]);
 vi.mock("../convex/workflows", () => ({ workflow: { start: vi.fn(async () => "wf-test") } }));
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
@@ -465,4 +465,60 @@ it("noun helpers: services never become 'shops'", () => {
   expect(cleanNoun("businesses", false, "institutes")).toBe("institutes");
   expect(cleanNoun("tutors", false, "institutes")).toBe("tutors");
   expect(cleanNoun(undefined, false)).toBe("businesses");
+});
+
+it("asking for 'more' after a business card does not post the same card again; wider widens that card in place", async () => {
+  const { t, user, chatRequests, urls } = await setup(
+    [
+      tool("ask_brief", { request: "Plumber near 500032 to fix a leaking tap", noun: "plumbers" }),
+      tool("find_businesses", { location: "500032" }),
+      // "search online for more": the model repeats the same search; the server refuses to post a duplicate card.
+      tool("find_businesses", { location: "500032" }),
+      say("Tap \"Show 5 more\" in the card above, or \"Search up to 20 km\" for a wider area."),
+      // "I've seen them all, find others": wider widens the existing card instead of adding one.
+      tool("find_businesses", { location: "500032", wider: true }),
+      say("The list above now covers up to 20 km."),
+      // Asking again after 20 km: still no new card.
+      tool("find_businesses", { location: "500032", wider: true }),
+      say("Those are all the plumbers we found."),
+    ],
+    [{ status: "ready", summary: "Leaking tap near 500032.", brief: readyBrief }],
+  );
+  const out = await user.action(api.chat.send, { text: "Plumber near 500032 to fix a leaking tap" });
+  const picker = out.messages.find((m: any) => m.kind === "picker");
+  const searchesBefore = urls.filter((u) => u.includes("places:searchText")).length;
+  const more = await user.action(api.chat.send, { chatId: out.chatId, text: "search online for more" });
+  expect(more.messages.map((m: any) => m.kind)).toEqual(["text"]);
+  expect(more.messages[0].text).toContain("Show 5 more");
+  const refused = JSON.parse(chatRequests[3].messages.at(-1).content);
+  expect(refused.error).toContain("Do not post it again");
+  expect(urls.filter((u) => u.includes("places:searchText")).length).toBe(searchesBefore); // no new Google search
+  const wider = await user.action(api.chat.send, { chatId: out.chatId, text: "I've seen them all, find others" });
+  expect(wider.messages.map((m: any) => m.kind)).toEqual(["text"]);
+  const read = await user.query(api.chat.messages, { chatId: out.chatId });
+  const cards = read.messages.filter((m: any) => m.kind === "picker");
+  expect(cards).toHaveLength(1);
+  expect(cards[0]._id).toBe(picker._id);
+  const draft = await user.query(api.drafts.get, { draftId: cards[0].payload.draftId });
+  expect(draft.radiusKm).toBe(20);
+  const again = await user.action(api.chat.send, { chatId: out.chatId, text: "any others?" });
+  expect(again.messages.map((m: any) => m.kind)).toEqual(["text"]);
+  expect(JSON.parse(chatRequests.at(-1).messages.at(-1).content).error).toContain("up to 20 km");
+  expect((await user.query(api.chat.messages, { chatId: out.chatId })).messages.filter((m: any) => m.kind === "picker")).toHaveLength(1);
+  expect(await t.run((ctx) => ctx.db.query("tasks").collect())).toHaveLength(0);
+  expect(CHAT_SYSTEM_PROMPT).toContain("Show 5 more");
+});
+
+it("pickerRepeat: only the same brief and place repeat; a different place, brief or an expired card searches anew", () => {
+  const latest = { messageId: "m1" as any, briefId: "b1" as any, pincode: "500032", radiusKm: 10, expired: false };
+  expect(pickerRepeat(latest, "b1" as any, { pincode: "500032" }, 10)).toBe("duplicate");
+  expect(pickerRepeat(latest, "b1" as any, { pincode: "500032" }, 20)).toBe("widen");
+  expect(pickerRepeat({ ...latest, radiusKm: 20 }, "b1" as any, { pincode: "500032" }, 20)).toBe("duplicate");
+  expect(pickerRepeat(latest, "b1" as any, { pincode: "500016" }, 10)).toBe("new");
+  expect(pickerRepeat(latest, "b2" as any, { pincode: "500032" }, 10)).toBe("new");
+  expect(pickerRepeat({ ...latest, expired: true }, "b1" as any, { pincode: "500032" }, 10)).toBe("new");
+  expect(pickerRepeat(null, "b1" as any, { pincode: "500032" }, 10)).toBe("new");
+  const area = { messageId: "m1" as any, briefId: "b1" as any, area: "Ameerpet, Hyderabad", radiusKm: 10, expired: false };
+  expect(pickerRepeat(area, "b1" as any, { area: "ameerpet,  hyderabad" }, 10)).toBe("duplicate");
+  expect(pickerRepeat(area, "b1" as any, { area: "Kukatpally" }, 10)).toBe("new");
 });

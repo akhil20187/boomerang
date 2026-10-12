@@ -36,6 +36,7 @@ HOW A REQUEST GOES
 
 ONE BRIEF AT A TIME
 - While the chat has a ready brief, never start a new one. Requests like "search online", "find more", "get the pincode", "any others?" or "go ahead" continue the same brief: look up a general fact, or call find_businesses.
+- After a business card is shown, "more", "search online for more", "find others" or "any others?" never repeat the same search: point the customer to "Show 5 more" or "Search up to 20 km" in that card, in one short sentence. Only if they have seen them all, call find_businesses with wider true once.
 - Only when the customer clearly asks for something different (a different product or service, or says start over) call ask_brief with request and start_over set to true.
 
 GENERAL FACTS FROM THE WEB
@@ -263,7 +264,13 @@ export const context = internalQuery({
     const chat = await ownChat(ctx, args.chatId, args.userId);
     const messages = (await ctx.db.query("chatMessages").withIndex("by_chat", (q) => q.eq("chatId", args.chatId)).order("desc").take(HISTORY)).reverse();
     const brief = chat.briefId ? await ctx.db.get(chat.briefId) : null;
-    return { chat, messages, brief: brief && brief.userId === args.userId ? { status: brief.status, pincode: brief.pincode, area: briefArea(brief.brief), expired: brief.expiresAt < Date.now() } : null };
+    // The newest business card still open for picking (no calls started from it), so find_businesses can avoid posting it twice.
+    const card = [...messages].reverse().find((m) => m.kind === "picker" && m.payload?.draftId && !m.payload?.taskId);
+    const draft = card?.payload?.draftId ? await ctx.db.get(card.payload.draftId) : null;
+    const latestPicker: LatestPicker | null = card && draft && draft.userId === args.userId
+      ? { messageId: card._id, briefId: card.payload?.briefId ?? draft.briefId, pincode: draft.pincode, area: draft.area, radiusKm: draft.radiusKm ?? 10, expired: draft.expiresAt < Date.now(), noun: card.payload?.noun }
+      : null;
+    return { chat, messages, latestPicker, brief: brief && brief.userId === args.userId ? { status: brief.status, pincode: brief.pincode, area: briefArea(brief.brief), expired: brief.expiresAt < Date.now() } : null };
   },
 });
 
@@ -299,6 +306,21 @@ export const taskResults = internalQuery({
     };
   },
 });
+
+export type LatestPicker = { messageId: Id<"chatMessages">; briefId?: Id<"briefs">; pincode?: string; area?: string; radiusKm: number; expired: boolean; noun?: string };
+const placeKey = (x?: string) => (x ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+/**
+ * What find_businesses should do when the chat already shows an open business card (live-test fix, increment 7):
+ * "duplicate" = same brief, same place, same or smaller radius: do not post the same card again;
+ * "widen" = same brief and place but 20 km asked while the card covers 10 km: widen that card in place;
+ * "new" = no open card, it expired, or the brief or place differ.
+ */
+export function pickerRepeat(latest: LatestPicker | null | undefined, briefId: Id<"briefs"> | undefined, where: { pincode?: string; area?: string }, radiusKm: number): "duplicate" | "widen" | "new" {
+  if (!latest || latest.expired || !briefId || latest.briefId !== briefId) return "new";
+  const same = where.pincode ? where.pincode === latest.pincode : !!where.area && !latest.pincode && placeKey(where.area) === placeKey(latest.area);
+  if (!same) return "new";
+  return radiusKm > latest.radiusKm ? "widen" : "duplicate";
+}
 
 // ---------- model ----------
 
@@ -358,7 +380,7 @@ async function callModel(messages: ModelMessage[]): Promise<{ content?: string; 
   throw new ConvexError("Couldn’t reach our assistant. Try again.");
 }
 
-type State = { chat: Doc<"chats">; userId: Id<"users">; chatId: Id<"chats"> };
+type State = { chat: Doc<"chats">; userId: Id<"users">; chatId: Id<"chats">; latestPicker?: LatestPicker | null };
 type ToolOutcome = { result: unknown; card?: NewMessage; stop?: boolean; state?: { briefId?: Id<"briefs">; pincode?: string; area?: string; noun?: string } };
 
 async function runTool(ctx: ActionCtx, s: State, name: string, rawArgs: string): Promise<ToolOutcome> {
@@ -433,7 +455,26 @@ async function runTool(ctx: ActionCtx, s: State, name: string, rawArgs: string):
       } catch (error: any) {
         return { result: { error: error instanceof ConvexError ? String(error.data) : "Ask the customer for the area or pincode." } };
       }
-      const found = await searchBusinesses(ctx, s.userId, { briefId: s.chat.briefId, ...where, radiusKm: args.wider ? 20 : 10 });
+      const radiusKm = args.wider ? 20 : 10;
+      const repeat = pickerRepeat(s.latestPicker, s.chat.briefId, where, radiusKm);
+      if (repeat === "duplicate")
+        return {
+          result: {
+            error: s.latestPicker!.radiusKm >= 20
+              ? "The card above already lists everything up to 20 km for this place. Do not search again. In one short sentence, say those are all the listings we found; offer to search a different area if they name one."
+              : "The card above already shows these results. Do not post it again. In one short sentence, point the customer to \"Show 5 more\" in that card, or \"Search up to 20 km\" for a wider area. If they say they have seen them all, call find_businesses with wider true.",
+          },
+        };
+      if (repeat === "widen") {
+        const latest = s.latestPicker!;
+        const found = await searchBusinesses(ctx, s.userId, { briefId: s.chat.briefId, ...where, radiusKm: 20 });
+        const count = found.shops?.length ?? 0;
+        const noun = latest.noun ?? s.chat.noun ?? "businesses";
+        await ctx.runMutation(internal.chat.swapPickerDraft, { userId: s.userId, chatId: s.chatId, messageId: latest.messageId, draftId: found.draftId, text: `${count} ${noun} near ${where.pincode ?? where.area}` });
+        s.latestPicker = { ...latest, radiusKm: 20 };
+        return { result: { found: count, noun, location: where.pincode ?? where.area, note: "The card above now lists businesses up to 20 km; no new card was posted. Tell the customer in one short sentence." } };
+      }
+      const found = await searchBusinesses(ctx, s.userId, { briefId: s.chat.briefId, ...where, radiusKm });
       // "shops" only when both the brief and the search agree it is a product (training institutes are not shops).
       const briefText = `${brief.request ?? ""} ${brief.brief?.task_context?.summary ?? ""}`;
       const product = found.requestKind === "product" && guessRequestKind(briefText, brief.brief?.task_type) === "product";
@@ -487,7 +528,7 @@ export const send = action({
     const saved: any[] = [];
     try {
       const context = await ctx.runQuery(internal.chat.context, { userId, chatId });
-      const s: State = { chat: context.chat, userId, chatId };
+      const s: State = { chat: context.chat, userId, chatId, latestPicker: context.latestPicker };
       const stateNote = `Current chat state (data): ${JSON.stringify({
         brief: context.brief ? (context.brief.expired ? "expired" : context.brief.status === "question" ? "waiting for the customer's answer" : "ready") : "none",
         pincode: context.chat.pincode ?? context.brief?.pincode ?? null,
