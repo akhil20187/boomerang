@@ -125,11 +125,19 @@ async function ownChat(ctx: { db: any }, chatId: Id<"chats">, userId: Id<"users"
   if (!chat || chat.userId !== userId) throw new ConvexError("Chat not found.");
   return chat;
 }
-async function recentTurns(ctx: { db: any }, userId: Id<"users">) {
+/**
+ * Hourly turn limit, keyed by user (not chat), from the chatTurns ledger. Called inside the same mutation
+ * that records the turn, so concurrent sends conflict and serialise instead of racing past the limit.
+ */
+async function takeTurn(ctx: { db: any }, userId: Id<"users">) {
   const hourAgo = Date.now() - 60 * 60 * 1000;
-  const rows = await ctx.db.query("chatMessages").withIndex("by_user", (q: any) => q.eq("userId", userId)).order("desc").take(200);
-  return rows.filter((m: Doc<"chatMessages">) => m.role === "user" && m._creationTime > hourAgo).length;
+  const recent = await ctx.db.query("chatTurns").withIndex("by_user", (q: any) => q.eq("userId", userId).gt("_creationTime", hourAgo)).take(HOURLY_TURN_LIMIT);
+  if (recent.length >= HOURLY_TURN_LIMIT)
+    throw new ConvexError("You’ve sent a lot of messages in the last hour. Try again a little later.");
+  await ctx.db.insert("chatTurns", { userId });
 }
+/** Tool calls allowed in one customer turn. find_businesses also ends the turn. */
+export const TOOL_CAPS: Record<string, number> = { ask_brief: 2, find_businesses: 1, read_task_results: 2 };
 
 // ---------- internal steps used by `send` ----------
 
@@ -137,8 +145,7 @@ export const begin = internalMutation({
   args: { userId: v.id("users"), chatId: v.optional(v.id("chats")), text: v.string(), kind: v.optional(kindV) },
   returns: v.object({ chatId: v.id("chats"), messageId: v.id("chatMessages"), created: v.boolean() }),
   handler: async (ctx, args) => {
-    if ((await recentTurns(ctx, args.userId)) >= HOURLY_TURN_LIMIT)
-      throw new ConvexError("You’ve sent a lot of messages in the last hour. Try again a little later.");
+    await takeTurn(ctx, args.userId);
     const now = Date.now();
     let chatId = args.chatId;
     let created = false;
@@ -155,7 +162,7 @@ export const begin = internalMutation({
   },
 });
 
-/** The model failed: take the customer's message back out so a retry does not duplicate it. */
+/** The model failed: take the customer's message back out so a retry does not duplicate it. The turn stays counted in chatTurns. */
 export const rollback = internalMutation({
   args: { userId: v.id("users"), chatId: v.id("chats"), messageId: v.id("chatMessages"), created: v.boolean() },
   returns: v.null(),
@@ -397,6 +404,7 @@ export const send = action({
       const messages: ModelMessage[] = [{ role: "system", content: CHAT_SYSTEM_PROMPT }, { role: "system", content: stateNote }, ...context.messages.map(historyLine)];
       const pending: { message: NewMessage; state?: ToolOutcome["state"] }[] = [];
       let finished = false;
+      const used: Record<string, number> = {};
       for (let round = 0; round < MAX_ROUNDS && !finished; round++) {
         const reply = await callModel(messages);
         const words = reply.content?.trim();
@@ -408,7 +416,11 @@ export const send = action({
             messages.push({ role: "tool", tool_call_id: call.id, content: JSON.stringify({ skipped: true }) });
             continue;
           }
-          const outcome = await runTool(ctx, s, String(call.function?.name ?? ""), String(call.function?.arguments ?? ""));
+          const toolName = String(call.function?.name ?? "");
+          used[toolName] = (used[toolName] ?? 0) + 1;
+          const outcome = TOOL_CAPS[toolName] !== undefined && used[toolName] > TOOL_CAPS[toolName]
+            ? { result: { error: `${toolName} was already used this turn. Reply to the customer now.` } } as ToolOutcome
+            : await runTool(ctx, s, toolName, String(call.function?.arguments ?? ""));
           if (outcome.card) pending.push({ message: outcome.card, state: outcome.state });
           else if (outcome.state) pending.push({ message: { role: "assistant", kind: "text", text: "" }, state: outcome.state });
           messages.push({ role: "tool", tool_call_id: call.id, content: JSON.stringify(outcome.result).slice(0, 12000) });
@@ -482,8 +494,7 @@ export const startTestCard = mutation({
   returns: v.object({ chatId: v.id("chats") }),
   handler: async (ctx, args) => {
     const userId = await requireUser(ctx);
-    if ((await recentTurns(ctx, userId)) >= HOURLY_TURN_LIMIT)
-      throw new ConvexError("You’ve sent a lot of messages in the last hour. Try again a little later.");
+    await takeTurn(ctx, userId);
     const now = Date.now();
     const chatId = args.chatId ?? (await ctx.db.insert("chats", { userId, title: "Test call to myself", createdAt: now, updatedAt: now }));
     if (args.chatId) await ownChat(ctx, chatId, userId);

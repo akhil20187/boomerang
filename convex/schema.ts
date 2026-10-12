@@ -301,6 +301,8 @@ export default defineSchema({
   })
     .index("by_chat", ["chatId"])
     .index("by_user", ["userId"]),
+  /** One row per chat turn that may call the model. Never deleted on failure, so the hourly limit cannot be reset. */
+  chatTurns: defineTable({ userId: v.id("users") }).index("by_user", ["userId"]),
   notifications: defineTable({
     attempts: v.optional(v.number()),
     leaseUntil: v.optional(v.number()),

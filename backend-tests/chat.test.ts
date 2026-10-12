@@ -126,14 +126,45 @@ it("offers the model only three tools, none of which starts calls or spends cred
   for (const name of TOOL_NAMES) expect(name).not.toMatch(/start|reserve|charge|pay|book|spend/);
 });
 
-it("rate-limits turns per hour and checks message length", async () => {
-  const { t, user, id } = await setup([]);
+it("checks message length before using a turn", async () => {
+  const { t, user } = await setup([]);
   await expect(user.action(api.chat.send, { text: "   " })).rejects.toThrow("Type a message");
   await expect(user.action(api.chat.send, { text: "x".repeat(2001) })).rejects.toThrow("under 2000");
-  const chatId = await t.run((ctx) => ctx.db.insert("chats", { userId: id, title: "t", createdAt: Date.now(), updatedAt: Date.now() }));
-  for (let i = 0; i < 30; i++) await t.run((ctx) => ctx.db.insert("chatMessages", { chatId, userId: id, role: "user", kind: "text", text: `m${i}` }));
-  await expect(user.action(api.chat.send, { chatId, text: "one more" })).rejects.toThrow("a lot of messages");
+  expect(await t.run((ctx) => ctx.db.query("chatTurns").collect())).toHaveLength(0);
+});
+
+it("limits turns per user per hour across new chats, existing chats and the test-call starter", async () => {
+  const { t, user, id, chatRequests } = await setup(Array.from({ length: 40 }, () => say("ok")));
+  // 29 turns, each in a brand-new chat: starting new chats must not reset the limit.
+  for (let i = 0; i < 29; i++) await user.action(api.chat.send, { text: `request ${i}` });
+  expect(await user.query(api.chat.list, {})).toHaveLength(20); // sidebar shows the newest 20
+  const { chatId } = await user.mutation(api.chat.startTestCard, {}); // turn 30
+  await expect(user.action(api.chat.send, { text: "one more new chat" })).rejects.toThrow("a lot of messages");
+  await expect(user.action(api.chat.send, { chatId, text: "one more in an old chat" })).rejects.toThrow("a lot of messages");
   await expect(user.mutation(api.chat.startTestCard, {})).rejects.toThrow("a lot of messages");
+  expect(chatRequests).toHaveLength(29); // refused turns never reach the model
+  // Another user is unaffected.
+  const otherId = await t.run((ctx) => ctx.db.insert("users", { email: "other@example.com" }));
+  await expect(t.withIdentity({ subject: otherId }).action(api.chat.send, { text: "hi" })).resolves.toBeTruthy();
+  // Turns older than an hour no longer count.
+  await t.run(async (ctx) => { for (const row of await ctx.db.query("chatTurns").withIndex("by_user", (q) => q.eq("userId", id)).collect()) await ctx.db.delete(row._id); });
+  await expect(user.action(api.chat.send, { text: "after an hour" })).resolves.toBeTruthy();
+});
+
+it("a failed model call still uses the turn, so failures cannot reset the limit", async () => {
+  const { t, user } = await setup([new Response("boom", { status: 500 }), new Response("boom", { status: 500 })]);
+  await expect(user.action(api.chat.send, { text: "hello" })).rejects.toThrow("Couldn’t reach");
+  expect(await t.run((ctx) => ctx.db.query("chatTurns").collect())).toHaveLength(1);
+});
+
+it("caps ask_brief at two calls in one turn", async () => {
+  const { user, chatRequests } = await setup(
+    [tool("ask_brief", { request: "Painter near 500032" }), tool("ask_brief", { request: "Painter near 500032 again" }), tool("ask_brief", { request: "and again" }), say("Done.")],
+    [{ status: "ready", summary: "Painter.", brief: readyBrief }, { status: "ready", summary: "Painter.", brief: readyBrief }],
+  );
+  await user.action(api.chat.send, { text: "Painter near 500032" });
+  expect(chatRequests).toHaveLength(4);
+  expect(chatRequests[3].messages.at(-1).content).toContain("already used this turn");
 });
 
 it("keeps chats private: another user cannot read, send to, list or attach to the chat", async () => {
