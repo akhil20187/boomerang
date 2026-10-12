@@ -14,6 +14,7 @@ import type * as auth from "../auth.js";
 import type * as briefs from "../briefs.js";
 import type * as callLog from "../callLog.js";
 import type * as calls from "../calls.js";
+import type * as chat from "../chat.js";
 import type * as connections from "../connections.js";
 import type * as contactDetails from "../contactDetails.js";
 import type * as contacts from "../contacts.js";
@@ -54,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   briefs: typeof briefs;
   callLog: typeof callLog;
   calls: typeof calls;
+  chat: typeof chat;
   connections: typeof connections;
   contactDetails: typeof contactDetails;
   contacts: typeof contacts;

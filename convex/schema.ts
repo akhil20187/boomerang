@@ -259,6 +259,48 @@ export default defineSchema({
     .index("by_shop", ["shopJobId"])
     .index("by_user", ["userId"])
     .index("by_task", ["taskId"]),
+  // Website chat (D158). New tables only; they start empty.
+  chats: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    lastTaskId: v.optional(v.id("tasks")),
+    /** Latest brief this chat is working on, and the pincode the customer gave. */
+    briefId: v.optional(v.id("briefs")),
+    pincode: v.optional(v.string()),
+    /** Plural word for who we call: "shops", "plumbers", "businesses". */
+    noun: v.optional(v.string()),
+  }).index("by_user_updated", ["userId", "updatedAt"]),
+  chatMessages: defineTable({
+    chatId: v.id("chats"),
+    userId: v.id("users"),
+    role: v.union(v.literal("user"), v.literal("assistant")),
+    kind: v.union(
+      v.literal("text"),
+      v.literal("question"),
+      v.literal("brief"),
+      v.literal("picker"),
+      v.literal("calls"),
+      v.literal("test_call"),
+    ),
+    text: v.string(),
+    payload: v.optional(
+      v.object({
+        briefId: v.optional(v.id("briefs")),
+        question: v.optional(v.string()),
+        choices: v.optional(v.array(v.string())),
+        index: v.optional(v.number()),
+        total: v.optional(v.number()),
+        questions: v.optional(v.array(v.string())),
+        noun: v.optional(v.string()),
+        draftId: v.optional(v.id("drafts")),
+        taskId: v.optional(v.id("tasks")),
+      }),
+    ),
+  })
+    .index("by_chat", ["chatId"])
+    .index("by_user", ["userId"]),
   notifications: defineTable({
     attempts: v.optional(v.number()),
     leaseUntil: v.optional(v.number()),

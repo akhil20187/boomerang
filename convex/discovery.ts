@@ -1,4 +1,5 @@
-import { action } from "./_generated/server";
+import { action, type ActionCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import { v, ConvexError } from "convex/values";
 import {
@@ -128,6 +129,13 @@ export const search = action({
     const userId = await ctx.runQuery(internal.users.resolve, {
       accessToken: args.accessToken,
     });
+    return searchBusinesses(ctx, userId, args);
+  },
+});
+
+export type SearchArgs = { productInput?: string; briefId?: Id<"briefs">; pincode: string; cards?: string[]; comments?: string; radiusKm?: number };
+/** Shared by the `search` action and the website chat engine (convex/chat.ts). The caller resolves the user. */
+export async function searchBusinesses(ctx: ActionCtx, userId: Id<"users">, args: SearchArgs): Promise<any> {
     let input = (args.productInput ?? "").trim();
     let taskType: string | undefined;
     if (args.briefId) {
@@ -285,5 +293,4 @@ export const search = action({
       radiusKm,
       requestKind: kind,
     };
-  },
-});
+}

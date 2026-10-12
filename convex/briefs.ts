@@ -1,4 +1,5 @@
-import { action, query, internalQuery } from "./_generated/server";
+import { action, query, internalQuery, type ActionCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { internalMutation } from "./mutationSafety";
 import { v, ConvexError } from "convex/values";
 import { internal } from "./_generated/api";
@@ -152,6 +153,13 @@ export const prepare = action({
   returns: v.any(),
   handler: async (ctx, args): Promise<any> => {
     const userId = await ctx.runQuery(internal.users.resolve, { accessToken: args.accessToken });
+    return prepareBrief(ctx, userId, args);
+  },
+});
+
+export type PrepareArgs = { request?: string; briefId?: Id<"briefs">; answer?: string; pincode?: string; contacts?: Contact[] };
+/** Shared by the `prepare` action and the website chat engine (convex/chat.ts). The caller resolves the user. */
+export async function prepareBrief(ctx: ActionCtx, userId: Id<"users">, args: PrepareArgs): Promise<any> {
     let briefId = args.briefId;
     let request: string, pincode: string | undefined, turns: Turn[], contacts: Contact[] | undefined;
     if (!briefId) {
@@ -193,5 +201,4 @@ export const prepare = action({
     }
     await ctx.runMutation(internal.briefs.record, { briefId, expectedTurns, turns, status: "ready", summary: out.summary, brief: out.brief });
     return { status: "ready", briefId, summary: out.summary, brief: out.brief, asked: turns.length, maxQuestions: MAX_QUESTIONS };
-  },
-});
+}
