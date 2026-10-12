@@ -23,6 +23,7 @@ import type * as crons from "../crons.js";
 import type * as discovery from "../discovery.js";
 import type * as domain from "../domain.js";
 import type * as drafts from "../drafts.js";
+import type * as facts from "../facts.js";
 import type * as http from "../http.js";
 import type * as intake from "../intake.js";
 import type * as maintenance from "../maintenance.js";
@@ -64,6 +65,7 @@ declare const fullApi: ApiFromModules<{
   discovery: typeof discovery;
   domain: typeof domain;
   drafts: typeof drafts;
+  facts: typeof facts;
   http: typeof http;
   intake: typeof intake;
   maintenance: typeof maintenance;

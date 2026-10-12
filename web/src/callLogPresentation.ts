@@ -1,6 +1,6 @@
 /** Call log page (/calls, spec "Call log"): pure helpers for rows, filters, day groups, totals and the CSV download. */
 import {chargeText,formatPaise,taskDate} from './taskPresentation.ts';
-import {callLogDetail,clock,shopStatus,type CallLogRow,type Tone} from './statusPresentation.ts';
+import {briefStatus,callLogDetail,clock,shopStatus,type CallLogRow,type Tone} from './statusPresentation.ts';
 
 /** One row of `api.callLog.log`: one call attempt. */
 export type LogRow=CallLogRow&{shopJobId?:string;taskLabel:string;attemptNumber:number;executor?:string;isLatestAttempt?:boolean;attemptStatus?:string;jobState?:string;answeredAt?:number;endedAt?:number;selfTest?:boolean;verification?:boolean};
@@ -16,7 +16,7 @@ export const realRows=(rows:LogRow[])=>rows.filter(r=>!r.verification);
 export const rowBusiness=(r:LogRow)=>r.selfTest?'Test call to you':r.businessName;
 
 /** Result line in its DESIGN.md colour. An earlier unanswered try that we retried reads "No answer · tried again". */
-export function rowResult(r:LogRow):[string,Tone]{if(r.isLatestAttempt===false&&(r.state==='retry_scheduled'||r.attemptStatus==='unanswered'))return ['No answer · tried again','amber'];return shopStatus(callLogDetail(r).shop)}
+export function rowResult(r:LogRow):[string,Tone]{if(r.isLatestAttempt===false&&(r.state==='retry_scheduled'||r.attemptStatus==='unanswered'))return ['No answer · tried again','amber'];return briefStatus(shopStatus(callLogDetail(r).shop),r.briefTask)}
 
 /** Charge column. Never green (D72): the page renders it in grey. Test calls are free. */
 export function rowCharge(r:LogRow){if(r.selfTest||r.chargeNote?.kind==='free')return 'Free';return chargeText(r.chargeNote)||'Not charged'}

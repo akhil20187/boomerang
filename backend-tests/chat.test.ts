@@ -2,7 +2,7 @@ import { it, expect, vi, afterEach } from "vitest";
 import { convexTest } from "convex-test";
 import schema from "../convex/schema";
 import { api } from "../convex/_generated/api";
-import { CHAT_SYSTEM_PROMPT, TOOL_NAMES, cleanNoun, singular } from "../convex/chat";
+import { CHAT_SYSTEM_PROMPT, TOOL_NAMES, cleanNoun, singular, isSmallTalk } from "../convex/chat";
 const modules = import.meta.glob(["../convex/**/*.{ts,js}", "!../convex/**/*.d.ts"]);
 vi.mock("../convex/workflows", () => ({ workflow: { start: vi.fn(async () => "wf-test") } }));
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
@@ -25,16 +25,23 @@ const tool = (name: string, args: unknown, id = `call_${name}_${Math.random().to
 });
 
 /** Routes every fetch: chat engine (has `tools`), brief intake (json_object), search classifier, Google geocode/places. */
-async function setup(chatReplies: unknown[], intakeReplies: unknown[] = []) {
+async function setup(chatReplies: unknown[], intakeReplies: unknown[] = [], factReplies: unknown[] = []) {
   vi.stubEnv("OPENAI_API_KEY", "test-key");
   vi.stubEnv("GOOGLEPLACES_API_KEY", "test-places");
   const t = convexTest(schema, modules);
   const id = await t.run((ctx) => ctx.db.insert("users", { email: "chat@example.com", name: "Akhil", eligible: true }));
   const chatRequests: any[] = [];
   const urls: string[] = [];
+  const factRequests: any[] = [];
   vi.stubGlobal("fetch", vi.fn(async (url: string, init?: any) => {
     urls.push(String(url));
     const body = init?.body ? JSON.parse(init.body) : undefined;
+    if (String(url).includes("api.openai.com/v1/responses")) {
+      factRequests.push(body);
+      const next = factReplies.shift();
+      if (next === undefined) throw new Error("unexpected web lookup");
+      return json(next);
+    }
     if (String(url).includes("api.openai.com")) {
       if (body.tools) {
         chatRequests.push(body);
@@ -50,7 +57,7 @@ async function setup(chatReplies: unknown[], intakeReplies: unknown[] = []) {
       }
       return json({ choices: [{ message: { content: '{"kind":"service","query":"plumber"}' } }] });
     }
-    if (String(url).includes("geocode")) return json({ status: "OK", results: [{ geometry: { location: { lat: 17.44, lng: 78.35 } } }] });
+    if (String(url).includes("geocode")) return json({ status: "OK", results: [{ types: ["sublocality"], address_components: [{ short_name: "IN", types: ["country", "political"] }], geometry: { location: { lat: 17.44, lng: 78.35 } } }] });
     if (String(url).includes("places:searchText"))
       return json({ places: [
         { id: "pl1", displayName: { text: "Sri Sai Plumbing Works" }, formattedAddress: "Gachibowli", location: { latitude: 17.441, longitude: 78.351 }, internationalPhoneNumber: "+91 98765 43210", rating: 4.8, userRatingCount: 412, primaryType: "plumber" },
@@ -58,7 +65,7 @@ async function setup(chatReplies: unknown[], intakeReplies: unknown[] = []) {
       ] });
     throw new Error(`unexpected fetch ${url}`);
   }));
-  return { t, user: t.withIdentity({ subject: id }), id, chatRequests, urls };
+  return { t, user: t.withIdentity({ subject: id }), id, chatRequests, urls, factRequests };
 }
 
 it("send creates a chat, stores the customer's message and the assistant reply; list and messages read it back", async () => {
@@ -118,10 +125,10 @@ it("ask_brief yields a question card; the answer yields a brief box, then find_b
   expect(await t.run((ctx) => ctx.db.query("creditReservations").collect())).toHaveLength(0);
 });
 
-it("offers the model only three tools, none of which starts calls or spends credit", async () => {
+it("offers the model only four tools, none of which starts calls or spends credit", async () => {
   const { chatRequests, user } = await setup([say("ok")]);
   await user.action(api.chat.send, { text: "hi" });
-  expect(TOOL_NAMES).toEqual(["ask_brief", "find_businesses", "read_task_results"]);
+  expect(TOOL_NAMES).toEqual(["ask_brief", "find_businesses", "look_up_fact", "read_task_results"]);
   expect(chatRequests[0].tools.map((x: any) => x.function.name)).toEqual(TOOL_NAMES);
   for (const name of TOOL_NAMES) expect(name).not.toMatch(/start|reserve|charge|pay|book|spend/);
 });
@@ -273,4 +280,189 @@ it("noun helpers", () => {
   expect(singular("plumbers")).toBe("plumber");
   expect(singular("businesses")).toBe("business");
   expect(singular("shops")).toBe("shop");
+});
+
+// ---------- Increment 6: founder's first real test (D160) ----------
+
+/** The bad brief from the real test: research topics instead of questions to the business. */
+const badTrainingBrief = {
+  task_type: "training_course_enquiry",
+  task_context: { summary: "Intermediate AI training in Ameerpet, Hyderabad.", known: [{ fact: "area", value: "Ameerpet" }, { fact: "level", value: "Intermediate" }], unknown: [], share_only_if_asked: [] },
+  call_purpose: "Find intermediate AI training options.",
+  expected_outcome: {
+    must_confirm: ["Which institutes/shops in Ameerpet offer intermediate AI training?", "Fees for intermediate AI training in Ameerpet"],
+    nice_to_have: ["Batch timings"],
+    deciding_question: "When does the next batch start",
+  },
+  representing: { name: "the customer", kind: "personal", caller_name: "Gayatri" },
+  authority: { enquiry_only: true, may_share_customer_contact: false, may_schedule: false, follow_up: "customer will follow up" },
+  in_call_rules: [],
+  deadline: { date: null, start_assumption: null },
+  location: { home_visit: false, area: "Ameerpet", building_if_asked: null },
+};
+
+it("a greeting gets a normal reply: no brief, no question card", async () => {
+  const { t, user, chatRequests } = await setup([tool("ask_brief", { request: "hello" }), say("Hi! What would you like us to find out?")]);
+  const out = await user.action(api.chat.send, { text: "hello" });
+  expect(out.messages.map((m: any) => [m.kind, m.text])).toEqual([["text", "Hi! What would you like us to find out?"]]);
+  expect(chatRequests[1].messages.at(-1).content).toContain("greeting or small talk");
+  expect(await t.run((ctx) => ctx.db.query("briefs").collect())).toHaveLength(0);
+  expect(CHAT_SYSTEM_PROMPT).toContain("Greetings, small talk");
+  expect(isSmallTalk("Hello there!")).toBe(true);
+  expect(isSmallTalk("good morning luna")).toBe(true);
+  expect(isSmallTalk("hi, I need a plumber")).toBe(false);
+});
+
+it("real-test replay: ready training brief gets call questions, searches by area, says institutes; 'search online' cannot start a second brief", async () => {
+  const { t, user, chatRequests, urls } = await setup(
+    [
+      tool("ask_brief", { request: "I am looking for AI training institutes in Ameerpet", noun: "shops" }),
+      tool("find_businesses", {}),
+      tool("ask_brief", { request: "Search online for AI training institutes in Ameerpet and their fees" }),
+      say("I'll use the list above. Tick the institutes you want us to call."),
+    ],
+    [{ status: "ready", summary: "Intermediate AI training near Ameerpet.", brief: badTrainingBrief }],
+  );
+  const first = await user.action(api.chat.send, { text: "I am looking for AI training institutes in Ameerpet" });
+  expect(first.messages.map((m: any) => m.kind)).toEqual(["brief", "picker"]);
+  // C: every item is a direct question to the business; no "which institutes", no area as a search term.
+  expect(first.messages[0].payload.questions).toEqual(["Do you offer intermediate AI training?", "Can you tell me the fees for intermediate AI training?", "When does the next batch start?"]);
+  for (const q of first.messages[0].payload.questions) {
+    expect(q.endsWith("?")).toBe(true);
+    expect(q).not.toMatch(/Ameerpet|which institutes/i);
+  }
+  const stored = await t.run((ctx) => ctx.db.query("briefs").first());
+  expect(stored!.brief!.expected_outcome.nice_to_have).toEqual(["Can you tell me the batch timings?"]);
+  // B4: the ready result tells the model to search now with the area; no pincode asked.
+  const readyResult = JSON.parse(chatRequests[1].messages.at(-1).content);
+  expect(readyResult.next).toContain('Call find_businesses now with location "Ameerpet"');
+  // D: area-name search, geocoded in India; B3: "institutes", not "shops".
+  expect(urls.some((u) => u.includes("geocode") && u.includes("address=Ameerpet") && u.includes("country%3AIN"))).toBe(true);
+  expect(first.messages[1].text).toBe("2 institutes near Ameerpet");
+  expect(first.messages[1].payload.noun).toBe("institutes");
+  const draft = await user.query(api.drafts.get, { draftId: first.messages[1].payload.draftId });
+  expect(draft.area).toBe("Ameerpet");
+  expect(draft.pincode).toBeUndefined();
+  // B1: "search online" → the server refuses a second brief; the chat keeps the first one.
+  const second = await user.action(api.chat.send, { chatId: first.chatId, text: "search online" });
+  expect(second.messages.map((m: any) => m.kind)).toEqual(["text"]);
+  expect(chatRequests.at(-1).messages.at(-1).content).toContain("already has a ready brief");
+  expect(await t.run((ctx) => ctx.db.query("briefs").collect())).toHaveLength(1);
+  const chat = await t.run((ctx) => ctx.db.get(first.chatId));
+  expect(chat!.briefId).toBe(stored!._id);
+  expect(chat!.area).toBe("Ameerpet");
+});
+
+it("start_over lets the customer change what they want: a new brief replaces the ready one", async () => {
+  const { t, user } = await setup(
+    [tool("ask_brief", { request: "Plumber near 500032 for a leaking tap" }), say("Brief ready."), tool("ask_brief", { request: "Actually I need a painter for two rooms in Kondapur", start_over: true })],
+    [{ status: "ready", summary: "Plumber.", brief: readyBrief }, { status: "question", question: "When do you want it painted?", choices: ["This week", "Next week"] }],
+  );
+  const first = await user.action(api.chat.send, { text: "Plumber near 500032 for a leaking tap" });
+  const second = await user.action(api.chat.send, { chatId: first.chatId, text: "Actually I need a painter for two rooms in Kondapur" });
+  expect(second.messages.map((m: any) => m.kind)).toEqual(["question"]);
+  const briefs = await t.run((ctx) => ctx.db.query("briefs").collect());
+  expect(briefs).toHaveLength(2);
+  expect((await t.run((ctx) => ctx.db.get(first.chatId)))!.briefId).toBe(briefs[1]._id);
+});
+
+it("a reply passed as a new request while a question is open is refused, so the brief is not restarted", async () => {
+  const { t, user, chatRequests } = await setup(
+    [tool("ask_brief", { request: "Plumber near 500032" }), tool("ask_brief", { request: "Today" }), say("Got it.")],
+    [{ status: "question", question: "When do you need them?", choices: ["Today"] }],
+  );
+  const first = await user.action(api.chat.send, { text: "Plumber near 500032" });
+  await user.action(api.chat.send, { chatId: first.chatId, text: "Today" });
+  expect(chatRequests.at(-1).messages.at(-1).content).toContain("A brief question is open");
+  expect(await t.run((ctx) => ctx.db.query("briefs").collect())).toHaveLength(1);
+});
+
+it("look_up_fact answers a general fact with the web search tool, at most 2 source domains, and counts a turn", async () => {
+  const fact = {
+    output: [
+      { type: "web_search_call", status: "completed", action: { type: "search", query: "Ameerpet pincode" } },
+      { type: "message", role: "assistant", content: [{ type: "output_text", text: "Ameerpet, Hyderabad has the pincode 500016 ([indiapost.gov.in](https://www.indiapost.gov.in/x)).", annotations: [
+        { type: "url_citation", url: "https://www.indiapost.gov.in/x", title: "India Post" },
+        { type: "url_citation", url: "https://en.wikipedia.org/wiki/Ameerpet", title: "Ameerpet" },
+        { type: "url_citation", url: "https://example.com/pin", title: "Other" },
+      ] }] },
+    ],
+  };
+  const { t, user, chatRequests, factRequests } = await setup([tool("look_up_fact", { question: "What's the pincode for Ameerpet?" }), say("Ameerpet's pincode is 500016.")], [], [fact]);
+  const out = await user.action(api.chat.send, { text: "can you get the Ameerpet pincode" });
+  expect(out.messages.map((m: any) => m.text)).toEqual(["Ameerpet's pincode is 500016."]);
+  expect(factRequests).toHaveLength(1);
+  expect(factRequests[0].model).toBe("gpt-6-luna");
+  expect(factRequests[0].tools).toEqual([{ type: "web_search", search_context_size: "low" }]);
+  expect(factRequests[0].instructions).toContain("REFUSED");
+  const result = JSON.parse(chatRequests[1].messages.at(-1).content);
+  expect(result.untrusted_web_fact).toBe("Ameerpet, Hyderabad has the pincode 500016.");
+  expect(result.sources).toEqual(["indiapost.gov.in", "en.wikipedia.org"]);
+  expect(await t.run((ctx) => ctx.db.query("chatTurns").collect())).toHaveLength(2); // the message + the lookup
+});
+
+it("look_up_fact uses OPENAI_WEB_MODEL when set, and is capped at one per turn", async () => {
+  const fact = { output: [{ type: "message", content: [{ type: "output_text", text: "500016.", annotations: [] }] }] };
+  const { user, chatRequests, factRequests } = await setup(
+    [tool("look_up_fact", { question: "Pincode of Ameerpet?" }), tool("look_up_fact", { question: "Pincode of Kondapur?" }), say("Done.")],
+    [],
+    [fact],
+  );
+  vi.stubEnv("OPENAI_WEB_MODEL", "gpt-6-luna-web-test");
+  await user.action(api.chat.send, { text: "pincodes please" });
+  expect(factRequests).toHaveLength(1);
+  expect(factRequests[0].model).toBe("gpt-6-luna-web-test");
+  expect(chatRequests[2].messages.at(-1).content).toContain("already used this turn");
+});
+
+it("look_up_fact refuses to find businesses or phone numbers, without any web request (D148, D160)", async () => {
+  const { user, chatRequests, factRequests } = await setup(
+    [tool("look_up_fact", { question: "find AI institutes in Ameerpet and their phone numbers" }), say("I can't search for businesses online. I can search Google Maps for institutes near Ameerpet.")],
+  );
+  await user.action(api.chat.send, { text: "find AI institutes and their phone numbers" });
+  expect(factRequests).toHaveLength(0);
+  const result = JSON.parse(chatRequests[1].messages.at(-1).content);
+  expect(result.error).toContain("never finds businesses, websites or phone numbers");
+  expect(CHAT_SYSTEM_PROMPT).toContain("Never use it to find businesses");
+});
+
+it("look_up_fact passes on the model's REFUSED reply as a refusal", async () => {
+  const refused = { output: [{ type: "message", content: [{ type: "output_text", text: "REFUSED", annotations: [] }] }] };
+  const { user, chatRequests } = await setup([tool("look_up_fact", { question: "Where can I learn AI near Ameerpet?" }), say("ok")], [], [refused]);
+  await user.action(api.chat.send, { text: "where can I learn AI" });
+  expect(JSON.parse(chatRequests[1].messages.at(-1).content).error).toContain("general facts only");
+});
+
+it("picker 'Search up to 20 km' is a customer button: a wider search lands in the same card, no model call", async () => {
+  const { t, user, id, chatRequests, urls } = await setup(
+    [tool("ask_brief", { request: "Plumber near 500032 to fix a leaking tap", noun: "plumbers" }), tool("find_businesses", { location: "500032" })],
+    [{ status: "ready", summary: "Leaking tap near 500032.", brief: readyBrief }],
+  );
+  const out = await user.action(api.chat.send, { text: "Plumber near 500032 to fix a leaking tap" });
+  const picker = out.messages.find((m: any) => m.kind === "picker");
+  const modelCalls = chatRequests.length;
+  const before = urls.length;
+  const widened = await user.action(api.chat.widenSearch, { chatId: out.chatId, messageId: picker._id });
+  expect(chatRequests.length).toBe(modelCalls);
+  expect(urls.slice(before).some((u) => u.includes("places:searchText"))).toBe(true);
+  const draft = await user.query(api.drafts.get, { draftId: widened.draftId });
+  expect(draft.radiusKm).toBe(20);
+  expect(draft.pincode).toBe("500032");
+  const read = await user.query(api.chat.messages, { chatId: out.chatId });
+  const card = read.messages.find((m: any) => m._id === picker._id);
+  expect(card.payload.draftId).toBe(widened.draftId);
+  expect(card.text).toBe("2 plumbers near 500032");
+  expect(read.messages.filter((m: any) => m.kind === "picker")).toHaveLength(1);
+  await expect(user.action(api.chat.widenSearch, { chatId: out.chatId, messageId: picker._id })).rejects.toThrow("already covers 20 km");
+  const otherId = await t.run((ctx) => ctx.db.insert("users", { email: "other@example.com" }));
+  await expect(t.withIdentity({ subject: otherId }).action(api.chat.widenSearch, { chatId: out.chatId, messageId: picker._id })).rejects.toThrow("Chat not found");
+  expect(await t.run((ctx) => ctx.db.query("tasks").collect())).toHaveLength(0);
+  void id;
+});
+
+it("noun helpers: services never become 'shops'", () => {
+  expect(cleanNoun("shops", false, "institutes")).toBe("institutes");
+  expect(cleanNoun("businesses", false, "institutes")).toBe("institutes");
+  expect(cleanNoun("tutors", false, "institutes")).toBe("tutors");
+  expect(cleanNoun(undefined, false)).toBe("businesses");
 });

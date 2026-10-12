@@ -32,11 +32,29 @@ export function isRetailCandidate(shop: {
 /** What a search request is for: a product to buy, or a service provider to hire. */
 export type RequestKind = "product" | "service";
 const SERVICE_WORDS =
-  /\b(plumb\w*|painters?|painting|electricians?|carpent\w*|notar\w*|tailor\w*|stitch\w*|alterations?|repair\w*|servic(e|es|ing)|mechanics?|install\w*|cleaners?|cleaning|pest|lawyers?|advocates?|doctors?|clinics?|dentists?|salons?|barbers?|tutors?|tuition|coaching|drivers?|movers|packers|couriers?|laundry|dry\s?clean\w*|photograph\w*|caterers?|catering|decorators?|architects?|contractors?|interior\s+design\w*|technicians?|plaster\w*|waterproof\w*|tiling|welders?|welding|locksmiths?|pandits?|priests?|consultants?|accountants?|chartered\s+accountants?|astrolog\w*|beauticians?|mehendi|makeup\s+artists?|vets?|veterinar\w*|physiotherap\w*)\b/i;
+  /\b(plumb\w*|painters?|painting|electricians?|carpent\w*|notar\w*|tailor\w*|stitch\w*|alterations?|repair\w*|servic(e|es|ing)|mechanics?|install\w*|cleaners?|cleaning|pest|lawyers?|advocates?|doctors?|clinics?|dentists?|salons?|barbers?|tutors?|tuition|coaching|training|trainers?|institutes?|institutions?|academy|academies|courses?|classes|schools?|colleges?|lessons|drivers?|movers|packers|couriers?|laundry|dry\s?clean\w*|photograph\w*|caterers?|catering|decorators?|architects?|contractors?|interior\s+design\w*|technicians?|plaster\w*|waterproof\w*|tiling|welders?|welding|locksmiths?|pandits?|priests?|consultants?|accountants?|chartered\s+accountants?|astrolog\w*|beauticians?|mehendi|makeup\s+artists?|vets?|veterinar\w*|physiotherap\w*)\b/i;
 /** Cheap offline guess used when the search classifier is unavailable. A product link is always a product. */
 export function guessRequestKind(input: string, taskType?: string): RequestKind {
   if (/^https?:\/\//i.test(input.trim())) return "product";
-  return SERVICE_WORDS.test(`${taskType ?? ""} ${input}`) ? "service" : "product";
+  return SERVICE_WORDS.test(`${(taskType ?? "").replace(/_/g, " ")} ${input}`) ? "service" : "product";
+}
+/** Natural plural word for who we call, from the request and the brief's task type. Products are always "shops". */
+const NOUN_RULES: [RegExp, string][] = [
+  [/\b(institutes?|institutions?|academy|academies|training|courses?|coaching|classes|tuition|schools?|colleges?)\b/i, "institutes"],
+  [/\b(clinics?|doctors?|dentists?|hospitals?|physiotherap\w*|vets?|veterinar\w*)\b/i, "clinics"],
+  [/\b(plumb\w*)\b/i, "plumbers"],
+  [/\b(electricians?|electrical)\b/i, "electricians"],
+  [/\b(painters?|painting)\b/i, "painters"],
+  [/\b(carpent\w*)\b/i, "carpenters"],
+  [/\b(tailor\w*|stitch\w*|alterations?)\b/i, "tailors"],
+  [/\b(salons?|barbers?|beauticians?)\b/i, "salons"],
+  [/\b(lawyers?|advocates?|notar\w*|chartered\s+accountants?|accountants?|consultants?)\b/i, "offices"],
+];
+export function defaultNoun(input: string, taskType?: string): string {
+  const kind = guessRequestKind(input, taskType);
+  if (kind === "product") return "shops";
+  const text = `${taskType ?? ""} ${input}`.replace(/_/g, " ");
+  return NOUN_RULES.find(([re]) => re.test(text))?.[1] ?? "businesses";
 }
 /** Google Maps text query used when the classifier is unavailable. Products keep the original "<product> retailers" form. */
 export function fallbackSearchQuery(name: string, kind: RequestKind) {

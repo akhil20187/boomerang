@@ -106,3 +106,73 @@ describe("discovery.search with mocked providers", () => {
     expect(textQuery).toBe("notary for rent agreement near me");
   });
 });
+
+// ---------- Increment 6 ----------
+import { defaultNoun } from "../convex/domain";
+import { searchLocation, indianPlace } from "../convex/discovery";
+
+describe("training institutes are a service, never 'shops' (B3)", () => {
+  it("guessRequestKind and defaultNoun", () => {
+    for (const s of ["AI training institute", "I am looking for Ai training insititutes in Ameerpet", "intermediate AI course", "spoken English classes", "coaching for IIT"])
+      expect(guessRequestKind(s)).toBe("service");
+    expect(defaultNoun("AI training institute")).toBe("institutes");
+    expect(defaultNoun("someone to teach AI", "training_course_enquiry")).toBe("institutes");
+    expect(defaultNoun("plumber for leaking tap")).toBe("plumbers");
+    expect(defaultNoun("dentist for a cleaning")).toBe("clinics");
+    expect(defaultNoun("notary for rent agreement")).toBe("offices");
+    expect(defaultNoun("pest control at home")).toBe("businesses");
+    expect(defaultNoun("iPhone 17 256GB")).toBe("shops");
+  });
+});
+
+describe("area-name search (D)", () => {
+  it("searchLocation accepts a pincode or area text and rejects junk", () => {
+    expect(searchLocation({ pincode: "500016" })).toEqual({ pincode: "500016" });
+    expect(searchLocation({ area: " Ameerpet,  Hyderabad " })).toEqual({ area: "Ameerpet, Hyderabad" });
+    expect(searchLocation({ area: "500016" })).toEqual({ pincode: "500016" });
+    expect(() => searchLocation({ pincode: "12345" })).toThrow("six-digit");
+    expect(() => searchLocation({})).toThrow("area");
+    expect(() => searchLocation({ area: "123" })).toThrow("area");
+  });
+  it("indianPlace keeps only a place inside India, not the whole country", () => {
+    const india = { short_name: "IN", types: ["country", "political"] };
+    expect(indianPlace({ status: "OK", results: [{ types: ["country"], address_components: [india], geometry: { location: { lat: 1, lng: 2 } } }] })).toBeUndefined();
+    expect(indianPlace({ status: "OK", results: [{ types: ["sublocality"], address_components: [{ short_name: "US", types: ["country"] }], geometry: { location: { lat: 1, lng: 2 } } }] })).toBeUndefined();
+    expect(indianPlace({ status: "ZERO_RESULTS", results: [] })).toBeUndefined();
+    expect(indianPlace({ status: "OK", results: [{ types: ["sublocality"], address_components: [india], geometry: { location: { lat: 17.43, lng: 78.44 } } }] })?.geometry.location.lat).toBe(17.43);
+  });
+  async function areaSearch(area: string, geo: unknown) {
+    vi.stubEnv("GOOGLEPLACES_API_KEY", "test-places");
+    const urls: string[] = [];
+    vi.stubGlobal("fetch", vi.fn(async (url: string) => {
+      urls.push(String(url));
+      if (String(url).includes("geocode")) return new Response(JSON.stringify(geo));
+      if (String(url).includes("places:searchText"))
+        return new Response(JSON.stringify({ places: [{ id: "i1", displayName: { text: "Ameerpet AI Academy" }, location: { latitude: 17.437, longitude: 78.448 }, rating: 4.7, userRatingCount: 300, primaryType: "school" }] }));
+      throw new Error(`Unexpected fetch ${url}`);
+    }));
+    const t = convexTest(schema, modules);
+    const userId = await t.run((ctx) => ctx.db.insert("users", { email: "area@example.com" }));
+    const user = t.withIdentity({ subject: `${userId}|session` });
+    return { urls, run: () => user.action(api.discovery.search, { productInput: "AI training institute", area }), user };
+  }
+  it("geocodes area text with country:IN and keeps the pincode path unchanged", async () => {
+    const geo = { status: "OK", results: [{ types: ["sublocality"], address_components: [{ short_name: "IN", types: ["country"] }], geometry: { location: { lat: 17.437, lng: 78.448 } } }] };
+    const { urls, run, user } = await areaSearch("Ameerpet, Hyderabad", geo);
+    const result = await run();
+    const geocode = urls.find((u) => u.includes("geocode"))!;
+    expect(geocode).toContain("address=Ameerpet%2C%20Hyderabad");
+    expect(geocode).toContain("components=country%3AIN");
+    expect(geocode).not.toContain("postal_code");
+    expect(result.area).toBe("Ameerpet, Hyderabad");
+    expect(result.pincode).toBeUndefined();
+    expect(result.requestKind).toBe("service");
+    expect(result.shops.map((s: any) => s.name)).toEqual(["Ameerpet AI Academy"]);
+    const draft = await user.query(api.drafts.get, { draftId: result.draftId });
+    expect(draft.area).toBe("Ameerpet, Hyderabad");
+  });
+  it("refuses an area that does not resolve to a place in India", async () => {
+    const { run } = await areaSearch("Nowhereville", { status: "OK", results: [{ types: ["country"], address_components: [{ short_name: "IN", types: ["country"] }], geometry: { location: { lat: 20, lng: 77 } } }] });
+    await expect(run()).rejects.toThrow("couldn’t find that area in India");
+  });
+});

@@ -64,6 +64,7 @@ Respond with exactly one JSON object and nothing else.
 Question: {"status":"question","question":"...","choices":["...","..."]}
 Ready: {"status":"ready","summary":"one short paragraph for the customer","brief":{"task_type":"string","task_context":{"summary":"string","known":[{"fact":"string","value":"string"}],"unknown":[{"fact":"string","fallback":"string"}],"share_only_if_asked":["string"]},"call_purpose":"string","expected_outcome":{"must_confirm":["string"],"nice_to_have":["string"],"deciding_question":"string or null"},"representing":{"name":"string","kind":"personal|organisation","caller_name":"Gayatri"},"authority":{"enquiry_only":true,"may_share_customer_contact":false,"may_schedule":false,"follow_up":"string"},"in_call_rules":["task-specific rules only"],"deadline":{"date":"YYYY-MM-DD or null","start_assumption":"string or null"},"location":{"home_visit":true|false,"area":"area or locality, or null","building_if_asked":"apartment or building name, or null"}}}
 Leave unknowns as unknown entries with a fallback; do not invent values.
+CALL QUESTIONS: every entry in must_confirm and nice_to_have, and deciding_question, is one direct question the caller asks the business on the phone, addressed to them as "you" and ending with "?" (for example "Do you offer intermediate AI training?", "What does the course cover?", "What are the fees?", "When does the next batch start?"). Never write a research topic ("Fees for AI training"), never ask which businesses, institutes or shops exist or offer something (the business being called is the one answering), and never put the area or pincode in a question as a search term; finding businesses is done separately.
 For home-visit services, questions in must_confirm and deciding_question name the area, never the pincode (write "Can you come to Gachibowli today?", never "Can you come to 500032 today?"). Keep the apartment or building name only in location.building_if_asked; never put it in the summary, call_purpose, known facts or questions.`;
 
 /** Known recipients need an enquiry location only when the requested answer depends on it. */
@@ -169,7 +170,58 @@ function parseBrief(raw: unknown): Brief | null {
       start_assumption: isStr(dl.start_assumption) ? dl.start_assumption : null,
     },
   };
-  return location ? applyLocation(parsed, location) : parsed;
+  return repairCallQuestions(location ? applyLocation(parsed, location) : parsed);
+}
+
+const BUSINESS_WORDS = "(?:institutes?|institutions?|academ(?:y|ies)|centres?|centers?|shops?|stores?|businesses|business|companies|company|clinics?|providers?|dealers?|sellers?|showrooms?|schools?|colleges?|firms?|agencies|agency|plumbers?|electricians?|painters?|tailors?|salons?|offices?)";
+/** "Which institutes/shops in Ameerpet offer X?" style: asks which businesses exist. */
+const WHICH_BUSINESS = new RegExp(`^(?:(?:which|what)\\s+(?:[a-z]+\\s+)?${BUSINESS_WORDS}\\b|(?:list|find|search|name|top|best|any|nearby)\\b[^?]*?\\b${BUSINESS_WORDS}\\b)`, "i");
+const WHICH_OFFER = new RegExp(`^(?:which|what)\\s+(?:[a-z]+\\s+)?${BUSINESS_WORDS}(?:\\s*/\\s*${BUSINESS_WORDS})*\\b(?:\\s+(?:in|near|around|at)\\s+[^?]+?)?\\s+(offers?|provides?|sells?|has|have|stocks?|teach(?:es)?|runs?|does|do)\\s+(.+?)\\s*\\??$`, "i");
+const QUESTION_START = /^(?:do|does|did|is|are|was|were|can|could|will|would|should|shall|may|might|have|has|what|when|where|which|who|whom|whose|why|how)\b/i;
+const baseVerb = (v: string) => v.toLowerCase().replace(/^has$/, "have").replace(/^does$/, "do").replace(/^teaches$/, "teach").replace(/(offer|provide|sell|stock|run)s$/, "$1");
+const upperFirst = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+
+/**
+ * One brief item as a question the caller can ask the business. Returns null when the item is a search for businesses
+ * that cannot be turned into a question to one business. `places` are area names that must not appear as search terms.
+ */
+export function callQuestion(raw: string, places: string[] = []): string | null {
+  let t = raw.replace(/\s+/g, " ").trim().replace(/^[-*•\d.)\s]+/, "");
+  if (!t) return null;
+  for (const place of places.filter(Boolean)) {
+    const head = escapeRe(place.split(",")[0].trim());
+    if (head) t = t.replace(new RegExp(`\\s*,?\\s*\\b(?:in|near|around|at|within)\\s+${head}(?:\\s*,\\s*[A-Z][\\w ]*)?\\b`, "gi"), "");
+  }
+  t = t.replace(/\s*\b(?:in|near|around|at)\s+[1-9]\d{5}\b/g, "").replace(/\s+([?,.])/g, "$1").trim();
+  const offer = t.match(WHICH_OFFER);
+  if (offer) return `Do you ${baseVerb(offer[1])} ${offer[2].replace(/[?.\s]+$/, "")}?`;
+  if (WHICH_BUSINESS.test(t) && !/\byour?\b/i.test(t)) return null;
+  t = t.replace(/[.;:!\s]+$/, "");
+  if (t.endsWith("?")) return upperFirst(t);
+  if (QUESTION_START.test(t)) return `${upperFirst(t)}?`;
+  const whether = t.match(/^(?:whether|if)\s+(?:they|the business|the shop)\s+(can|will|would|could|are|is|has|have|offers?|provides?|sells?|stocks?|runs?|teach(?:es)?|does|do)\s+(.+)$/i);
+  if (whether) {
+    const verb = whether[1].toLowerCase(), rest = whether[2].replace(/\btheir\b/gi, "your").replace(/\bthey\b/gi, "you");
+    if (["can", "will", "would", "could"].includes(verb)) return `${upperFirst(verb)} you ${rest}?`;
+    if (verb === "are" || verb === "is") return `Are you ${rest}?`;
+    return `Do you ${baseVerb(verb)} ${rest}?`;
+  }
+  // A topic ("Fees for intermediate AI training") becomes a question to the business.
+  const topic = t.charAt(0).toLowerCase() + t.slice(1);
+  return /^(?:whether|if)\b/i.test(topic) ? `Can you tell me ${topic}?` : `Can you tell me ${/^(?:the|your|a|an)\b/i.test(topic) ? topic : `the ${topic}`}?`;
+}
+
+/** Every must_confirm, deciding and nice_to_have item becomes a direct question to the business (see callQuestion). */
+export function repairCallQuestions(brief: Brief): Brief {
+  const loc = brief.location;
+  // For a home visit the area is part of the job ("Can you come to Gachibowli today?"), so it stays.
+  const places = loc?.home_visit ? [] : [loc?.area ?? "", ...brief.task_context.known.filter((k) => /\b(area|locality|location|place|city|pincode)\b/i.test(k.fact)).map((k) => k.value)];
+  const fix = (list: string[]) => [...new Set(list.map((x) => callQuestion(x, places)).filter((x): x is string => !!x))];
+  let must = fix(brief.expected_outcome.must_confirm);
+  const deciding = brief.expected_outcome.deciding_question ? callQuestion(brief.expected_outcome.deciding_question, places) : null;
+  const nice = fix(brief.expected_outcome.nice_to_have).filter((x) => !must.includes(x) && x !== deciding);
+  if (!must.length && !deciding) must = ["Can you help with this request?", "What would it cost, and are there any conditions?"];
+  return { ...brief, expected_outcome: { must_confirm: must.filter((x) => x !== deciding), nice_to_have: nice, deciding_question: deciding } };
 }
 
 /** Stores the location and, for a home visit, keeps the building name and unit numbers out of every spoken field and the pincode out of every question. */
@@ -236,7 +288,7 @@ export function forceReady(request: string, turns: Turn[]): Extract<IntakeOutput
       share_only_if_asked: [],
     },
     call_purpose: `Find out what the customer asked: ${request.trim().slice(0, 300)}`,
-    expected_outcome: { must_confirm: ["whether they can help with the request", "any price or conditions mentioned"], nice_to_have: [], deciding_question: null },
+    expected_outcome: { must_confirm: ["Can you help with this request?", "What would it cost, and are there any conditions?"], nice_to_have: [], deciding_question: null },
     representing: { name: "the customer", kind: "personal", caller_name: "Gayatri" },
     authority: { enquiry_only: true, may_share_customer_contact: false, may_schedule: false, follow_up: "customer will follow up" },
     in_call_rules: [],

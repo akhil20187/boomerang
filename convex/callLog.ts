@@ -111,6 +111,8 @@ async function rowsForTask(ctx: QueryCtx, task: Doc<"tasks">) {
           recordingStatus: recordingStatus(a),
           answer: a.answer ?? null,
           askedItems: a.items ?? [],
+          /** Brief (service or question-based) task: the log never talks about stock for these. */
+          briefTask: !!(task.brief || task.briefId || a.items?.length),
           timeline: jobEvents
             .filter((e) => !next || e.timestamp < next.startedAt)
             .map((e) => ({ text: e.text, time: e.timestamp })),

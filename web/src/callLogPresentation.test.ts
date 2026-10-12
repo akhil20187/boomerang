@@ -94,3 +94,20 @@ test('pagination: one page hides controls; empty pages while loading have no ran
  const waiting=pageInfo(10,2,'loading');assert.equal(waiting.label,'Page 2');assert.equal(waiting.hasNext,true);
  assert.equal(pageInfo(12,5,'done').lastPage,2);
 });
+test('service (brief) tasks never say "stock" in the log: wording follows the questions',()=>{
+ const asked=[{id:'m1',text:'Do you offer intermediate AI training?',kind:'must_confirm'},{id:'m2',text:'What are the fees?',kind:'must_confirm'},{id:'d',text:'When does the next batch start?',kind:'deciding'}];
+ const svc=(extra:Partial<LogRow>)=>row({briefTask:true,askedItems:asked,...extra});
+ const all=svc({answer:{stock:'unconfirmed',items:asked.map(i=>({...i,status:'answered',answer:'Yes'}))}});
+ assert.deepEqual(rowResult(all),['Answered your questions','green']);
+ const some=svc({answer:{stock:'unconfirmed',items:asked.map((i,k)=>({...i,status:k<2?'answered':'not_answered'}))}});
+ assert.deepEqual(rowResult(some),['Answered 2 of 3 questions · rest open','amber']);
+ // The answer came back without per-question results: the questions are still the measure, not stock.
+ const bare=svc({answer:{stock:'unconfirmed',notes:'Call back after 5.'}});
+ assert.deepEqual(rowResult(bare),['Didn’t answer your questions','grey']);
+ assert.ok(!/stock/i.test(rowResult(bare)[0]));
+ // A brief task with no recorded questions at all.
+ assert.deepEqual(rowResult(row({briefTask:true,answer:{stock:'unconfirmed'}})),['Answered · see notes','grey']);
+ // Product rows keep their wording.
+ assert.deepEqual(rowResult(row({answer:{stock:'unconfirmed'}})),['Answered · stock unconfirmed','grey']);
+ assert.deepEqual(rowResult(row({briefTask:true})),['In stock · ₹500','green']);
+});

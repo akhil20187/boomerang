@@ -102,6 +102,8 @@ export default defineSchema({
     productInput: v.string(),
     product: productV,
     pincode: v.optional(v.string()),
+    /** Area text the customer gave instead of a pincode ("Ameerpet, Hyderabad"). */
+    area: v.optional(v.string()),
     cards: v.array(v.string()),
     comments: v.string(),
     radiusKm: v.optional(v.number()),
@@ -269,6 +271,8 @@ export default defineSchema({
     /** Latest brief this chat is working on, and the pincode the customer gave. */
     briefId: v.optional(v.id("briefs")),
     pincode: v.optional(v.string()),
+    /** Area or locality the customer gave ("Ameerpet, Hyderabad"), used to search when there is no pincode. */
+    area: v.optional(v.string()),
     /** Plural word for who we call: "shops", "plumbers", "businesses". */
     noun: v.optional(v.string()),
   }).index("by_user_updated", ["userId", "updatedAt"]),

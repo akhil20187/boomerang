@@ -114,11 +114,37 @@ function distance(
       Math.sin(dlon / 2) ** 2;
   return 6371 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
 }
+/** A search location: a six-digit pincode, or an area/locality name (D160 slice: "Ameerpet, Hyderabad"). */
+export function searchLocation(args: { pincode?: string; area?: string }): { pincode?: string; area?: string } {
+  const pincode = args.pincode?.trim();
+  if (pincode) {
+    if (!/^[1-9]\d{5}$/.test(pincode)) throw new ConvexError("Enter a valid six-digit Indian pincode.");
+    return { pincode };
+  }
+  const area = (args.area ?? "").replace(/\s+/g, " ").trim();
+  if (/^[1-9]\d{5}$/.test(area)) return { pincode: area };
+  if (area.length < 2 || area.length > 100 || !/[a-z]/i.test(area) || /[<>{}\[\]\\]/.test(area))
+    throw new ConvexError("Tell us the area (for example “Ameerpet, Hyderabad”) or the six-digit pincode.");
+  return { area };
+}
+/** First geocoding result that is a place inside India, not the whole country. */
+export function indianPlace(geo: any): any {
+  if (geo?.status !== "OK" || !Array.isArray(geo.results)) return undefined;
+  return geo.results.find(
+    (r: any) =>
+      r?.geometry?.location &&
+      !(r.types ?? []).includes("country") &&
+      (r.address_components ?? []).some((c: any) => (c.types ?? []).includes("country") && c.short_name === "IN"),
+  );
+}
 export const search = action({
   args: {
     productInput: v.optional(v.string()),
     briefId: v.optional(v.id("briefs")),
-    pincode: v.string(),
+    /** Six-digit pincode. Give this or `area`. */
+    pincode: v.optional(v.string()),
+    /** Area or locality text such as "Ameerpet, Hyderabad". Give this or `pincode`. */
+    area: v.optional(v.string()),
     cards: v.optional(v.array(v.string())),
     comments: v.optional(v.string()),
     radiusKm: v.optional(v.number()),
@@ -133,7 +159,7 @@ export const search = action({
   },
 });
 
-export type SearchArgs = { productInput?: string; briefId?: Id<"briefs">; pincode: string; cards?: string[]; comments?: string; radiusKm?: number };
+export type SearchArgs = { productInput?: string; briefId?: Id<"briefs">; pincode?: string; area?: string; cards?: string[]; comments?: string; radiusKm?: number };
 /** Shared by the `search` action and the website chat engine (convex/chat.ts). The caller resolves the user. */
 export async function searchBusinesses(ctx: ActionCtx, userId: Id<"users">, args: SearchArgs): Promise<any> {
     let input = (args.productInput ?? "").trim();
@@ -149,8 +175,7 @@ export async function searchBusinesses(ctx: ActionCtx, userId: Id<"users">, args
       throw new ConvexError(
         "Enter the product, model and colour or a product link.",
       );
-    if (!/^[1-9]\d{5}$/.test(args.pincode))
-      throw new ConvexError("Enter a valid six-digit Indian pincode.");
+    const where = searchLocation(args);
     const radiusKm = args.radiusKm ?? 10;
     if (![10, 20].includes(radiusKm))
       throw new ConvexError("Search within 10 or 20 km.");
@@ -158,13 +183,18 @@ export async function searchBusinesses(ctx: ActionCtx, userId: Id<"users">, args
     if (!key) throw new ConvexError("Shop search is not configured yet.");
     const product = await productFromInput(input);
     const geo = await fetchJson(
-      `https://maps.googleapis.com/maps/api/geocode/json?components=${encodeURIComponent(`postal_code:${args.pincode}|country:IN`)}&key=${encodeURIComponent(key)}`,
+      where.pincode
+        ? `https://maps.googleapis.com/maps/api/geocode/json?components=${encodeURIComponent(`postal_code:${where.pincode}|country:IN`)}&key=${encodeURIComponent(key)}`
+        : `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(where.area!)}&components=${encodeURIComponent("country:IN")}&region=in&key=${encodeURIComponent(key)}`,
     );
-    if (geo.status !== "OK" || !geo.results?.[0]?.geometry?.location)
+    const place = where.pincode ? geo.results?.[0] : indianPlace(geo);
+    if (geo.status !== "OK" || !place?.geometry?.location)
       throw new ConvexError(
-        "This pincode could not be located. Check it and try again.",
+        where.pincode
+          ? "This pincode could not be located. Check it and try again."
+          : "We couldn’t find that area in India. Add the city, for example “Ameerpet, Hyderabad”, or give the six-digit pincode.",
       );
-    const location = geo.results[0].geometry.location,
+    const location = place.geometry.location,
       center = { latitude: location.lat, longitude: location.lng };
     let kind = guessRequestKind(input, taskType);
     let textQuery = fallbackSearchQuery(product.name, kind);
@@ -276,7 +306,7 @@ export async function searchBusinesses(ctx: ActionCtx, userId: Id<"users">, args
       briefId: args.briefId,
       productInput: input,
       product,
-      pincode: args.pincode,
+      ...(where.pincode ? { pincode: where.pincode } : { area: where.area }),
       cards: args.cards ?? [],
       comments: args.comments ?? "",
       radiusKm,
@@ -288,7 +318,7 @@ export async function searchBusinesses(ctx: ActionCtx, userId: Id<"users">, args
       availableCents: await ctx.runQuery(internal.credits.availableFor, { userId: userId ?? null }),
       product,
       shops: cleanShops,
-      pincode: args.pincode,
+      ...(where.pincode ? { pincode: where.pincode } : { area: where.area }),
       attribution: "Google Maps",
       radiusKm,
       requestKind: kind,

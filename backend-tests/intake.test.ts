@@ -181,3 +181,42 @@ it("D159: scrubUnitNumbers and cleanPlace", () => {
   expect(cleanPlace("Skip")).toBeNull();
   expect(cleanPlace("500032")).toBeNull();
 });
+
+// ---------- Increment 6: brief items are questions to the business (C) ----------
+import { callQuestion, repairCallQuestions, parseIntakeOutput as parseOut, INTAKE_SYSTEM_PROMPT as PROMPT } from "../convex/intake";
+
+it("callQuestion turns research topics into direct questions and drops searches for businesses", () => {
+  const places = ["Ameerpet"];
+  expect(callQuestion("Which institutes/shops in Ameerpet offer intermediate AI training?", places)).toBe("Do you offer intermediate AI training?");
+  expect(callQuestion("Fees for intermediate AI training in Ameerpet", places)).toBe("Can you tell me the fees for intermediate AI training?");
+  expect(callQuestion("when does the next batch start", places)).toBe("When does the next batch start?");
+  expect(callQuestion("Whether they offer placement support", places)).toBe("Do you offer placement support?");
+  expect(callQuestion("Which shops near 500016 sell iPhone 17?")).toBe("Do you sell iPhone 17?");
+  expect(callQuestion("Do you have it in stock in Ameerpet, Hyderabad?", places)).toBe("Do you have it in stock?");
+  expect(callQuestion("List AI institutes in Ameerpet", places)).toBeNull();
+  expect(callQuestion("Top institutes for AI in Hyderabad")).toBeNull();
+  // Questions to the business itself are kept as they are.
+  expect(callQuestion("What is the fee at your institute?")).toBe("What is the fee at your institute?");
+  expect(callQuestion("What options do you have for weekend batches?")).toBe("What options do you have for weekend batches?");
+});
+
+it("the real-test bad brief is repaired on parse; home-visit questions keep the area; empty lists get safe questions", () => {
+  const brief = {
+    task_type: "training_course_enquiry",
+    task_context: { summary: "Intermediate AI training in Ameerpet.", known: [{ fact: "area", value: "Ameerpet" }], unknown: [], share_only_if_asked: [] },
+    call_purpose: "Find intermediate AI training.",
+    expected_outcome: { must_confirm: ["Which institutes/shops in Ameerpet offer intermediate AI training?", "Fees for intermediate AI training in Ameerpet"], nice_to_have: [], deciding_question: null },
+    representing: { name: "the customer", kind: "personal", caller_name: "Gayatri" },
+    authority: { enquiry_only: true, may_share_customer_contact: false, may_schedule: false, follow_up: "x" },
+    in_call_rules: [],
+    deadline: { date: null, start_assumption: null },
+  };
+  const out = parseOut(JSON.stringify({ status: "ready", summary: "AI training.", brief }));
+  expect(out?.status === "ready" && out.brief.expected_outcome.must_confirm).toEqual(["Do you offer intermediate AI training?", "Can you tell me the fees for intermediate AI training?"]);
+  const home = repairCallQuestions({ ...(brief as any), expected_outcome: { must_confirm: ["Can you come to Gachibowli today?"], nice_to_have: [], deciding_question: null }, location: { home_visit: true, area: "Gachibowli", building_if_asked: null } });
+  expect(home.expected_outcome.must_confirm).toEqual(["Can you come to Gachibowli today?"]);
+  const empty = repairCallQuestions({ ...(brief as any), expected_outcome: { must_confirm: ["List institutes in Ameerpet"], nice_to_have: [], deciding_question: null } });
+  expect(empty.expected_outcome.must_confirm).toEqual(["Can you help with this request?", "What would it cost, and are there any conditions?"]);
+  expect(PROMPT).toContain("CALL QUESTIONS");
+  expect(PROMPT).toContain("never ask which businesses, institutes or shops exist");
+});
