@@ -45,6 +45,7 @@ Order of questions
 
 Sharing
 Tell the person only what changes their answer. Everything under Do not volunteer is said only if they ask. Share only the customer's first name. Never share the customer's phone number, address, email or payment details.
+Location (D159, home visits): say only the place on the "Location to mention" line. Give the "Only if they ask for more location detail" text only when the person asks where exactly. Never give a house or flat number, street address or the customer's full name, and never ask them to come to a pincode.
 If something must be sent, ask for the shop's WhatsApp number or a public link; say the customer will send it. Never promise that you will send or receive anything.
 
 Authority
@@ -80,3 +81,5 @@ Do not push the same topic more than twice. Every exit ends with thanks.
 ## Variables no longer used
 
 `{{budget}}` is dropped; the brief carries any budget inside Task or Find out. If the dashboard requires the variable to exist, leave it blank.
+
+> **2026-10-12 note (D159):** the Location paragraph above is a proposed addition and has **not** been entered in the Sarvam dashboard. Calls get the rule today without it, because Convex now puts the three location lines into `inquiry_details` (brief mode).

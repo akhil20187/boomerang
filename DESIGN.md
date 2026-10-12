@@ -253,6 +253,7 @@ Spec: [signed-in redesign](docs/superpowers/specs/2026-10-12-signed-in-chat-rede
 - Empty state: "What should we call about?", one line under it, three starter chips, and the real balance with "₹10 only when a shop answers".
 - The picker's price line and main button live inside the picker card. After "Call", the picker folds to one line and the call card follows.
 - The noun follows the request: "shops" for products, the service word ("plumbers") or "businesses" otherwise.
+- Home visits (D159): the question cards ask "Which area is it in?" and, optionally, "Apartment or building name? We share it only if a plumber asks for more detail." with a "Skip" choice. Never ask for a house or flat number, street address or full name. Brief questions use the area, never the pincode: "Can you come to Gachibowli today?", never "Can you come to 500032 today?". The brief box note reads "We share only what changes their answer: the area, never your flat number, street address or full name. No booking."
 
 **Sidebar / menu**
 - Laptop (≥900px): fixed 270px left sidebar. Phone: top bar (menu button, logo, balance pill → account) and a drawer.
@@ -268,6 +269,9 @@ Spec: [signed-in redesign](docs/superpowers/specs/2026-10-12-signed-in-chat-rede
 - An earlier unanswered try reads amber "No answer · tried again". Charge lines are grey: "Charged ₹10", "Not charged · reason", "Refunded ₹10", "Free" for a test call to yourself. Never green.
 - "Download CSV" exports the rows on screen in rupees, without recording links; text cells starting with = + - @ are escaped.
 - Empty: "No calls yet." + "Start a request". Simulated verification tasks never appear.
+- Pages of 10 rows (call tries), not "Load more". Controls under the list: "‹ Previous" · "Page N" · "Next ›". Add "of M" only once every call is loaded (a reliable total); until then the label reads "Page 2 · Showing 11–20". Disabled buttons are faded, never hidden; one page only → no controls.
+- The filter applies to every loaded call, then the result is paged; when a page is not full and older calls exist, the next batch loads by itself. Changing the filter returns to page 1.
+- Changing page closes any opened call, scrolls to the top of the list and moves focus there. Same on phone (stacked cards) and /demo/calls.
 
 **Use in ChatGPT or Claude (`/connect-assistant`)**
 - A two-option switch (ChatGPT / Claude) with real tab semantics; selected = light grey fill and dark outline.
