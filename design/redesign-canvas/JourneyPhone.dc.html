@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Phone journey: sign in to sign out</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#1A1A19;background:#FFFFFF}
+a{color:#1A1A19}a:hover{color:#000}
+.ex{font-size:14px;border:1px solid #DAD7D0;border-radius:8px;padding:10px 12px;color:#55544F}
+.chip{font:inherit;font-size:14px;text-align:left;background:#FFFFFF;border:1px solid #DAD7D0;border-radius:8px;padding:11px 12px;min-height:44px;color:#1A1A19;cursor:pointer;text-decoration:none;display:block}
+.navi{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:0 12px;border-radius:8px;font:inherit;font-size:15px;background:none;border:0;color:#1A1A19;cursor:pointer;text-align:left;width:100%}
+.navi:hover{background:#F2F1EE}
+.primary{font:inherit;font-size:15px;font-weight:500;height:48px;border:0;border-radius:8px;background:#1A1A19;color:#FFFFFF;cursor:pointer}
+.ghost{font:inherit;font-size:15px;height:44px;border:1px solid #DAD7D0;border-radius:8px;background:#FFFFFF;color:#1A1A19;cursor:pointer;padding:0 16px}
+.demo{font:inherit;font-size:12px;border:1px dashed #A8A59D;border-radius:6px;background:#FAFAF8;color:#55544F;padding:6px 10px;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #FFFFFF; overflow: hidden">
+
+<sc-if value="{{signedOutScreens}}" hint-placeholder-val="{{ true }}">
+<header style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #DAD7D0; flex-shrink: 0">
+<div style="display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 17px; letter-spacing: -0.02em">
+<svg width="22" height="22" viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-12 50 50)" fill="none" stroke="#1A1A19" stroke-width="13" stroke-linecap="round"><path d="M30 12 V60"></path><path d="M30 56 Q32 38 53 38 Q75 38 75 61 Q75 84 55 84"></path></g><circle cx="32" cy="82" r="8.5" fill="#16A34A" transform="rotate(-12 50 50)"></circle></svg>
+<span>boomerang</span>
+</div>
+<a href="#" style="font-size: 14px; min-height: 44px; display: flex; align-items: center">See a demo</a>
+</header>
+<div style="flex: 1; overflow-y: auto; padding: 28px 16px; display: flex; flex-direction: column; gap: 20px">
+
+<sc-if value="{{showSignedOutNote}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="font-size: 14px; border: 1px solid #DAD7D0; border-radius: 8px; padding: 10px 12px">You're signed out. Sign in again any time to see your chats and calls.</div>
+</sc-if>
+
+<sc-if value="{{isSignIn}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 26px; letter-spacing: -0.03em; line-height: 1.15">Sign in to Boomerang</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #55544F">We'll email you a link. No password.</p>
+</div>
+<form onSubmit="{{send}}" style="display: flex; flex-direction: column; gap: 10px">
+<label for="pemail" style="font-size: 13px; font-weight: 500">Email</label>
+<input id="pemail" type="email" value="{{email}}" onChange="{{typed}}" placeholder="you@example.com" style="font: inherit; font-size: 16px; height: 48px; border: 1px solid #DAD7D0; border-radius: 8px; padding: 0 14px">
+<button type="submit" class="primary">Email me a sign-in link</button>
+</form>
+<p style="margin: 0; font-size: 13px; color: #55544F; line-height: 1.5">New here? You start with ₹100 credit, about 10 answers. You pay ₹10 only when a shop answers what you asked.</p>
+<div style="border-top: 1px solid #DAD7D0; padding-top: 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 13px; font-weight: 500">Then just tell us what to call about</div>
+<div class="ex">Plumber in Gachibowli who can come today</div>
+<div class="ex">iPhone 17 256GB near Ameerpet, best price</div>
+<div class="ex">AI training institutes in Ameerpet: fees and next batch</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isSent}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="display: flex; flex-direction: column; gap: 10px">
+<h1 style="margin: 0; font-size: 26px; letter-spacing: -0.03em">Check your email</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #55544F">We sent a sign-in link to <strong style="color: #1A1A19">{{shownEmail}}</strong>. Open it on this phone. It expires in 15 minutes.</p>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #55544F">Not there? Check spam, or wait a minute and send it again.</p>
+<div style="display: flex; gap: 14px; flex-wrap: wrap">
+<button onClick="{{resend}}" style="font: inherit; font-size: 14px; background: none; border: 0; padding: 10px 0; text-decoration: underline; cursor: pointer; color: #1A1A19">{{resendLabel}}</button>
+<button onClick="{{toSignIn}}" style="font: inherit; font-size: 14px; background: none; border: 0; padding: 10px 0; text-decoration: underline; cursor: pointer; color: #1A1A19">Use a different email</button>
+</div>
+<button class="demo" onClick="{{openLink}}" style="align-self: flex-start; margin-top: 12px">Prototype only: pretend I opened the email link</button>
+</div>
+</sc-if>
+
+<sc-if value="{{isExpired}}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="display: flex; flex-direction: column; gap: 10px">
+<h1 style="margin: 0; font-size: 26px; letter-spacing: -0.03em">That link has expired</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #55544F">Sign-in links work once, for 15 minutes. We can send you a fresh one.</p>
+<button class="primary" onClick="{{send}}">Send a new link</button>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{signedInScreens}}" hint-placeholder-val="{{ false }}">
+<header style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #DAD7D0; flex-shrink: 0">
+<button onClick="{{openMenu}}" aria-label="Open menu" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: 0; cursor: pointer; color: #1A1A19">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+</button>
+<div style="display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 17px; letter-spacing: -0.02em">
+<svg width="22" height="22" viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-12 50 50)" fill="none" stroke="#1A1A19" stroke-width="13" stroke-linecap="round"><path d="M30 12 V60"></path><path d="M30 56 Q32 38 53 38 Q75 38 75 61 Q75 84 55 84"></path></g><circle cx="32" cy="82" r="8.5" fill="#16A34A" transform="rotate(-12 50 50)"></circle></svg>
+<span>boomerang</span>
+</div>
+<button onClick="{{toAccount}}" style="font: inherit; font-size: 13px; font-weight: 500; border: 1px solid #DAD7D0; border-radius: 999px; padding: 0 12px; height: 32px; background: #FFFFFF; color: #1A1A19; cursor: pointer">₹100</button>
+</header>
+
+<sc-if value="{{isChat}}" hint-placeholder-val="{{ true }}">
+<div style="flex: 1; overflow-y: auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 18px">
+<div role="status" style="font-size: 14px; line-height: 1.5; border: 1px solid #DAD7D0; border-radius: 8px; padding: 12px">You're in. Your ₹100 welcome credit is ready, about 10 answers.</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 26px; line-height: 1.15; letter-spacing: -0.03em">What should we call about?</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.45; color: #55544F">Tell us what you need. We find nearby shops or services, call them, and bring the answers back here.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<a class="chip" href="Main.dc.html">Plumber in Gachibowli who can come today</a>
+<a class="chip" href="Main.dc.html">iPhone 17 256GB near Ameerpet, best price after card offers</a>
+<a class="chip" href="Main.dc.html" style="display: flex; justify-content: space-between; gap: 8px"><span>Call me first, so I hear how it sounds</span><span style="font-size: 12px; color: #55544F">Free</span></a>
+</div>
+<p style="margin: 0; font-size: 12px; color: #55544F">The chips open the full chat prototype (screen 1).</p>
+</div>
+<div style="flex-shrink: 0; padding: 10px 12px 14px; border-top: 1px solid #DAD7D0; display: flex; gap: 8px">
+<label for="pask" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Your request</label>
+<input id="pask" placeholder="Ask us to call about anything nearby…" style="flex: 1; min-width: 0; font: inherit; font-size: 15px; border: 1px solid #DAD7D0; border-radius: 999px; padding: 0 16px; height: 44px">
+<button aria-label="Send" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: #A8A59D; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg></button>
+</div>
+</sc-if>
+
+<sc-if value="{{isAccount}}" hint-placeholder-val="{{ false }}">
+<div style="flex: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 18px">
+<h1 style="margin: 0; font-size: 24px; letter-spacing: -0.03em">Account and credit</h1>
+<section style="border: 1px solid #DAD7D0; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 13px; color: #55544F">Your credit</div>
+<div style="font-size: 32px; font-weight: 700; letter-spacing: -0.03em">₹100</div>
+<div style="font-size: 13px">About 10 answers · ₹10 per shop that answers</div>
+<div style="font-size: 12px; color: #55544F">Paid top-ups aren't available yet.</div>
+</section>
+<section style="border: 1px solid #DAD7D0; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 15px; font-weight: 600">Charges and refunds</div>
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span>Welcome credit</span><span>+₹100</span></div>
+<div style="font-size: 12px; color: #55544F">Today</div>
+</section>
+<section style="border: 1px solid #DAD7D0; border-radius: 8px; padding: 4px 14px">
+<div style="display: flex; justify-content: space-between; align-items: center; min-height: 44px; font-size: 14px"><span>Name the AI gives shops</span><span style="color: #55544F">Add</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; min-height: 44px; font-size: 14px; border-top: 1px solid #DAD7D0"><span>Email</span><span style="color: #55544F">{{shownEmail}}</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; min-height: 44px; font-size: 14px; border-top: 1px solid #DAD7D0"><span>Use in ChatGPT or Claude</span><span style="color: #55544F">Not connected ›</span></div>
+</section>
+<button class="ghost" onClick="{{askSignOut}}" style="align-self: flex-start">Sign out</button>
+</div>
+</sc-if>
+
+<sc-if value="{{menuOpen}}" hint-placeholder-val="{{ false }}">
+<button aria-label="Close menu" onClick="{{closeMenu}}" style="position: absolute; inset: 0; border: 0; background: rgba(26,26,25,0.35); cursor: pointer"></button>
+<nav aria-label="Menu" style="position: absolute; top: 0; left: 0; bottom: 0; width: 300px; background: #FFFFFF; border-right: 1px solid #DAD7D0; display: flex; flex-direction: column; padding: 10px 8px">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 4px 10px 12px">
+<span style="font-weight: 700; font-size: 17px; letter-spacing: -0.02em">boomerang</span>
+<button aria-label="Close menu" onClick="{{closeMenu}}" style="width: 44px; height: 44px; background: none; border: 0; cursor: pointer; color: #1A1A19"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+</div>
+<button class="navi" onClick="{{toChat}}" style="border: 1px solid #DAD7D0; justify-content: flex-start; font-weight: 500">+ New request</button>
+<div style="font-size: 12px; color: #55544F; padding: 16px 12px 4px; font-weight: 500">Your requests</div>
+<div style="font-size: 14px; color: #55544F; padding: 6px 12px 0; line-height: 1.5">No requests yet. Your chats and calls will show here.</div>
+<div style="flex: 1"></div>
+<div style="border-top: 1px solid #DAD7D0; padding-top: 6px">
+<a class="navi" href="CallLogPhone.dc.html" style="text-decoration: none">Call log</a>
+<a class="navi" href="Connect.dc.html" style="text-decoration: none">Use in ChatGPT or Claude</a>
+<button class="navi" onClick="{{toAccount}}"><span>Account and credit</span><span style="font-size: 13px; color: #55544F">₹100</span></button>
+<button class="navi" onClick="{{askSignOut}}" style="color: #55544F">Sign out</button>
+</div>
+</nav>
+</sc-if>
+
+<sc-if value="{{confirmOut}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 0; background: rgba(26,26,25,0.35); display: flex; align-items: flex-end">
+<div role="dialog" aria-label="Sign out?" style="width: 100%; background: #FFFFFF; border-radius: 12px 12px 0 0; padding: 20px 16px 24px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 18px; font-weight: 600">Sign out of Boomerang?</div>
+<div style="font-size: 14px; color: #55544F; line-height: 1.5">Calls already running keep going. Their answers will be here when you sign in again, and we also email you the results.</div>
+<button class="primary" onClick="{{signOut}}">Sign out</button>
+<button class="ghost" onClick="{{cancelOut}}">Stay signed in</button>
+</div>
+</div>
+</sc-if>
+</sc-if>
+
+<div style="position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px">
+<sc-if value="{{showExpiredDemo}}" hint-placeholder-val="{{ false }}"><button class="demo" onClick="{{showExpired}}">Prototype: expired link</button></sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { screen: 'signin', email: '', menu: false, confirm: false, signedOut: false, resent: false }; }
+  renderVals() {
+    const s = this.state, out = ['signin', 'sent', 'expired'].includes(s.screen);
+    return {
+      signedOutScreens: out, signedInScreens: !out,
+      isSignIn: s.screen === 'signin', isSent: s.screen === 'sent', isExpired: s.screen === 'expired',
+      isChat: s.screen === 'chat', isAccount: s.screen === 'account',
+      showSignedOutNote: s.signedOut && s.screen === 'signin',
+      showExpiredDemo: s.screen === 'sent',
+      menuOpen: s.menu, confirmOut: s.confirm,
+      email: s.email, shownEmail: s.email || 'you@example.com',
+      resendLabel: s.resent ? 'Sent again' : 'Send it again',
+      typed: (e) => this.setState({ email: e.target.value }),
+      send: (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ screen: 'sent', resent: false }); },
+      resend: () => this.setState({ resent: true }),
+      toSignIn: () => this.setState({ screen: 'signin' }),
+      showExpired: () => this.setState({ screen: 'expired' }),
+      openLink: () => this.setState({ screen: 'chat', signedOut: false }),
+      openMenu: () => this.setState({ menu: true }), closeMenu: () => this.setState({ menu: false }),
+      toChat: () => this.setState({ screen: 'chat', menu: false }),
+      toAccount: () => this.setState({ screen: 'account', menu: false }),
+      askSignOut: () => this.setState({ confirm: true, menu: false }), cancelOut: () => this.setState({ confirm: false }),
+      signOut: () => this.setState({ confirm: false, screen: 'signin', signedOut: true })
+    };
+  }
+}
+</script>
+</body>
+</html>
