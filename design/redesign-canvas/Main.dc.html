@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Boomerang chat</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#1A1A19;background:#FFFFFF}
+a{color:#1A1A19}a:hover{color:#000}
+@keyframes bpulse{0%{opacity:1}50%{opacity:.25}100%{opacity:1}}
+.pulse{animation:bpulse 1.2s ease-in-out infinite}
+.chip{font:inherit;font-size:14px;text-align:left;background:#FFFFFF;border:1px solid #DAD7D0;border-radius:8px;padding:11px 12px;min-height:44px;color:#1A1A19;cursor:pointer}
+.chip:hover{border-color:#1A1A19}
+.choice{font:inherit;font-size:14px;background:#FFFFFF;border:1px solid #DAD7D0;border-radius:999px;padding:0 14px;min-height:40px;color:#1A1A19;cursor:pointer}
+.choice:hover{border-color:#1A1A19}
+.rowbtn{font:inherit;background:none;border:0;padding:0;text-align:left;color:inherit;cursor:pointer;width:100%}
+.icon{width:34px;height:34px;border:1px solid #DAD7D0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#1A1A19;box-sizing:border-box}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; box-sizing: border-box; background: #FFFFFF; overflow: hidden">
+
+<header style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #DAD7D0; flex-shrink: 0">
+<a href="Tasks.dc.html" aria-label="Open menu: your tasks" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1A1A19">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+</a>
+<div style="display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 17px; letter-spacing: -0.02em">
+<svg width="22" height="22" viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-12 50 50)" fill="none" stroke="#1A1A19" stroke-width="13" stroke-linecap="round"><path d="M30 12 V60"></path><path d="M30 56 Q32 38 53 38 Q75 38 75 61 Q75 84 55 84"></path></g><circle cx="32" cy="82" r="8.5" fill="#16A34A" transform="rotate(-12 50 50)"></circle></svg>
+<span>boomerang</span>
+</div>
+<a href="Wallet.dc.html" style="font-size: 13px; font-weight: 500; text-decoration: none; border: 1px solid #DAD7D0; border-radius: 999px; padding: 0 12px; height: 32px; display: flex; align-items: center; color: #1A1A19">{{balance}}</a>
+</header>
+
+<div ref="{{scrollRef}}" style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+
+<sc-if value="{{isHome}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 18px; padding-top: 40px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 26px; line-height: 1.15; letter-spacing: -0.03em; font-weight: 700">What should we call about?</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.45; color: #55544F">Tell us what you need. We find nearby shops or services, call them, and bring the answers back here.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<button class="chip" onClick="{{startPlumber}}">Plumber near 500032 to fix a leaking tap</button>
+<button class="chip">iPhone 17 256GB near 500032, best price after card offers</button>
+<button class="chip" onClick="{{startTest}}" style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span>Call me first, so I hear how it sounds</span><span style="font-size: 12px; color: #55544F; white-space: nowrap">Free</span></button>
+</div>
+<p style="margin: 0; font-size: 12px; color: #55544F; line-height: 1.5">You have ₹100 welcome credit, about 10 answers. You pay ₹10 only when a shop answers what you asked.</p>
+</div>
+</sc-if>
+
+<sc-if value="{{isTest}}" hint-placeholder-val="{{ false }}">
+<div style="align-self: flex-end; max-width: 80%; background: #F2F1EE; border-radius: 16px; padding: 10px 14px; font-size: 15px">Call me first, so I hear how it sounds</div>
+<div style="font-size: 15px; line-height: 1.5">Calling +91 98••• ••210 now. Pick up to hear our AI ask about an iPhone, the way it would with a shop. This one is free.</div>
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #2341B5"><span class="pulse" style="width: 8px; height: 8px; border-radius: 50%; background: #2341B5"></span>AI agent calling you</div>
+<button class="choice" onClick="{{reset}}" style="align-self: flex-start">Start a real request</button>
+</sc-if>
+
+<sc-if value="{{hasRequest}}" hint-placeholder-val="{{ false }}">
+<div style="align-self: flex-end; max-width: 80%; background: #F2F1EE; border-radius: 16px; padding: 10px 14px; font-size: 15px; line-height: 1.4">{{request}}</div>
+<div style="font-size: 15px; line-height: 1.5">Got it. Two quick questions, so plumbers can give you a real answer on the phone.</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="font-size: 15px; font-weight: 600">When do you need them?</div>
+<sc-if value="{{q1Open}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{q1Choices}}" as="c" hint-placeholder-count="4">
+<button class="choice" onClick="{{c.pick}}">{{c.label}}</button>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{showA1}}" hint-placeholder-val="{{ false }}">
+<div style="align-self: flex-end; background: #F2F1EE; border-radius: 16px; padding: 10px 14px; font-size: 15px">{{a1}}</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="font-size: 15px; font-weight: 600">What needs fixing?</div>
+<sc-if value="{{q2Open}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{q2Choices}}" as="c" hint-placeholder-count="3">
+<button class="choice" onClick="{{c.pick}}">{{c.label}}</button>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{showA2}}" hint-placeholder-val="{{ false }}">
+<div style="align-self: flex-end; background: #F2F1EE; border-radius: 16px; padding: 10px 14px; font-size: 15px">{{a2}}</div>
+<div style="border: 1px solid #DAD7D0; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 13px; color: #55544F">We'll ask each plumber</div>
+<div style="font-size: 13px; line-height: 1.45">1. Can you come to 500032 {{a1lower}}?</div>
+<div style="font-size: 13px; line-height: 1.45">2. What's the visit charge?</div>
+<div style="font-size: 13px; line-height: 1.45">3. Rough cost to fix: {{a2lower}}?</div>
+<div style="font-size: 12px; color: #55544F">We share only what changes their answer. No address or booking.</div>
+</div>
+</sc-if>
+
+<sc-if value="{{showPicker}}" hint-placeholder-val="{{ false }}">
+<section style="border: 1px solid #DAD7D0; border-radius: 8px; overflow: hidden">
+<div style="padding: 14px 14px 10px; display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 16px; font-weight: 600">5 plumbers near 500032</div>
+<div style="font-size: 13px; color: #55544F">Pick who we call. Highest rated first.</div>
+</div>
+<sc-for list="{{shops}}" as="s" hint-placeholder-count="5">
+<label style="display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-top: 1px solid #DAD7D0; cursor: pointer">
+<input type="checkbox" checked="{{s.on}}" onChange="{{s.toggle}}" style="width: 20px; height: 20px; margin: 1px 0 0; accent-color: #1A1A19; flex-shrink: 0">
+<span style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
+<span style="font-size: 15px; font-weight: 500">{{s.name}} · {{s.area}}</span>
+<span style="font-size: 12px; color: #55544F">★ {{s.rating}} ({{s.count}}) · {{s.dist}} · <span style="color: {{s.hoursColor}}">{{s.hours}}</span></span>
+</span>
+</label>
+</sc-for>
+<div style="padding: 14px; border-top: 1px solid #DAD7D0; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; font-size: 13px"><span><strong>Up to ₹{{maxCharge}}</strong> for {{pickedCount}} · ₹10 per answer</span><span style="color: #55544F">You have ₹100</span></div>
+<button onClick="{{startCalls}}" disabled="{{noneOn}}" style="font: inherit; font-size: 15px; font-weight: 500; background: #1A1A19; color: #FFFFFF; border: 0; border-radius: 8px; min-height: 48px; cursor: pointer">{{callLabel}}</button>
+<div style="font-size: 12px; color: #55544F; line-height: 1.5">No charge if they don't pick up or can't answer. A listing doesn't confirm they're free.</div>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{showPicked}}" hint-placeholder-val="{{ false }}">
+<div style="font-size: 13px; color: #55544F">{{pickedLine}}</div>
+</sc-if>
+
+<sc-if value="{{showCalls}}" hint-placeholder-val="{{ false }}">
+<section style="border: 1px solid #DAD7D0; border-radius: 8px; overflow: hidden">
+<div style="padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="font-size: 16px; font-weight: 600">{{callHeadline}}</div>
+<div style="height: 4px; background: #ECEAE5; border-radius: 2px; overflow: hidden"><div style="height: 4px; width: {{progress}}; background: #1A1A19"></div></div>
+<div style="font-size: 12px; color: #55544F">{{tags}}</div>
+</div>
+<sc-for list="{{calls}}" as="r" hint-placeholder-count="3">
+<div style="border-top: 1px solid #DAD7D0; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; gap: 10px; align-items: flex-start">
+<button class="rowbtn" onClick="{{r.toggle}}" aria-expanded="{{r.open}}" style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 15px; font-weight: 500">{{r.name}} · {{r.area}}</span>
+<span style="font-size: 12px; color: #55544F">★ {{r.rating}} ({{r.count}}) · {{r.dist}}</span>
+<span style="font-size: 13px; color: {{r.color}}; display: flex; align-items: center; gap: 6px">
+<sc-if value="{{r.live}}" hint-placeholder-val="{{ false }}"><span class="pulse" style="width: 8px; height: 8px; border-radius: 50%; background: #2341B5"></span></sc-if>
+{{r.status}} <span style="font-size: 11px; color: #55544F; border: 1px solid #DAD7D0; border-radius: 4px; padding: 0 5px">AI</span>
+</span>
+</button>
+<a class="icon" href="#" aria-label="Call {{r.name}} yourself"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></a>
+<a class="icon" href="#" aria-label="Directions to {{r.name}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg></a>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12px"><a href="#" style="color: #1A1A19">{{r.phone}}</a><span style="color: #55544F">{{r.charge}}</span></div>
+<sc-if value="{{r.open}}" hint-placeholder-val="{{ false }}">
+<dc-import name="CallDetail" call="{{r.detail}}" hint-size="100%,300px"></dc-import>
+</sc-if>
+</div>
+</sc-for>
+</section>
+</sc-if>
+
+<sc-if value="{{showDone}}" hint-placeholder-val="{{ false }}">
+<div style="font-size: 15px; line-height: 1.5">{{doneText}}</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button class="choice">Call 2 more plumbers</button>
+<button class="choice" onClick="{{reset}}">New request</button>
+</div>
+</sc-if>
+
+</div>
+
+<form onSubmit="{{send}}" style="flex-shrink: 0; padding: 10px 12px 14px; border-top: 1px solid #DAD7D0; display: flex; gap: 8px; align-items: center">
+<label for="ask" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Your request</label>
+<input id="ask" value="{{draft}}" onChange="{{typed}}" placeholder="{{composerHint}}" style="flex: 1; min-width: 0; font: inherit; font-size: 15px; border: 1px solid #DAD7D0; border-radius: 999px; padding: 0 16px; height: 44px; outline-color: #1A1A19">
+<button type="submit" aria-label="Send" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: #1A1A19; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg></button>
+</form>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 0, request: '', draft: '', a1: '', a2: '', on: [true, true, true, false, false], open: 0 };
+    this.el = null;
+    this.scrollRef = (el) => { this.el = el; };
+    this.timer = null;
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if (this.el && prevState.step !== this.state.step) this.el.scrollTop = this.el.scrollHeight;
+    if (this.state.step === 4 && prevState.step !== 4) {
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => this.setState({ step: 5 }), 3000);
+    }
+  }
+  componentWillUnmount() { clearTimeout(this.timer); }
+  renderVals() {
+    const st = this.state, step = st.step;
+    const shopsData = [
+      { name: 'Sri Sai Plumbing Works', area: 'Gachibowli', rating: '4.8', count: '412', dist: '1.1 km', hours: 'Open till 8 pm', phone: '+91 00000 00001' },
+      { name: 'Quick Fix Plumbers', area: 'Kondapur', rating: '4.6', count: '238', dist: '2.4 km', hours: 'Open till 9 pm', phone: '+91 00000 00002' },
+      { name: 'AquaCare Plumbing', area: 'Madhapur', rating: '4.5', count: '1,064', dist: '3.0 km', hours: 'Hours unknown', phone: '+91 00000 00003' },
+      { name: 'Raju Sanitary & Plumbing', area: 'Nanakramguda', rating: '4.4', count: '96', dist: '2.2 km', hours: 'Open till 7 pm', phone: '+91 00000 00004' },
+      { name: 'HomeFix Services', area: 'Hitech City', rating: '4.3', count: '577', dist: '3.6 km', hours: 'Open 24 hours', phone: '+91 00000 00005' }
+    ];
+    const shops = shopsData.map((s, i) => ({ ...s, on: st.on[i], hoursColor: s.hours === 'Hours unknown' ? '#7A4A00' : '#55544F',
+      toggle: () => { const on = st.on.slice(); on[i] = !on[i]; this.setState({ on }); } }));
+    const picked = shopsData.filter((s, i) => st.on[i]);
+    const n = picked.length;
+    const a1 = st.a1, a2 = st.a2;
+    const outcomes = [
+      { color: '#17573A', status: 'Answered your questions', charge: 'Charged ₹10', hasRec: true, endLine: 'Answered · 1 min 42 s · 4:04 pm',
+        answers: [
+          { mark: '✓', color: '#17573A', q: 'Can you come ' + (a1 || 'today').toLowerCase() + '?', a: '"Yes, I can come at 4 pm."' },
+          { mark: '✓', color: '#17573A', q: 'Visit charge?', a: '"₹200 for the visit."' },
+          { mark: '~', color: '#7A4A00', q: 'Cost to fix?', a: '"Depends on the tap. Usually ₹150 to ₹300, parts extra."' } ] },
+      { color: '#7A4A00', status: 'Answered 2 of 3 questions · rest open', charge: 'Charged ₹10', hasRec: true, endLine: 'Answered · 1 min 05 s · 4:03 pm',
+        answers: [
+          { mark: '✓', color: '#17573A', q: 'Can you come ' + (a1 || 'today').toLowerCase() + '?', a: '"Tomorrow morning, not today."' },
+          { mark: '✓', color: '#17573A', q: 'Visit charge?', a: '"₹150 visit."' },
+          { mark: '–', color: '#7A4A00', q: 'Cost to fix?', a: 'Unconfirmed' } ] },
+      { color: '#7A4A00', status: 'Prefers a personal call', charge: 'Not charged', hasRec: false, endLine: 'Asked to speak to a person · 4:03 pm. Best to call them directly.',
+        answers: [] },
+      { color: '#55544F', status: 'No answer', charge: 'Not charged', hasRec: false, endLine: 'Rang 40 s, no answer · 4:03 pm', answers: [] },
+      { color: '#55544F', status: 'No answer', charge: 'Not charged', hasRec: false, endLine: 'Rang 40 s, no answer · 4:03 pm', answers: [] }
+    ];
+    const bars = [6,10,16,9,20,14,8,18,22,12,7,15,19,11,6,13,21,17,9,14,8,16,12,6,10,18,13,7,11,9].map(h => ({ h: h + 'px' }));
+    const done = step >= 5;
+    const w = a1 ? a1.toLowerCase() : 'today';
+    const noAns = { steps: [['Call requested', '4:01 pm', 'ok'], ['AI called on your behalf', '4:02 pm', 'ok'], ['No answer · retry scheduled', '4:03 pm', 'fail'], ['AI called on your behalf', '4:08 pm', 'ok'], ['No answer', '4:09 pm', 'fail']], pending: 'Their answers remain unconfirmed.' };
+    const details = [
+      { steps: [['Call requested', '4:01 pm', 'ok'], ['AI called on your behalf', '4:02 pm', 'ok'], ['Shop answered · notes saved', '4:04 pm', 'ok'], ['Call recording ready', '4:04 pm', 'ok']],
+        items: [['✓ Can you come ' + w + '?', '"Yes, at 4 pm."'], ['✓ Visit charge?', '"₹200 for the visit."'], ['~ Cost to fix the tap?', '"Usually ₹150 to ₹300, parts extra."']], cols: 'items', rec: true, calledAt: '4:02 pm', address: 'Plot 12, Gachibowli Main Road, Hyderabad 500032' },
+      { steps: [['Call requested', '3:57 pm', 'ok'], ['AI called on your behalf', '3:58 pm', 'ok'], ['No answer · retry scheduled', '3:59 pm', 'fail'], ['AI called on your behalf', '4:03 pm', 'ok'], ['Shop answered · notes saved', '4:04 pm', 'ok']],
+        items: [['✓ Can you come ' + w + '?', '"Tomorrow morning, not today."'], ['✓ Visit charge?', '"₹150 visit."'], ['– Cost to fix the tap?', 'Unconfirmed']], cols: 'items', rec: true, calledAt: '4:03 pm', address: 'Kothaguda X Roads, Kondapur, Hyderabad 500084' },
+      { steps: [['Call requested', '4:01 pm', 'ok'], ['AI called on your behalf', '4:02 pm', 'ok'], ['Shop asked to speak to a person', '4:03 pm', 'warn']], personal: true, address: 'Ayyappa Society, Madhapur, Hyderabad 500081' },
+      { ...noAns, address: 'Nanakramguda Main Road, Hyderabad 500032' },
+      { ...noAns, address: 'Hitech City Road, Hyderabad 500081' }
+    ];
+    const calls = picked.map((s, i) => {
+      const o = outcomes[i];
+      return { ...s, live: !done, color: done ? o.color : '#2341B5', status: done ? o.status : 'AI agent calling',
+        charge: done ? o.charge : '₹10 on hold', detail: details[i], answers: o.answers, hasRec: o.hasRec, endLine: o.endLine, bars,
+        open: done && st.open === i, toggle: () => this.setState({ open: st.open === i ? -1 : i }) };
+    });
+    const answered = Math.min(n, 2), charged = answered * 10;
+    const choice = (key, label, next) => ({ label, pick: () => this.setState({ [key]: label, step: next }) });
+    const start = (text) => this.setState({ step: 1, request: text, draft: '', a1: '', a2: '' });
+    return {
+      balance: done ? '₹' + (100 - charged) : '₹100',
+      scrollRef: this.scrollRef,
+      isHome: step === 0, isTest: step === -1,
+      hasRequest: step >= 1, q1Open: step === 1, showA1: step >= 2, q2Open: step === 2, showA2: step >= 3,
+      showPicker: step === 3, notPicking: step !== 3, showCalls: step >= 4, showDone: done,
+      showPicked: step >= 4, pickedLine: n + ' plumbers picked: ' + picked.map(s => s.name).join(', '),
+      request: st.request, a1, a2, a1lower: a1.toLowerCase(), a2lower: a2.toLowerCase(),
+      q1Choices: ['Today', 'Tomorrow', 'This week', 'Flexible'].map(l => choice('a1', l, 2)),
+      q2Choices: ['A leaking tap', 'Tap and a pipe leak', 'Not sure'].map(l => choice('a2', l, 3)),
+      shops, pickedCount: n, maxCharge: n * 10, noneOn: n === 0,
+      callLabel: n === 0 ? 'Pick at least 1 plumber' : 'Call ' + n + (n === 1 ? ' plumber' : ' plumbers'),
+      calls, bars,
+      callHeadline: done ? n + ' plumbers called · ' + answered + ' answered' : 'Calling ' + n + (n === 1 ? ' plumber…' : ' plumbers…'),
+      progress: done ? '100%' : '15%',
+      tags: done ? '1 answered all · ' + (answered - 1) + ' partly · ' + Math.max(0, n - answered) + ' not reached · charged ₹' + charged : n + ' calling now · updates by itself',
+      doneText: 'Sri Sai Plumbing Works can come today at 4 pm. Visit is ₹200, parts extra. Tap their number to book. Quick Fix can only come tomorrow. Want me to try 2 more plumbers?',
+      composerHint: step === 1 || step === 2 ? 'Type your own answer…' : step === 3 ? 'Ask about these plumbers…' : step >= 4 ? 'Ask a follow-up…' : 'Ask us to call about anything nearby…',
+      draft: st.draft,
+      typed: (e) => this.setState({ draft: e.target.value }),
+      send: (e) => { e.preventDefault(); if (step <= 0) start(st.draft.trim() || 'Plumber near 500032 to fix a leaking tap'); },
+      startPlumber: () => start('Plumber near 500032 to fix a leaking tap'),
+      startTest: () => this.setState({ step: -1 }),
+      startCalls: () => { if (n > 0) this.setState({ step: 4, open: 0 }); },
+      reset: () => this.setState({ step: 0, request: '', draft: '', a1: '', a2: '', open: 0 })
+    };
+  }
+}
+</script>
+</body>
+</html>

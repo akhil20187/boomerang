@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Account and credit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#1A1A19;background:#FFFFFF}
+a{color:#1A1A19}a:hover{color:#000}
+.amt{font:inherit;font-size:15px;font-weight:500;height:44px;border:1px solid #DAD7D0;border-radius:8px;background:#FFFFFF;cursor:pointer;color:#1A1A19}
+.line{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #DAD7D0;font-size:13px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #FFFFFF; overflow: hidden">
+
+<header style="display: flex; align-items: center; gap: 4px; padding: 10px 12px; border-bottom: 1px solid #DAD7D0">
+<a href="Tasks.dc.html" aria-label="Back to menu" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1A1A19"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+<div style="font-size: 16px; font-weight: 600">Account and credit</div>
+</header>
+
+<div style="flex: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 22px">
+
+<section style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 13px; color: #55544F">Your credit</div>
+<div style="font-size: 34px; font-weight: 700; letter-spacing: -0.03em">₹80</div>
+<div style="font-size: 13px; color: #55544F">About 8 answers · ₹10 per shop that answers</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<div style="font-size: 13px; font-weight: 500">Add credit</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+<button class="amt">₹100</button>
+<button class="amt">₹250</button>
+<button class="amt">₹500</button>
+<button class="amt">Other</button>
+</div>
+<div style="font-size: 12px; color: #55544F">Other amounts in steps of ₹10. Pay by UPI or card.</div>
+</section>
+
+<section>
+<div style="font-size: 13px; font-weight: 500; padding-bottom: 6px">Charges and refunds</div>
+<div class="line"><span>Sri Sai Plumbing Works<br><span style="color: #55544F; font-size: 12px">Plumber near 500032 · today 4:04 pm</span></span><span>−₹10</span></div>
+<div class="line"><span>Quick Fix Plumbers<br><span style="color: #55544F; font-size: 12px">Plumber near 500032 · today 4:03 pm</span></span><span>−₹10</span></div>
+<div class="line"><span>AquaCare Plumbing<br><span style="color: #55544F; font-size: 12px">Prefers a personal call</span></span><span style="color: #55544F">Not charged</span></div>
+<div class="line"><span>Welcome credit</span><span>+₹100</span></div>
+</section>
+
+<section style="display: flex; flex-direction: column; border-top: 1px solid #DAD7D0; padding-top: 6px">
+<div style="display: flex; justify-content: space-between; align-items: center; min-height: 44px; font-size: 15px"><span>Name the AI gives shops</span><span style="color: #55544F">Akhil</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; min-height: 44px; font-size: 15px"><span>Email</span><span style="color: #55544F">akhil@altir.co</span></div>
+<a href="Connect.dc.html" style="display: flex; justify-content: space-between; align-items: center; min-height: 44px; font-size: 15px; text-decoration: none"><span>Use in ChatGPT or Claude</span><span style="color: #55544F">Not connected ›</span></a>
+<button style="font: inherit; font-size: 15px; text-align: left; background: none; border: 0; padding: 0; min-height: 44px; color: #55544F; cursor: pointer">Sign out</button>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
