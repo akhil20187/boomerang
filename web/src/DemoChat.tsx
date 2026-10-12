@@ -1,11 +1,13 @@
 import {useEffect,useRef,useState} from 'react';
 import {ChatView,ChatPicker,ChatCalls,STARTERS,type ChatItem} from './Chat';
 import {demoPlumberDiscovery,demoPlumberTask} from './demo';
+import {welcomeLine} from './signInPresentation';
 
 /** /demo: a scripted chat with no backend and no model (spec D). Four questions (when, what, area, optional building: D159) → brief → picker → Call → simulated calls → results. */
 const AREA_CHOICES=['Gachibowli','Kondapur','Madhapur'];
 const BUILDING_Q='Apartment or building name? We share it only if a plumber asks for more detail.';
-export function DemoChat(){
+/** `welcome`: /demo/welcome shows a brand-new account's first chat with the one-time welcome note. */
+export function DemoChat({welcome=false}:{welcome?:boolean}){
  const [step,setStep]=useState(0);const [request,setRequest]=useState('');const [a1,setA1]=useState('');const [a2,setA2]=useState('');const [area,setArea]=useState('');const [building,setBuilding]=useState('');
  const [selected,setSelected]=useState<string[]>([]);const [stage,setStage]=useState(0);const [extra,setExtra]=useState<ChatItem[]>([]);const [test,setTest]=useState(false);const [thinking,setThinking]=useState(false);
  const timer=useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -32,6 +34,6 @@ export function DemoChat(){
  if(step>=5)items.push({_id:'a4',role:'user',kind:'text',text:building||'Skip'},{_id:'brief',role:'assistant',kind:'brief',text:'',payload:{noun:'plumbers',questions:[`Can you come to ${area} ${a1.toLowerCase()}?`,'What’s the visit charge?',`Rough cost to fix: ${a2.toLowerCase()}?`]}},{_id:'picker',role:'assistant',kind:'picker',text:'',payload:{noun:'plumbers',...(step>=6?{taskId:'demo'}:{})}});
  if(step>=6)items.push({_id:'calls',role:'assistant',kind:'calls',text:'',payload:{noun:'plumbers',taskId:'demo'}});
  items.push(...extra);
- return <ChatView items={items} thinking={thinking} error="" balanceCents={10000} priceCents={1000} onSend={onSend} onTestStarter={()=>{reset();setTest(true)}}
+ return <ChatView items={items} thinking={thinking} error="" balanceCents={10000} priceCents={1000} welcome={welcome?welcomeLine(10000,1000):undefined} onSend={onSend} onTestStarter={()=>{reset();setTest(true)}}
   renderCard={(item,latest)=>item.kind==='picker'?(item.payload?.taskId?null:<ChatPicker data={demoPlumberDiscovery} noun="plumbers" busy={false} onCall={ids=>{setSelected(ids);setStage(0);setStep(6)}}/>):item.kind==='calls'?<ChatCalls data={demoPlumberTask(selected,stage,a1,area,building)} taskId="demo" noun="plumbers" latest={latest&&!extra.length} onMore={()=>void onSend('Call more plumbers')} onNew={reset}/>:item.kind==='test_call'?<div className="bubble-assistant">{item.text}</div>:null}/>
 }

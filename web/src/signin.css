@@ -1,0 +1,42 @@
+/* Signed-out pages and the sign-out confirmation. Mockups: design/redesign-canvas/SignIn.dc.html, JourneyPhone.dc.html. */
+.signed-out{min-height:100vh;display:flex;flex-direction:column;background:#fff}
+.signed-out-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 24px;border-bottom:1px solid #dad7d0}
+.see-demo{font-size:14px;min-height:44px;display:flex;align-items:center}
+.signin-main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 16px}
+.signin{width:100%;max-width:420px;display:flex;flex-direction:column;gap:22px}
+.signin h1{font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.15}.signin h1:focus{outline:none}
+.signin-lede{margin-top:8px;font-size:15px;line-height:1.5;color:#55544f}.signin-lede strong{color:#1a1a19;overflow-wrap:anywhere}
+.signin-step{display:flex;flex-direction:column;gap:10px}.signin-step .signin-lede{margin-top:0}
+.signin form{display:flex;flex-direction:column;gap:10px}
+.signin label{font-size:13px;font-weight:500}
+.signin input[type=email]{height:48px;border-radius:8px;padding:0 14px;font-size:16px}
+.signin .primary{width:100%;height:48px;border:0;border-radius:8px;font-size:15px;font-weight:500}
+.signin .error{font-size:14px}
+.signin-note{font-size:13px;line-height:1.5;color:#55544f}.signin-note strong{color:#1a1a19;overflow-wrap:anywhere}
+.signin-status{font-size:14px;line-height:1.5;border:1px solid #dad7d0;border-radius:8px;padding:10px 12px}
+.signin-examples{border-top:1px solid #dad7d0;padding-top:18px;display:flex;flex-direction:column;gap:8px}
+.signin-examples h2{font-size:13px;font-weight:500;line-height:1.4}
+.signin-examples ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.signin-examples li{font-size:14px;line-height:1.4;border:1px solid #dad7d0;border-radius:8px;padding:10px 12px;color:#55544f}
+.link-actions{display:flex;gap:4px 18px;flex-wrap:wrap}
+.link-actions button{min-height:44px;padding:0;border:0;background:none;font-size:14px;text-decoration:underline;text-underline-offset:3px;color:#1a1a19}
+.signin .demo-banner{margin:0}
+.chat-welcome{font-size:14px;line-height:1.5;border:1px solid #dad7d0;border-radius:8px;padding:12px}
+@media(max-width:600px){
+ .signed-out-top{padding:4px 16px}
+ .signin-main{align-items:flex-start;padding:28px 16px}
+ .signin{gap:20px}.signin h1{font-size:26px}
+}
+/* Sign-out confirmation: small dialog on laptops, bottom sheet on phones. */
+.dialog-scrim{position:fixed;z-index:50;inset:0;background:rgba(26,26,25,.35);display:flex;align-items:center;justify-content:center;padding:16px}
+.dialog{width:min(420px,100%);background:#fff;border-radius:12px;padding:22px 20px 20px;display:flex;flex-direction:column;gap:12px}
+.dialog h2{font-size:18px;font-weight:600}
+.dialog p{font-size:14px;line-height:1.5;color:#55544f}
+.dialog-actions{display:flex;gap:10px;margin-top:6px}
+.dialog-actions button{min-height:44px;padding:0 18px;font-size:15px}
+.dialog-actions .primary{border:0;border-radius:8px}
+@media(max-width:600px){
+ .dialog-scrim{align-items:flex-end;padding:0}
+ .dialog{width:100%;border-radius:12px 12px 0 0;padding:20px 16px 24px}
+ .dialog-actions{flex-direction:column}.dialog-actions .primary{height:48px}
+}

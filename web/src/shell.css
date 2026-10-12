@@ -16,7 +16,9 @@
 .sidebar-all{display:flex;align-items:center;min-height:44px;padding:0 12px;margin-top:4px;border-radius:8px;font-size:13px;color:#55544f;text-decoration:none}
 .sidebar-links{border-top:1px solid #dad7d0;margin-top:8px;padding-top:8px;display:flex;flex-direction:column;gap:2px}
 .sidebar-links a{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:0 12px;border-radius:8px;text-decoration:none}
-.sidebar-links a>svg{flex-shrink:0}.sidebar-links a:not(:last-child){justify-content:flex-start}
+.sidebar-links a>svg{flex-shrink:0}.sidebar-links a:not(.sidebar-account){justify-content:flex-start}
+.sidebar-signout{display:flex;align-items:center;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#55544f;font-size:14px;text-align:left}.sidebar-signout:hover{background:#f2f1ee;color:#1a1a19}
+.sidebar-empty{font-size:14px;line-height:1.5;padding:6px 12px 0}
 .sidebar-link-text{display:flex;align-items:center;gap:10px}.sidebar-balance{font-size:13px;color:#55544f}
 .balance-pill{display:grid;place-items:center;min-width:44px;min-height:44px;text-decoration:none}.balance-pill>span{height:32px;padding:0 12px;border:1px solid #dad7d0;border-radius:999px;display:flex;align-items:center;font-size:13px;font-weight:500}
 @media(min-width:900px){

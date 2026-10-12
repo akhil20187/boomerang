@@ -1,3 +1,4 @@
+import {signedOutUrl} from './signInPresentation';
 import {useEffect,useRef,useState} from 'react';
 import {CallLogView} from './CallLog';
 import {ConnectView} from './ConnectAssistant';
@@ -41,4 +42,4 @@ const demoMoney=():MoneyRow[]=>[
  {_id:'m4',_creationTime:at(3,18,12),type:'charge',amountCents:-1000,shopName:'Aptronix',productName:iphone,taskId:'demo'},
  {_id:'m5',_creationTime:at(7,9,0),type:'grant',amountCents:10000},
 ];
-export function DemoAccount(){const [name,setName]=useState('Asha');return <AccountView demo account={{email:'you@example.com',availableCents:8000,reservedCents:0,answerPriceCents:1000,eligible:true,callingEnabled:true,name}} money={demoMoney()} connection={{connected:false,clients:[]}} nameForm={<CustomerNameForm saved={name} onSave={async n=>setName(n)}/>} onSignOut={()=>{location.href='/demo'}}/>}
+export function DemoAccount(){const [name,setName]=useState('Asha');return <AccountView demo account={{email:'you@example.com',availableCents:8000,reservedCents:0,answerPriceCents:1000,eligible:true,callingEnabled:true,name}} money={demoMoney()} connection={{connected:false,clients:[]}} nameForm={<CustomerNameForm saved={name} onSave={async n=>setName(n)}/>} onSignOut={()=>{location.href=signedOutUrl(true)}}/>}

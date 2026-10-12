@@ -1,5 +1,5 @@
 import {Component,Fragment,useEffect,useLayoutEffect,useRef,useState,type ReactNode} from 'react';
-import {useAction,useMutation,useQuery} from 'convex/react';
+import {useAction,useMutation,useQuery,usePaginatedQuery} from 'convex/react';
 import {makeFunctionReference} from 'convex/server';
 import {Icon} from './Icon';
 import {customerError} from './errors';
@@ -9,14 +9,16 @@ import {formatPaise,CHARGE_RULE} from './taskPresentation';
 import {terminal} from './statusPresentation';
 import type {Discovery,TaskView} from './types';
 import type {RecordingLoader} from './VoicePlayer';
+import {isNewAccount,markWelcomeSeen,welcomeLine,welcomeSeen} from './signInPresentation';
 import './chat.css';
+import './signin.css';
 
 import {composerHint,one,count,pickerFoot,pickerPlace,STARTERS,type ChatItem} from './chatPresentation';
 export {STARTERS};
 export type {ChatItem};
-type ViewProps={items:ChatItem[];thinking:boolean;error:string;onSend:(text:string)=>Promise<boolean>;onTestStarter:()=>void;balanceCents?:number;priceCents?:number|null;loading?:boolean;renderCard:(item:ChatItem,latest:boolean)=>ReactNode};
+type ViewProps={items:ChatItem[];thinking:boolean;error:string;onSend:(text:string)=>Promise<boolean>;onTestStarter:()=>void;balanceCents?:number;priceCents?:number|null;loading?:boolean;/** one-time note on a new account's first empty chat */welcome?:string;renderCard:(item:ChatItem,latest:boolean)=>ReactNode};
 /** The chat page (mockups Main.dc.html + Desktop.dc.html): message list, cards, and a composer that is always visible. */
-export function ChatView({items,thinking,error,onSend,onTestStarter,balanceCents,priceCents,loading,renderCard}:ViewProps){
+export function ChatView({items,thinking,error,onSend,onTestStarter,balanceCents,priceCents,loading,welcome,renderCard}:ViewProps){
  const [draft,setDraft]=useState('');const [failed,setFailed]=useState('');const end=useRef<HTMLDivElement>(null);const input=useRef<HTMLInputElement>(null);
  const lastKey=items.length+':'+(items.at(-1)?._id??'')+':'+thinking+':'+!!error;
  useLayoutEffect(()=>{if(items.length||thinking)end.current?.scrollIntoView({block:'end'})},[lastKey]);
@@ -24,7 +26,7 @@ export function ChatView({items,thinking,error,onSend,onTestStarter,balanceCents
  const price=priceCents??1000;
  return <div className="chat">
   <div className="chat-log" aria-live="polite">
-   {loading?<p className="chat-note" role="status">Loading your chat…</p>:!items.length&&!thinking?<div className="chat-empty"><div><h1>What should we call about?</h1><p>Tell us what you need. We find nearby shops or services, call them, and bring the answers back here.</p></div><div className="chat-starters"><button type="button" className="chip" onClick={()=>void submit(STARTERS.service)}>{STARTERS.service}</button><button type="button" className="chip" onClick={()=>void submit(STARTERS.product)}>{STARTERS.product}</button><button type="button" className="chip chip-test" onClick={onTestStarter}><span>{STARTERS.test}</span><span className="chip-note">Free</span></button></div>{balanceCents!==undefined&&<p className="chat-credit">You have {formatPaise(balanceCents)} credit{price>0?`, about ${Math.floor(Math.max(0,balanceCents)/price)} answers`:''}. You pay {formatPaise(price)} only when a shop answers what you asked.</p>}</div>:null}
+   {loading?<p className="chat-note" role="status">Loading your chat…</p>:!items.length&&!thinking?<div className="chat-empty">{welcome&&<p className="chat-welcome" role="status">{welcome}</p>}<div><h1>What should we call about?</h1><p>Tell us what you need. We find nearby shops or services, call them, and bring the answers back here.</p></div><div className="chat-starters"><button type="button" className="chip" onClick={()=>void submit(STARTERS.service)}>{STARTERS.service}</button><button type="button" className="chip" onClick={()=>void submit(STARTERS.product)}>{STARTERS.product}</button><button type="button" className="chip chip-test" onClick={onTestStarter}><span>{STARTERS.test}</span><span className="chip-note">Free</span></button></div>{balanceCents!==undefined&&!welcome&&<p className="chat-credit">You have {formatPaise(balanceCents)} credit{price>0?`, about ${Math.floor(Math.max(0,balanceCents)/price)} answers`:''}. You pay {formatPaise(price)} only when a shop answers what you asked.</p>}</div>:null}
    {items.map((item,i)=>{const latest=i===items.length-1;if(item.role==='user')return <div key={item._id} className="bubble-user">{item.text}</div>;if(item.kind==='text')return <div key={item._id} className="bubble-assistant">{item.text}</div>;if(item.kind==='question')return <QuestionCard key={item._id} item={item} open={latest&&!thinking} onChoice={c=>void submit(c)}/>;if(item.kind==='brief')return <BriefBox key={item._id} item={item}/>;return <Fragment key={item._id}>{renderCard(item,latest)}</Fragment>})}
    {thinking&&<p className="chat-thinking" role="status"><span className="pulse" aria-hidden="true"/>Thinking…</p>}
    {error&&<div className="chat-error" role="alert"><p>{error}</p>{failed&&<button type="button" onClick={()=>void submit(draft.trim()||failed)}>Try again</button>}</div>}
@@ -87,6 +89,8 @@ const taskRef=makeFunctionReference<'query'>('tasks:get');
 const startRef=makeFunctionReference<'mutation'>('tasks:start');
 const meRef=makeFunctionReference<'query'>('users:me');
 const playbackRef=makeFunctionReference<'mutation'>('recordings:playback');
+const chatsRef=makeFunctionReference<'query'>('chat:list');
+const historyRef=makeFunctionReference<'query'>('tasks:history');
 const trialRef=makeFunctionReference<'query'>('testCalls:status');
 const trialStartRef=makeFunctionReference<'mutation'>('testCalls:start');
 const widenRef=makeFunctionReference<'action'>('chat:widenSearch');
@@ -98,12 +102,26 @@ export function LiveChat(){
  const me=useQuery(meRef,{});const send=useAction(sendRef);const startTest=useMutation(testCardRef);
  const [thinking,setThinking]=useState(false);const [pending,setPending]=useState<{text:string;after:number}>();const [error,setError]=useState('');
  const items=data?.messages??[];
+ const welcome=useWelcome(me);
  const open=(id:string)=>{setChatId(id);history.replaceState(null,'',`/app?chat=${encodeURIComponent(id)}`)};
  async function onSend(text:string){setThinking(true);setError('');setPending({text,after:items.length});try{const out=await send({chatId,text});if(out.chatId!==chatId)open(out.chatId);return true}catch(e){setError(customerError(e,'Couldn’t send that. Try again.'));return false}finally{setThinking(false);setPending(undefined)}}
  const shown=pending&&!items.slice(pending.after).some(i=>i.role==='user'&&i.text===pending.text)?[...items,{_id:'pending',role:'user' as const,kind:'text' as const,text:pending.text}]:items;
- return <ChatView items={shown} thinking={thinking} error={error} loading={!!chatId&&data===undefined} balanceCents={me?.availableCents} priceCents={me?.answerPriceCents} onSend={onSend}
+ return <ChatView items={shown} thinking={thinking} error={error} loading={!!chatId&&data===undefined} balanceCents={me?.availableCents} priceCents={me?.answerPriceCents} welcome={chatId?undefined:welcome} onSend={onSend}
   onTestStarter={async()=>{setError('');try{const out=await startTest(chatId?{chatId}:{});if(out.chatId!==chatId)open(out.chatId)}catch(e){setError(customerError(e,'Couldn’t open the test call. Try again.'))}}}
   renderCard={(item,latest)=><CardBoundary fallback={item.kind==='picker'?'This list has expired. Ask again to search for current listings.':'This card couldn’t load. Open it from your tasks.'}>{item.kind==='picker'?<LivePicker item={item} chatId={chatId!}/>:item.kind==='calls'?<LiveCalls item={item} latest={latest} onSend={onSend}/>:item.kind==='test_call'?<LiveTestCall item={item} chatId={chatId!}/>:null}</CardBoundary>}/>
+}
+/**
+ * First visit after sign-up: "You're in. Your ₹100 welcome credit is ready, about 10 answers." once per account.
+ * "New" means no chats, no tasks and credit to spend; the note is then remembered as seen for this account in this
+ * browser (if storage is blocked it shows again only while the account is still new).
+ */
+function useWelcome(me:{id?:string;availableCents?:number;answerPriceCents?:number|null}|null|undefined){
+ const chats=useQuery(chatsRef,{}) as unknown[]|undefined;const history=usePaginatedQuery(historyRef,{},{initialNumItems:1});
+ const [note,setNote]=useState<string|null|undefined>(undefined);
+ useEffect(()=>{if(note!==undefined||!me?.id||chats===undefined||history.status==='LoadingFirstPage')return;
+  const fresh=isNewAccount({chats:chats.length,tasks:history.results.length,availablePaise:me.availableCents??0})&&!welcomeSeen(me.id);
+  if(fresh){markWelcomeSeen(me.id);setNote(welcomeLine(me.availableCents??0,me.answerPriceCents))}else setNote(null)},[note,me,chats,history.status,history.results.length]);
+ return note??undefined;
 }
 function LivePicker({item,chatId}:{item:ChatItem;chatId:string}){
  const noun=item.payload?.noun||'businesses';const folded=!!item.payload?.taskId;
