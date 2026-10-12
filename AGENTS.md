@@ -27,6 +27,10 @@ Before building or changing any screen (chat cards, website, emails), read `DESI
 
 ## Communication and execution
 
+- Develop and test on the `development` branch using an isolated, active Convex development deployment. Never use production data or the retired `little-kangaroo-718` forwarding deployment for development tests.
+- Merge reviewed changes into `main` for release. The live Vercel deployment must use Convex production (`coordinated-barracuda-687`). Check development and production separately; a development pass does not prove the deployed release works.
+- Before release, verify the selected database, HTTP/MCP routes, email redirects and Railway callbacks. Deploy changed Convex functions and widget assets as required; Vercel currently deploys the frontend only. See [environment workflow](docs/engineering/VERCEL_HOSTING.md#development-and-production-workflow).
+
 - Use concise, direct, plain words. Explain technical terms when needed. Avoid filler, hype and emojis.
 - Before using tools, say what you will do in one line. Explain a skill or subagent the first time it is used.
 - Ask one product question at a time with concrete choices. Choose routine technical details yourself.

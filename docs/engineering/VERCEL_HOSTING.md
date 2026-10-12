@@ -7,6 +7,21 @@ Convex production runs on `coordinated-barracuda-687`; Vercel forwards MCP, disc
 
 ## Deployment
 
+### Development and production workflow
+
+Agreed 12 October 2026 (D156): develop on `development`, then merge into `main` for release. Development uses a separate active Convex development deployment; the live Vercel website uses Convex production. Test each environment separately.
+
+| Branch | Convex environment | Required check |
+| --- | --- | --- |
+| `development` | Isolated development deployment | Check changes with test accounts and development data before merging. |
+| `main` | Production: `coordinated-barracuda-687` | After deployment, check the live website and MCP against production. |
+
+Before either check, confirm frontend database URL, HTTP/API/MCP destination, sign-in redirect origin and voice-bridge callback all belong to the intended environment. Development must not share the production voice bridge for calls; use an isolated bridge or keep calling disabled. Do not copy production users or balances back into development as part of routine releases.
+
+Release order: check development → merge into `main` → deploy changed Convex functions to production → publish changed widget assets to production → deploy the Vercel frontend → check the live production flow. A merge/Vercel build currently does **not** deploy Convex functions automatically. Changes that require data migrations need their own compatible release order and reconciliation.
+
+**Configuration check on 12 October:** main-only Git deployment is enabled; Vercel backend routes point to production. Local `.env.local` still selects the retired `little-kangaroo-718` deployment, which is read-only and forwards HTTP requests to production. It is not a usable development environment. Development/preview backend routing and an isolated development voice bridge are not configured or verified. Before running development tests, select a fresh active development deployment and its URLs. Do not restore writes to the retired deployment. Do not enable development previews with the current production route destinations.
+
 Live Convex `SITE_URL` and `MCP_PUBLIC_URL` are `https://www.askboomerang.online`. Production `MCP_LEGACY_PUBLIC_URLS=https://askboomerang.vercel.app,https://little-kangaroo-718.convex.site` preserves both old resource aliases. Vercel production settings are `VITE_CONVEX_URL=https://coordinated-barracuda-687.convex.cloud`, `VITE_MCP_PUBLIC_URL=https://www.askboomerang.online`, and `VITE_APP_PUBLIC_URL=https://www.askboomerang.online`. Live browser signup, welcome credit and public MCP account linking/refresh were verified after the 12 October cutover; see [migration report](2026-10-12-convex-production-migration.md). Historical 7 October checks below describe the earlier release.
 
 Automatic Git deployment is enabled for `main` only in `vercel.json`. Commit authors must belong to the connected `akhil20187` account. Backend changes require `npx convex deploy`; money migrations must finish and pass reconciliation before publishing the website. Assistant card changes also need `npx static-hosting upload --prod --dist web/dist` after building with production URLs. Run `scripts/audit-public-endpoints.mjs` to verify website, widget and Railway callback. Keep development on a separate deployment; do not restore writes to the retired forwarding deployment.
