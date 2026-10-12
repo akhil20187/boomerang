@@ -1,0 +1,38 @@
+import {useState} from 'react';
+import {CallLogView} from './CallLog';
+import {ConnectView} from './ConnectAssistant';
+import {AccountView,type MoneyRow} from './AccountPage';
+import {CustomerNameForm} from './CustomerName';
+import {sampleRecording} from './demo';
+import type {LogRow} from './callLogPresentation';
+import type {AnswerItem} from './types';
+
+/** /demo pages for the call log, connect and account (sample data, no backend, no calls). */
+const minute=60000,day=86400000;
+function at(daysAgo:number,h:number,m:number){const d=new Date(Date.now()-daysAgo*day);d.setHours(h,m,0,0);return d.getTime()}
+const item=(id:string,text:string,status:AnswerItem['status'],answer?:string,kind:AnswerItem['kind']='must_confirm'):AnswerItem=>({id,text,kind,status,answer});
+const plumber='Plumber near 500032',iphone='iPhone 17 256GB near 500037',notary='Notary in Balanagar';
+const charged={kind:'charged' as const,amountCents:1000};
+const free=(reason:string)=>({kind:'not_charged' as const,amountCents:1000,reason});
+export function demoLogRows():LogRow[]{const t0=Math.min(Date.now()-10*minute,at(0,16,4));const steps=(start:number,...texts:[string,number][])=>texts.map(([text,offset])=>({text,time:start+offset*minute}));return ([
+ {attemptId:'d1',taskId:'demo',businessName:'Sri Sai Plumbing Works',area:'Gachibowli',taskLabel:plumber,phone:'+91 00000 00001',address:'Plot 12, Gachibowli Main Road, Hyderabad 500032',mapsUrl:'https://www.google.com/maps/search/?api=1&query=Gachibowli+Hyderabad',source:'google',attemptNumber:1,isLatestAttempt:true,state:'answered',startedAt:t0,durationSeconds:102,recordingAvailable:true,answer:{stock:'unconfirmed',items:[item('q1','Can you come today?','answered','“Yes, at 4 pm.”'),item('q2','Visit charge?','answered','“₹200 for the visit.”'),item('q3','Cost to fix the tap?','conditional','“Usually ₹150 to ₹300, parts extra.”','deciding')]},timeline:steps(t0,['AI called on your behalf',0],['Shop answered · notes saved',2]),chargeNote:charged},
+ {attemptId:'d2',taskId:'demo',businessName:'Quick Fix Plumbers',area:'Kondapur',taskLabel:plumber,phone:'+91 00000 00002',address:'Kothaguda X Roads, Kondapur, Hyderabad 500084',source:'google',attemptNumber:2,isLatestAttempt:true,state:'answered',startedAt:t0-minute,durationSeconds:65,recordingAvailable:true,answer:{stock:'unconfirmed',items:[item('q1','Can you come today?','answered','“Tomorrow morning, not today.”'),item('q2','Visit charge?','answered','“₹150 visit.”'),item('q3','Cost to fix the tap?','not_answered',undefined,'deciding')]},timeline:steps(t0-minute,['Second attempt · AI called on your behalf',0],['Shop answered · notes saved',1]),chargeNote:charged},
+ {attemptId:'d3',taskId:'demo',businessName:'Quick Fix Plumbers',area:'Kondapur',taskLabel:plumber,phone:'+91 00000 00002',address:'Kothaguda X Roads, Kondapur, Hyderabad 500084',source:'google',attemptNumber:1,isLatestAttempt:false,attemptStatus:'unanswered',state:'retry_scheduled',startedAt:t0-6*minute,durationSeconds:40,answer:null,timeline:steps(t0-6*minute,['AI called on your behalf',0],['No answer · retry scheduled',1]),chargeNote:free('shop didn’t answer')},
+ {attemptId:'d4',taskId:'demo',businessName:'AquaCare Plumbing',area:'Madhapur',taskLabel:plumber,phone:'+91 00000 00003',address:'Ayyappa Society, Madhapur, Hyderabad 500081',source:'google',attemptNumber:1,isLatestAttempt:true,state:'personal_call_needed',startedAt:t0-2*minute,durationSeconds:22,answer:null,timeline:steps(t0-2*minute,['AI called on your behalf',0],['Shop asked to speak to a person',1]),chargeNote:free('shop prefers a personal call')},
+ {attemptId:'d5',taskId:'demo',businessName:'Balanagar Notary Office',taskLabel:notary,phone:'+91 00000 00006',address:'Balanagar Main Road, Hyderabad 500042',source:'supplied',contactSource:'assistant',attemptNumber:1,isLatestAttempt:true,state:'personal_call_needed',startedAt:at(2,11,20),durationSeconds:31,answer:null,timeline:steps(at(2,11,19),['AI called on your behalf',0],['Business asked to speak to a person',1]),chargeNote:free('shop prefers a personal call')},
+ {attemptId:'d6',taskId:'demo',businessName:'Aptronix',area:'Jubilee Hills',taskLabel:iphone,phone:'+91 00000 00007',address:'Road No. 36, Jubilee Hills, Hyderabad 500033',source:'google',attemptNumber:1,isLatestAttempt:true,state:'answered',startedAt:at(3,18,10),durationSeconds:130,recordingAvailable:true,answer:{stock:'available',finalPrice:75900,offers:'“₹4,000 instant discount on HDFC credit card.”',notes:'Black and blue in stock. Demo recording is a sample tone, not a real call.',variantMatch:'yes'},timeline:steps(at(3,18,10),['AI called on your behalf',0],['Shop answered · notes saved',2]),chargeNote:charged},
+ {attemptId:'d7',taskId:'demo',businessName:'Croma',area:'Banjara Hills',taskLabel:iphone,phone:'+91 00000 00008',address:'Road No. 1, Banjara Hills, Hyderabad 500034',source:'google',attemptNumber:1,isLatestAttempt:true,state:'answered',startedAt:at(3,18,9),durationSeconds:75,answer:{stock:'unavailable',notes:'“Not right now. Expected Friday.”'},timeline:steps(at(3,18,9),['AI called on your behalf',0],['Shop answered · notes saved',1]),chargeNote:charged},
+ {attemptId:'d8',taskId:'demo',businessName:'Vijay Sales',area:'Ameerpet',taskLabel:iphone,phone:'+91 00000 00009',address:'Ameerpet Main Road, Hyderabad 500016',source:'google',attemptNumber:2,isLatestAttempt:true,state:'unreachable',startedAt:at(3,18,14),durationSeconds:40,answer:null,timeline:steps(at(3,18,8),['AI called on your behalf',0],['No answer · retry scheduled',1],['Second attempt · no answer',6]),chargeNote:free('shop didn’t answer')},
+ {attemptId:'d9',taskId:'demo-test',businessName:'+91 00000 00000',taskLabel:'Hear how our AI sounds',phone:'+91 00000 00000',source:'google',attemptNumber:1,isLatestAttempt:true,state:'answered',startedAt:at(4,10,2),durationSeconds:48,answer:null,timeline:steps(at(4,10,2),['AI called on your behalf',0]),selfTest:true,chargeNote:{kind:'free',amountCents:0}},
+] as LogRow[]).sort((a,b)=>(b.startedAt??0)-(a.startedAt??0))}
+const demoLoader=async()=>({url:sampleRecording,expiresAt:Date.now()+day});
+export function DemoCallLog(){const [more,setMore]=useState<'can'|'done'>('can');return <CallLogView demo rows={demoLogRows()} summary={{calls:8,tries:9,answered:4,chargedPaise:4000,refundedPaise:0,notChargedCount:4,availablePaise:8000}} more={more} onLoadMore={()=>setMore('done')} loadRecording={demoLoader}/>}
+export function DemoConnect(){return <ConnectView status={{connected:false,clients:[]}} accessKeys={<p className="small-note">Sign in to create access keys. The demo doesn’t create real keys.</p>}/>}
+const demoMoney=():MoneyRow[]=>[
+ {_id:'m1',_creationTime:Date.now()-12*minute,type:'charge',amountCents:-1000,shopName:'Sri Sai Plumbing Works',productName:plumber,taskId:'demo'},
+ {_id:'m2',_creationTime:Date.now()-13*minute,type:'charge',amountCents:-1000,shopName:'Quick Fix Plumbers',productName:plumber,taskId:'demo'},
+ {_id:'m3',_creationTime:Date.now()-14*minute,type:'release',amountCents:0,shopName:'AquaCare Plumbing',productName:plumber,note:'shop prefers a personal call',taskId:'demo'},
+ {_id:'m4',_creationTime:at(3,18,12),type:'charge',amountCents:-1000,shopName:'Aptronix',productName:iphone,taskId:'demo'},
+ {_id:'m5',_creationTime:at(7,9,0),type:'grant',amountCents:10000},
+];
+export function DemoAccount(){const [name,setName]=useState('Asha');return <AccountView demo account={{email:'you@example.com',availableCents:8000,reservedCents:0,answerPriceCents:1000,eligible:true,callingEnabled:true,name}} money={demoMoney()} connection={{connected:false,clients:[]}} nameForm={<CustomerNameForm saved={name} onSave={async n=>setName(n)}/>} onSignOut={()=>{location.href='/demo'}}/>}
