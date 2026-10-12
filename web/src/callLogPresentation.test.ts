@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {realRows,rowBusiness,rowResult,rowCharge,chargedPaise,needsYou,filterRows,lengthText,groupByDay,totals,csvCell,callLogCsv,whenText,type LogRow} from './callLogPresentation.ts';
+import {realRows,rowBusiness,rowResult,rowCharge,chargedPaise,needsYou,filterRows,lengthText,groupByDay,totals,csvCell,callLogCsv,whenText,pageInfo,ROWS_PER_PAGE,type LogRow} from './callLogPresentation.ts';
 import {connectAddresses,connectionLines,answersLine,CONNECT_STEPS} from './accountPresentation.ts';
 
 const now=Date.now();const day=86400000;
@@ -74,4 +74,23 @@ test('connection lines and answers line',()=>{
  assert.equal(connectionLines({connected:true,clients:[{}]})[0],'Connected · AI assistant');
  assert.equal(answersLine(8000,1000),'About 8 answers · ₹10 per shop that answers');assert.equal(answersLine(1500,1000),'About 1 answer · ₹10 per shop that answers');assert.equal(answersLine(8000,null),'');
  assert.equal(CONNECT_STEPS.chatgpt.length,3);assert.equal(CONNECT_STEPS.claude.length,3);
+});
+
+test('pagination: 10 rows per page; "of M" only once every call is loaded',()=>{
+ assert.equal(ROWS_PER_PAGE,10);
+ const first=pageInfo(14,1,'can');
+ assert.deepEqual([first.start,first.end,first.hasPrev,first.hasNext,first.needsMore,first.totalPages],[0,10,false,true,false,undefined]);
+ assert.equal(first.label,'Page 1 · Showing 1–10');
+ const second=pageInfo(14,2,'can');
+ assert.equal(second.needsMore,true);assert.equal(second.label,'Page 2 · Showing 11–14');
+ const done=pageInfo(23,2,'done');
+ assert.deepEqual([done.start,done.end,done.totalPages,done.hasNext,done.hasPrev,done.needsMore],[10,20,3,true,true,false]);
+ assert.equal(done.label,'Page 2 of 3');
+ const last=pageInfo(23,3,'done');assert.equal(last.hasNext,false);assert.equal(last.end,23);
+});
+test('pagination: one page hides controls; empty pages while loading have no range',()=>{
+ assert.equal(pageInfo(7,1,'done').single,true);assert.equal(pageInfo(0,1,'done').label,'Page 1 of 1');
+ assert.equal(pageInfo(10,1,'done').hasNext,false);
+ const waiting=pageInfo(10,2,'loading');assert.equal(waiting.label,'Page 2');assert.equal(waiting.hasNext,true);
+ assert.equal(pageInfo(12,5,'done').lastPage,2);
 });

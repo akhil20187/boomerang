@@ -51,3 +51,26 @@ export function csvCell(value:string|number){if(typeof value==='number')return `
 
 /** CSV of the rows on screen. No recording links. Amounts are in rupees. */
 export function callLogCsv(rows:LogRow[]){const head=['When','Business','Task','Phone','Try','Caller','Result','Length','Charge','Charged (₹)'];const lines=rows.map(r=>[r.startedAt?new Date(r.startedAt).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'',rowBusiness(r),r.taskLabel,r.phone||'',`Try ${r.attemptNumber}`,'AI agent',rowResult(r)[0],lengthText(r.durationSeconds),rowCharge(r),chargedPaise(r)/100]);return [head,...lines].map(line=>line.map(csvCell).join(',')).join('\r\n')+'\r\n'}
+
+/** Call log page size (rows, after the filter). */
+export const ROWS_PER_PAGE=10;
+export type MoreState='can'|'loading'|'done';
+/**
+ * Page controls for the call log. `count` is the number of loaded rows that match the filter; `more` says whether the
+ * server has older calls. A total ("of M") is shown only once every call is loaded; until then the label gives the range.
+ */
+export function pageInfo(count:number,page:number,more:MoreState,per=ROWS_PER_PAGE){
+ const start=(page-1)*per,end=Math.min(count,start+per),complete=more==='done';
+ const totalPages=complete?Math.max(1,Math.ceil(count/per)):undefined;
+ const range=end>start?`Showing ${start+1}–${end}`:'';
+ return {start,end,totalPages,
+  /** this page is not full yet and older calls exist: load the next batch */
+  needsMore:!complete&&count<page*per,
+  hasPrev:page>1,
+  hasNext:count>page*per||!complete,
+  /** last valid page once everything is loaded (a filter or a deleted call can shrink the list) */
+  lastPage:totalPages,
+  label:totalPages?`Page ${page} of ${totalPages}`:`Page ${page}${range?` · ${range}`:''}`,
+  /** hide the controls when everything fits on one page */
+  single:totalPages===1};
+}
