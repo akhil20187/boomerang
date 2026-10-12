@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test voice-test/*.test.cjs call-bridge/*.test.cjs mcp/*.test.mjs web/src/errors.test.ts web/src/taskPresentation.test.ts scripts/configure-development.test.mjs",
+    "test": "node --test voice-test/*.test.cjs call-bridge/*.test.cjs mcp/*.test.mjs web/src/errors.test.ts web/src/taskPresentation.test.ts web/src/statusPresentation.test.ts scripts/configure-development.test.mjs",
     "test:backend": "vitest run backend-tests",
     "typecheck": "tsc -p web/tsconfig.json && tsc -p convex/tsconfig.json",
     "dev": "vite --config web/vite.config.ts --host 127.0.0.1",
