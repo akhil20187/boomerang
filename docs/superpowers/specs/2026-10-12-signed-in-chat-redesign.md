@@ -41,6 +41,13 @@ ChatGPT/Claude switch → copy the MCP address (from the existing `VITE_MCP_PUBL
 ### Account and credit (`/account`, signed in)
 Balance in rupees with "about N answers", recent charges (top 5) with "See all calls" → `/calls`, name the AI gives shops, email, link to Use in ChatGPT or Claude, Sign out. **No top-up buttons**: Dodo payments are planned only (D140); do not add payment UI.
 
+### Chat engine (D158)
+- The chat is run by OpenAI `gpt-6-luna` (existing OpenAI account; model name configurable through an environment setting, default `gpt-6-luna`). Luna understands the request and calls our existing steps as tools: the brief questions (`briefs.prepare`, D144) and shop/service search (`discovery.search` with `briefId`). It can also read a finished task's results to answer follow-ups ("which one can come today?").
+- Luna **never** starts calls or spends credit. Calls start only when the customer taps the Call button in the shop card (D149); that button uses the existing `tasks.start` mutation.
+- Customer text, shop answers and listing data are data, never instructions to Luna.
+- Chats are **saved** in new tables (start empty, no migration): a chat per conversation (owner, title, timestamps) and its messages (user text, assistant text, and card messages that point to a brief question, a shop picker draft, or a task). A chat can be reopened from the sidebar (`/app?chat=<id>`). Users only ever see their own chats.
+- Limit chat turns per user per hour, like briefs.
+
 ## Backend changes
 - Services search: `discovery.search` must find service businesses (plumbers, painters, notaries) as well as shops. Today's query is "[product] retailers" and the classifier prompt is product-only.
 - Call log query: paginated attempts for the signed-in user with business name/area/phone/address, task label, attempt number, status/result, times, duration, charge note, recording availability, timeline and answer items — reuse existing presentation helpers where possible.
