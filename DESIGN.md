@@ -245,6 +245,41 @@ Under it: elapsed time on the left, "Called 4:07 pm" on the right.
 | Loading | the waveform shows faded until the audio is ready |
 | Error | "Recording didn't load. Open it on the website." |
 | Done | stops at the end and resets to the start |
+### Signed-in website (D153)
+Spec: [signed-in redesign](docs/superpowers/specs/2026-10-12-signed-in-chat-redesign.md). Same colours, type and shapes as the cards above. Every signed-in page sits inside the app shell; `/demo/...` shows each page with sample data and no backend.
+
+**Chat page (`/app`)**
+- One column, about 760px wide. The composer stays visible at all times; cards (questions, shop picker, call card) appear inside the conversation.
+- Empty state: "What should we call about?", one line under it, three starter chips, and the real balance with "₹10 only when a shop answers".
+- The picker's price line and main button live inside the picker card. After "Call", the picker folds to one line and the call card follows.
+- The noun follows the request: "shops" for products, the service word ("plumbers") or "businesses" otherwise.
+
+**Sidebar / menu**
+- Laptop (≥900px): fixed 270px left sidebar. Phone: top bar (menu button, logo, balance pill → account) and a drawer.
+- Order: New request · Chats · Live now / Today / Needs you / Earlier · Call log · Use in ChatGPT or Claude · Account and credit (with balance).
+- Each task row: label, then one status line in its DESIGN colour; live tasks carry the blue pulse.
+
+**Call log (`/calls`)**
+- One row per call try, newest first. Heading "Call log" and "Every call we made for you, every try, and what it cost."
+- Totals in four boxes: calls this month (tries), answered, charged in ₹ (not-charged count), credit left (link to account). No "Add credit".
+- Filters are pill buttons with `aria-pressed`: All calls · Charged · Not charged · Needs you. Selected = light grey fill and dark outline, never black fill.
+- Laptop: a table (When · Business with task and tap-to-call phone · Try N / AI agent · Result in its status colour · Length · Charge · Open). It scrolls sideways inside its own box. Opening shows the shared opened call in a full-width row with call and directions icons.
+- Phone: grouped by day ("Today", "9 Oct"), stacked cards; the phone number and the call/directions icons are always visible (D146).
+- An earlier unanswered try reads amber "No answer · tried again". Charge lines are grey: "Charged ₹10", "Not charged · reason", "Refunded ₹10", "Free" for a test call to yourself. Never green.
+- "Download CSV" exports the rows on screen in rupees, without recording links; text cells starting with = + - @ are escaped.
+- Empty: "No calls yet." + "Start a request". Simulated verification tasks never appear.
+
+**Use in ChatGPT or Claude (`/connect-assistant`)**
+- A two-option switch (ChatGPT / Claude) with real tab semantics; selected = light grey fill and dark outline.
+- 1. Copy this address (the MCP address, a Copy button that reads "Copied") → 2. three short steps for the chosen app → 3. "Check connection" ("Connected · ChatGPT · last refreshed …" or "Not connected yet").
+- Steps stay generic ("add a custom connector"); menu names change often, so name only what our SKILL.md names.
+- Then "Or paste this into any AI assistant: Set me up with Boomerang using …/SKILL.md", and a closed fold "Advanced: access keys" with the access-key controls.
+
+**Account and credit (`/account`, signed in)**
+- Balance large in rupees, "About N answers · ₹10 per shop that answers" (price from the server), and "Paid top-ups aren't available yet." No payment or top-up buttons until payments are agreed (D140).
+- "Charges and refunds": latest five movements, amounts in text colour (−₹10, +₹100), never green; links "See all calls" and "Credit & charges".
+- Then: the name the AI gives shops (editable), email, "Use in ChatGPT or Claude" with connection status, and Sign out. Signed-out `/account` keeps the email sign-in form.
+
 ## 5. The first screen's words
 The shop picker card (D66). Numbers, product and pincode fill in from the search.
 
@@ -303,6 +338,8 @@ Copies of each screen's source are in [design/canvas/](./design/canvas/), taken 
 | Option 1 · New status card (fallback) | `Flow.dc.html` | Fallback if app review objects: the picker stays and a new call card appears below |
 
 **Mockups match this document** as of 5 October 2026. They use the phone's own font, "shops", the approved headline, a black main button, the "shops picked" line and "Prefers a personal call" instead of human rows. If they ever differ, this document wins.
+
+**Signed-in redesign mockups (reference):** [design/redesign-canvas/](design/redesign-canvas/) holds copies of the "Boomerang App Redesign" canvas (chat, sidebar, call log, connect, wallet, opened call). They are reference only: where they differ from section 4 "Signed-in website" (for example the Wallet's "Add credit" buttons or black selected filters), this document wins.
 
 Known gaps in the mockups:
 - All shop names, prices, ratings and answers are sample data.
