@@ -28,7 +28,7 @@
 @media(max-width:899px){
  .app-topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 8px;background:#fff;border-bottom:1px solid #dad7d0}
  .app-sidebar{position:fixed;z-index:30;top:0;left:0;bottom:0;width:min(318px,86vw);padding:8px 8px 12px;border-right:1px solid #dad7d0;transform:translateX(-100%);visibility:hidden;transition:transform .2s ease,visibility .2s}
- .menu-open .app-sidebar{transform:none;visibility:visible}
+ .menu-open .app-sidebar{transform:none;visibility:visible;transition:transform .2s ease}
  .menu-scrim{position:fixed;z-index:20;inset:0;background:rgba(26,26,25,.35)}
 }
 @media(max-width:600px){.app-main.workspace{padding-top:20px}}
