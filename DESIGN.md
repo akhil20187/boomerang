@@ -257,7 +257,8 @@ Spec: [signed-in redesign](docs/superpowers/specs/2026-10-12-signed-in-chat-rede
 
 **Sidebar / menu**
 - Laptop (≥900px): fixed 270px left sidebar. Phone: top bar (menu button, logo, balance pill → account) and a drawer.
-- Order: New request · Chats · Live now / Today / Needs you / Earlier · Call log · Use in ChatGPT or Claude · Account and credit (with balance).
+- Order: New request · Chats · Live now / Today / Needs you / Earlier · Call log · Use in ChatGPT or Claude · Account and credit (with balance) · Sign out (grey, last).
+- A new account with no chats or tasks shows "Your requests" and "No requests yet. Your chats and calls will show here."
 - Each task row: label, then one status line in its DESIGN colour; live tasks carry the blue pulse.
 
 **Call log (`/calls`)**
@@ -282,7 +283,17 @@ Spec: [signed-in redesign](docs/superpowers/specs/2026-10-12-signed-in-chat-rede
 **Account and credit (`/account`, signed in)**
 - Balance large in rupees, "About N answers · ₹10 per shop that answers" (price from the server), and "Paid top-ups aren't available yet." No payment or top-up buttons until payments are agreed (D140).
 - "Charges and refunds": latest five movements, amounts in text colour (−₹10, +₹100), never green; links "See all calls" and "Credit & charges".
-- Then: the name the AI gives shops (editable), email, "Use in ChatGPT or Claude" with connection status, and Sign out. Signed-out `/account` keeps the email sign-in form.
+- Then: the name the AI gives shops (editable), email, "Use in ChatGPT or Claude" with connection status, and Sign out.
+
+**Signed out, sign in and sign out** (mockups `SignIn.dc.html`, `JourneyPhone.dc.html`)
+- Every signed-out route (`/app`, `/account`, `/calls`, `/connect-assistant`, `/tasks`, `/status`, `/credit`, and `/connect` before the assistant consent) shows one page: a plain header (logo · "See a demo" → `/demo`, no other links) and a centred 420px column. The email link brings the customer back to the page they were on.
+- Sign in: "Sign in to Boomerang" · "We'll email you a link. No password." · Email · black "Email me a sign-in link" · "New here? You start with ₹100 credit, about 10 answers. You pay ₹10 only when a shop answers what you asked." · "Then just tell us what to call about" with three example requests (not buttons). A sending error stays under the button and keeps the typed email.
+- Check your email: the address in bold, "Open it on this device. It expires in 15 minutes." (the real link lifetime, `convex/auth.ts`), "Not there? Check spam, or wait a minute and send it again.", then underlined "Send it again" (waits 30 seconds after each email; reads "Sent again") and "Use a different email".
+- Expired or used link: "That link has expired" · "Sign-in links work once, for 15 minutes. We can send you a fresh one." · black "Send a new link" to the last address used in this browser (or an email field when none is known).
+- First visit of a new account (no chats, no tasks, credit to spend): the empty chat shows "You're in. Your ₹100 welcome credit is ready, about 10 answers." once, above "What should we call about?", instead of the usual credit line. The amount is the real balance.
+- Sign out (menu and Account page) always asks first: "Sign out of Boomerang?" · "Calls already running keep going. Their answers will be here when you sign in again, and we also email you the results." · black "Sign out" · "Stay signed in". Phone: bottom sheet; laptop: small centred dialog. Focus starts on "Stay signed in", stays inside, Escape or the backdrop closes it, and focus returns to where it was (the menu button on phones).
+- After signing out: the sign-in page with "You're signed out. Sign in again any time to see your chats and calls." shown once.
+- `/demo/signin` (add `?stage=sent`, `?stage=expired` or `?signed_out=1`) and `/demo/welcome` show these screens with no backend; the demo menu's Sign out opens the real dialog.
 
 ## 5. The first screen's words
 The shop picker card (D66). Numbers, product and pincode fill in from the search.

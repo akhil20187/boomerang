@@ -6,7 +6,8 @@ import './signin.css';
 /**
  * "Sign out of Boomerang?" (JourneyPhone.dc.html): a bottom sheet on phones, a small dialog on laptops.
  * Focus starts on "Stay signed in", Tab stays inside, Escape or the backdrop closes, and focus returns to the
- * button that opened it (or `fallbackFocus` when that button is gone, e.g. inside a closed phone menu).
+ * button that opened it, or to `fallbackFocus()` when that returns an element (e.g. the phone menu button, because
+ * the Sign out button sat inside the menu drawer that closed).
  */
 export function SignOutDialog({open,onClose,onConfirm,fallbackFocus}:{open:boolean;onClose:()=>void;onConfirm:()=>Promise<void>|void;fallbackFocus?:()=>HTMLElement|null|undefined}){
  const box=useRef<HTMLDivElement>(null);const stay=useRef<HTMLButtonElement>(null);const [busy,setBusy]=useState(false);
@@ -24,7 +25,7 @@ export function SignOutDialog({open,onClose,onConfirm,fallbackFocus}:{open:boole
    if(!box.current.contains(at)){e.preventDefault();a.focus()}else if(e.shiftKey&&at===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&at===z){e.preventDefault();a.focus()}
   };
   document.addEventListener('keydown',key,true);
-  return()=>{document.removeEventListener('keydown',key,true);document.body.style.overflow=previous;const shown=(el:HTMLElement|null)=>!!el&&el.isConnected&&el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden';const target=shown(opener)?opener:fallback.current?.()??null;target?.focus()};
+  return()=>{document.removeEventListener('keydown',key,true);document.body.style.overflow=previous;const preferred=fallback.current?.();if(preferred)preferred.focus();else opener?.focus()};
  },[open]);
  if(!open)return null;
  return <div className="dialog-scrim" onClick={e=>{if(e.target===e.currentTarget&&!busy)onClose()}}>

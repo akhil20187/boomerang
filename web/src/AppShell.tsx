@@ -31,7 +31,7 @@ export function AppShell({children,groups,balanceCents,demo=false,chats=[],mainC
    <div className="sidebar-links"><a href={`${demo?'/demo':''}/calls`} {...current(path===`${demo?'/demo':''}/calls`)}><Icon name="list"/>Call log</a><a href={`${demo?'/demo':''}/connect-assistant`} {...current(path===`${demo?'/demo':''}/connect-assistant`)}><Icon name="link"/>Use in ChatGPT or Claude</a><a className="sidebar-account" href={`${demo?'/demo':''}/account`} {...current(path===`${demo?'/demo':''}/account`||path==='/credit')}><span className="sidebar-link-text"><Icon name="user"/>Account and credit</span><span className="sidebar-balance">{balance}</span></a>{onSignOut&&<button type="button" className="sidebar-signout" onClick={()=>{setOpen(false);setConfirm(true)}}>Sign out</button>}</div>
   </nav>
   <main className={`workspace app-main${mainClassName?' '+mainClassName:''}`} inert={open}>{demo&&<div className="demo-banner">Interactive demo · sample shops, dummy phone numbers and answers · no calls or charges</div>}{children}</main>
-  {onSignOut&&<SignOutDialog open={confirm} onClose={()=>setConfirm(false)} onConfirm={onSignOut} fallbackFocus={()=>menuButton.current}/>}
+  {onSignOut&&<SignOutDialog open={confirm} onClose={()=>setConfirm(false)} onConfirm={onSignOut} fallbackFocus={()=>matchMedia('(min-width: 900px)').matches?null:menuButton.current}/>}
  </div>
 }
 /** AppShell with the signed-in user's first 15 tasks, recent chats and balance. A chat whose calls started is reached through its task row. */
