@@ -1,11 +1,13 @@
 # Vercel frontend
 
 Project: `akhil20187s-projects/boomerang`.
-Preferred frontend URL: https://askboomerang.vercel.app
+Preferred frontend URL: https://www.askboomerang.online (since 12 October 2026; apex redirects to www).
 Public MCP URL: https://askboomerang.vercel.app/mcp
 Convex runs the backend on `little-kangaroo-718`; Vercel forwards the public MCP endpoint and resource discovery to it. The OAuth sign-in issuer remains Convex, preserving existing grants and callbacks. Existing Convex connections remain supported.
 
 ## Deployment
+
+Live Convex `SITE_URL` is now `https://www.askboomerang.online`. The deployment examples and 7 October checks below describe the earlier Vercel-domain release; avoid restoring that old `SITE_URL`. The custom-domain sign-in form and Resend simulator delivery were verified on 12 October; real inbox delivery and link redemption remain unverified. Public MCP settings have not been migrated by this sign-in fix.
 
 Automatic Git deployment is enabled for `main` only in `vercel.json`. Commit authors must belong to the connected `akhil20187` account. Backend changes still require a separate Convex deployment; money migrations must finish and pass reconciliation before the website is published. The assistant widget is served by Convex, so card changes also need `CONVEX_DEPLOYMENT=dev:little-kangaroo-718 npx static-hosting upload --dist web/dist` after building with the approved live URLs. Run `scripts/audit-public-endpoints.mjs` to verify both the website and widget.
 
