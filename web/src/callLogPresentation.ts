@@ -46,8 +46,8 @@ export function totals(s:LogSummary){return [
  {label:'Charged',value:formatPaise(s.chargedPaise),note:[s.notChargedCount?`${s.notChargedCount} not charged`:'',s.refundedPaise?`${formatPaise(s.refundedPaise)} refunded`:''].filter(Boolean).join(' · ')},
  {label:'Credit left',value:formatPaise(s.availablePaise),note:''}]}
 
-/** Spreadsheet-safe cell: quoted, and text that a spreadsheet would run as a formula is prefixed with '. Phone numbers like "+91 …" stay as they are. */
-export function csvCell(value:string|number){const text=String(value);const safe=/^[=@\t\r]/.test(text)||/^[+-](?![\d\s])/.test(text)?`'${text}`:text;return `"${safe.replace(/"/g,'""')}"`}
+/** Spreadsheet-safe cell (CSV formula injection guard): every text cell starting with = + - @ tab or carriage return gets a leading ', then normal CSV quoting. Numbers (rupee amounts) stay unprefixed. */
+export function csvCell(value:string|number){if(typeof value==='number')return `"${value}"`;const safe=/^[=+\-@\t\r]/.test(value)?`'${value}`:value;return `"${safe.replace(/"/g,'""')}"`}
 
 /** CSV of the rows on screen. No recording links. Amounts are in rupees. */
 export function callLogCsv(rows:LogRow[]){const head=['When','Business','Task','Phone','Try','Caller','Result','Length','Charge','Charged (₹)'];const lines=rows.map(r=>[r.startedAt?new Date(r.startedAt).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'',rowBusiness(r),r.taskLabel,r.phone||'',`Try ${r.attemptNumber}`,'AI agent',rowResult(r)[0],lengthText(r.durationSeconds),rowCharge(r),chargedPaise(r)/100]);return [head,...lines].map(line=>line.map(csvCell).join(',')).join('\r\n')+'\r\n'}

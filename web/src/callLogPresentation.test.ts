@@ -53,10 +53,12 @@ test('totals strip uses rupees and the month summary',()=>{
  assert.deepEqual(t.map(x=>[x.label,x.value,x.note]),[['Calls this month','14','18 tries'],['Answered','8','of 14 calls'],['Charged','₹80','6 not charged'],['Credit left','₹80','']]);
 });
 test('CSV: header, rupee amounts, quotes escaped, formulas neutralised, no recording links',()=>{
- assert.equal(csvCell('a "b"'),'"a ""b"""');assert.equal(csvCell('=HYPERLINK("x")'),'"\'=HYPERLINK(""x"")"');assert.equal(csvCell('+91 00000 00001'),'"+91 00000 00001"');assert.equal(csvCell('-cmd'),'"\'-cmd"');
+ assert.equal(csvCell('a "b"'),'"a ""b"""');assert.equal(csvCell('Sri Sai, Plumbing\nWorks'),'"Sri Sai, Plumbing\nWorks"');
+ for(const [input,out] of [['=HYPERLINK("x")','"\'=HYPERLINK(""x"")"'],['+SUM(A1)','"\'+SUM(A1)"'],['-2+3','"\'-2+3"'],['@cmd','"\'@cmd"'],['\tTab','"\'\tTab"'],['\rCR','"\'\rCR"'],['+91 00000 00001','"\'+91 00000 00001"']])assert.equal(csvCell(input),out,input);
+ assert.equal(csvCell('Sri Sai Plumbing'),'"Sri Sai Plumbing"');assert.equal(csvCell(10),'"10"');assert.equal(csvCell(-5),'"-5"');
  const csv=callLogCsv([rows[0],rows[7]]);const lines=csv.trim().split('\r\n');
  assert.equal(lines[0],'"When","Business","Task","Phone","Try","Caller","Result","Length","Charge","Charged (₹)"');
- assert.match(lines[1],/"Sri Sai Plumbing","Plumber near 500032","\+91 00000 00001","Try 1","AI agent","In stock · ₹500","1:42","Charged ₹10","10"$/);
+ assert.match(lines[1],/"Sri Sai Plumbing","Plumber near 500032","'\+91 00000 00001","Try 1","AI agent","In stock · ₹500","1:42","Charged ₹10","10"$/);
  assert.match(lines[2],/"Test call to you".*"Free","0"$/);
  assert.doesNotMatch(csv,/recording|https?:/i);
 });
