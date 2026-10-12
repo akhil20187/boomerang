@@ -7,4 +7,10 @@ crons.interval(
   internal.maintenance.cleanup,
   {},
 );
+crons.interval(
+  "delete chat turn records older than 2 hours",
+  { minutes: 30 },
+  internal.maintenance.cleanupChatTurns,
+  {},
+);
 export default crons;

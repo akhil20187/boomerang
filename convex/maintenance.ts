@@ -2,6 +2,7 @@ import { internalMutation } from "./mutationSafety";
 import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { convertUserToRupees } from "./credits";
+import { internal } from "./_generated/api";
 export const cleanup = internalMutation({
   args: {},
   returns: v.null(),
@@ -53,5 +54,24 @@ export const convertTaskPricesToRupees = internalMutation({
       converted++;
     }
     return { converted, continueCursor: page.continueCursor, isDone: page.isDone };
+  },
+});
+/** Chat turn ledger (chat.ts takeTurn) only needs the last hour; rows older than this are deleted. */
+export const CHAT_TURN_RETENTION_MS = 2 * 60 * 60 * 1000;
+export const CHAT_TURN_CLEANUP_BATCH = 200;
+/** Deletes chatTurns rows older than 2 hours in bounded batches; schedules itself again while a full batch was found. */
+export const cleanupChatTurns = internalMutation({
+  args: {},
+  returns: v.number(),
+  handler: async (ctx) => {
+    const cutoff = Date.now() - CHAT_TURN_RETENTION_MS;
+    const old = await ctx.db
+      .query("chatTurns")
+      .withIndex("by_creation_time", (q) => q.lt("_creationTime", cutoff))
+      .take(CHAT_TURN_CLEANUP_BATCH);
+    for (const turn of old) await ctx.db.delete(turn._id);
+    if (old.length === CHAT_TURN_CLEANUP_BATCH)
+      await ctx.scheduler.runAfter(0, internal.maintenance.cleanupChatTurns, {});
+    return old.length;
   },
 });
