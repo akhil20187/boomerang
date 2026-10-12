@@ -1,0 +1,56 @@
+/* /app chat (D153, D158). Mockups: design/redesign-canvas/Main.dc.html (phone), Desktop.dc.html (laptop). DESIGN.md colours and shapes. */
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.app-main.chat-main{max-width:808px;padding:24px 24px 0;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+.chat{flex:1;display:flex;flex-direction:column;min-width:0}
+.chat-log{flex:1;display:flex;flex-direction:column;gap:14px;padding-bottom:20px;min-width:0}
+.chat-note{font-size:13px;color:#55544f}
+.chat-empty{display:flex;flex-direction:column;gap:18px;padding-top:40px}
+.chat-empty h1{font-size:26px;line-height:1.15;letter-spacing:-.03em;font-weight:700}
+.chat-empty p{font-size:15px;line-height:1.45;color:#55544f;margin-top:8px}
+.chat-starters{display:flex;flex-direction:column;gap:8px}
+.chip{font-size:14px;text-align:left;background:#fff;border:1px solid #dad7d0;border-radius:8px;padding:11px 12px;min-height:44px;color:#1a1a19;line-height:1.35}
+.chip:hover,.choice:hover{border-color:#1a1a19}
+.chip-test{display:flex;justify-content:space-between;align-items:center;gap:8px}.chip-note{font-size:12px;color:#55544f;white-space:nowrap}
+.chat-empty .chat-credit{font-size:12px;line-height:1.5;margin:0}
+.bubble-user{align-self:flex-end;max-width:80%;background:#f2f1ee;border-radius:16px;padding:10px 14px;font-size:15px;line-height:1.4;overflow-wrap:anywhere;white-space:pre-wrap}
+.bubble-assistant{font-size:15px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
+.chat-thinking{display:flex;align-items:center;gap:8px;font-size:13px;color:#55544f}
+.chat-error{display:flex;align-items:center;flex-wrap:wrap;gap:10px;font-size:13px;color:#b42318}.chat-error button{color:#b42318;border-color:#b42318;min-height:40px;padding:0 14px}
+/* Question card: question, tap-to-answer choices, hint. */
+.question-card{display:flex;flex-direction:column;gap:10px}
+.question-count{font-size:12px;color:#55544f}
+.question-text{font-size:15px;font-weight:600;line-height:1.4}
+.question-hint{font-size:12px;color:#55544f}
+.choices{display:flex;flex-wrap:wrap;gap:8px}
+.choice{font-size:14px;background:#fff;border:1px solid #dad7d0;border-radius:999px;padding:0 14px;min-height:40px;color:#1a1a19}
+/* Brief box: "We'll ask each plumber". */
+.brief-box{border:1px solid #dad7d0;border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.brief-head{font-size:13px;color:#55544f}
+.brief-box ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:1.45}
+.brief-note{font-size:12px;color:#55544f}
+/* Picker card: rows, then price + main button + small print inside the card. */
+.chat-card{line-height:normal}.chat-card p{line-height:inherit}
+.chat-card-head{padding:14px 14px 10px;display:flex;flex-direction:column;gap:4px}.chat-card-head p{font-size:13px;color:#55544f}
+.chat-card-body{padding:12px 14px;border-top:1px solid #dad7d0;display:flex;flex-direction:column;gap:10px;font-size:13px}
+.chat-rows{display:flex;flex-direction:column}
+.chat-row{display:flex;gap:12px;align-items:flex-start;width:100%;padding:12px 14px;border:0;border-top:1px solid #dad7d0;border-radius:0;background:#fff;text-align:left}
+.chat-row .tick{margin-top:1px}.chat-row[aria-pressed=true] .tick{background:#1a1a19;border-color:#1a1a19}
+.chat-row-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+.chat-row-meta{font-size:12px;color:#55544f}.chat-row-meta .count{color:#55544f}
+.chat-card-foot{padding:14px;border-top:1px solid #dad7d0;display:flex;flex-direction:column;gap:8px}
+.chat-price{display:flex;flex-direction:column;gap:4px}
+.chat-price>p:first-child{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px;font-size:13px}
+.chat-price strong{font-weight:600}
+.chat-card-foot .primary{width:100%;min-height:48px;border:0;border-radius:8px;font-size:15px;font-weight:500}
+.chat-card-foot .primary:disabled{background:#8f8c85;opacity:1}
+.chat-card-foot .blocked{font-size:13px;color:#7a4a00}
+.chat-card-foot .small-print{font-size:12px;line-height:1.5;color:#55544f}
+.chat-card-foot .listing-attribution{font-size:11px;color:#6b6a66}
+.chat-test{display:flex;flex-direction:column;gap:12px}
+/* Composer: always visible at the bottom of the screen. */
+.composer{position:sticky;bottom:0;z-index:5;display:flex;gap:8px;align-items:center;padding:10px 0 14px;background:#fff;border-top:1px solid #dad7d0}
+.composer input:not([type=checkbox]){flex:1;min-width:0;font-size:15px;border:1px solid #dad7d0;border-radius:999px;padding:0 16px;height:44px}
+.composer .send{width:44px;height:44px;flex-shrink:0;border-radius:50%;border:0;padding:0;background:#1a1a19;color:#fff;display:grid;place-items:center}
+.composer .send:disabled{background:#8f8c85;opacity:1}
+@media(max-width:899px){.app-main.chat-main{min-height:calc(100dvh - 53px)}}
+@media(max-width:600px){.app-main.chat-main{padding:16px 16px 0}.chat-empty{padding-top:20px}.composer{padding:10px 0 14px}}
