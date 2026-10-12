@@ -1,9 +1,10 @@
 import fs from 'node:fs/promises';
 import { build } from 'vite';
+import { vercelEnvironment, vercelRoutes } from './vercel-environment.mjs';
 
 // Upload only compiled public files with `vercel deploy --prebuilt --prod`.
 // Build first, with VITE_APP_PUBLIC_URL set to the chosen Vercel alias.
-const config = JSON.parse(await fs.readFile('vercel.json', 'utf8'));
+const routes = vercelRoutes(vercelEnvironment());
 await fs.rm('.vercel/output', { recursive: true, force: true });
 await fs.mkdir('.vercel/output', { recursive: true });
 await fs.cp('web/dist', '.vercel/output/static', { recursive: true });
@@ -27,7 +28,7 @@ for (const file of ['index.html', 'landing.html']) {
 }
 await fs.writeFile('.vercel/output/config.json', JSON.stringify({
   version: 3,
-  routes: config.routes,
+  routes,
 }, null, 2) + '\n');
 // `vercel build --prod` must wrap this command: its generated build metadata
 // provisions the analytics endpoints. Handcrafted prebuilt metadata did not.

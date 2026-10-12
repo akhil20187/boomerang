@@ -1,19 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "git": { "deploymentEnabled": { "main": true, "*": false } },
-  "buildCommand": "npm run build && node scripts/prepare-vercel.mjs",
-  "outputDirectory": "web/dist",
-  "routes": [
-    { "src": "/", "dest": "/landing.html" },
-    { "src": "/setup(?:\\.html)?", "status": 302, "headers": { "Location": "/" } },
-    { "src": "/audio/(.*)", "dest": "/sample-audio/$1" },
-    { "src": "/SKILL.md", "headers": { "Content-Type": "text/plain; charset=utf-8" }, "continue": true },
-    { "src": "/mcp", "dest": "https://coordinated-barracuda-687.convex.site/mcp/public" },
-    { "src": "/\\.well-known/oauth-protected-resource(?:/mcp)?", "dest": "https://coordinated-barracuda-687.convex.site/.well-known/oauth-protected-resource/public" },
-    { "src": "/oauth/(request|approve)", "dest": "https://coordinated-barracuda-687.convex.site/oauth/$1" },
-    { "src": "/api/(.*)", "dest": "https://coordinated-barracuda-687.convex.site/api/$1" },
-    { "handle": "filesystem" },
-    { "src": "/(app|account|tasks|credit|status|connect|demo)/?", "dest": "/index.html" }
-  ]
+  "git": { "deploymentEnabled": { "main": true, "development": true, "*": false } },
+  "buildCommand": "node scripts/build-vercel.mjs",
+  "outputDirectory": "web/dist"
 }

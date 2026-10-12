@@ -3,6 +3,7 @@ export function websiteOrigins() {
   return new Set([
     process.env.SITE_URL ?? 'http://localhost:5173',
     process.env.CONVEX_SITE_URL,
+    ...(process.env.WEBSITE_ALLOWED_ORIGINS || '').split(',').map(value => value.trim()).filter(Boolean),
   ].filter((value): value is string => !!value).map(value => new URL(value).origin));
 }
 

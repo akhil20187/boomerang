@@ -7,6 +7,14 @@ import { generateKeyPair, exportPKCS8, decodeJwt } from 'jose';
 const modules = import.meta.glob('../convex/**/*.*s');
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
+it('allows only explicitly configured preview and local development sign-in origins', () => {
+  vi.stubEnv('SITE_URL', 'https://preview.example');
+  vi.stubEnv('WEBSITE_ALLOWED_ORIGINS', 'https://build-123.vercel.app,http://127.0.0.1:5173');
+  expect(websiteRedirect('https://build-123.vercel.app/tasks')).toBe('https://build-123.vercel.app/tasks');
+  expect(websiteRedirect('http://127.0.0.1:5173/tasks')).toBe('http://127.0.0.1:5173/tasks');
+  expect(() => websiteRedirect('https://another-build.vercel.app/tasks')).toThrow();
+});
+
 it('creates a Vercel email link, redeems it and preserves the connection request through sign-in', async () => {
   vi.stubEnv('SITE_URL', 'https://askboomerang.vercel.app');
   vi.stubEnv('CONVEX_SITE_URL', 'https://little-kangaroo-718.convex.site');
