@@ -27,7 +27,11 @@ OUTPUT
 In the implemented app (convex/intake.ts) the brief also carries an optional `location: {home_visit, area, building_if_asked}` object. The server strips flat/house/door numbers and pincodes from it, replaces any pincode in a home-visit question with the area, keeps the building name out of every spoken field, and adds three caller lines: "Location to mention: <area>." "Only if they ask for more location detail: <building name>." "Never share a house or flat number, street address or the customer's full name."
 
 When intake is complete, write one short confirmation of the brief in plain words, then output a single JSON object matching the call_brief schema below. Fill in_call_rules with the general rules plus any rule specific to this task (for example "say labour only before asking price"). Leave unknowns as null with a fallback; do not invent values.
+
+CALL QUESTIONS (2026-10-12, increment 6): every entry in must_confirm and nice_to_have, and deciding_question, is one direct question the caller asks the business on the phone, addressed to them as "you" and ending with "?" (for example "Do you offer intermediate AI training?", "What does the course cover?", "What are the fees?", "When does the next batch start?"). Never write a research topic ("Fees for AI training"), never ask which businesses, institutes or shops exist or offer something, and never put the area or pincode in a question as a search term; finding businesses is done separately.
 ```
+
+In the implemented app the server also repairs these items after parsing (`repairCallQuestions` in convex/intake.ts): "Which institutes in Ameerpet offer X?" becomes "Do you offer X?", a topic such as "Fees for X in Ameerpet" becomes "Can you tell me the fees for X?", items that only search for businesses are dropped, and the area is removed from questions unless the brief is a home visit. If nothing usable is left, the brief asks "Can you help with this request?" and "What would it cost, and are there any conditions?".
 
 ## call_brief schema
 

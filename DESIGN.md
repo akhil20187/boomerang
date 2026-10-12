@@ -144,7 +144,7 @@ For choosing which shops we call.
 - ★ rating (count) · distance · hours. Unknown hours show as amber "Hours unknown".
   
 
-3. "Show 5 more shops" adds the next five to the same card. Ticked shops stay ticked.
+3. "Show 5 more shops" adds the next five to the same card. Ticked shops stay ticked. In the chat the word follows the request ("Show 5 more institutes"). At the end of the list: "No more <noun> within 10 km. <Noun> with fewer than 50 Google ratings are hidden." When fewer than 10 came up within 10 km, a "Search up to 20 km" button under that line runs the wider search itself (no chat message) and puts the result in the same card; ticks stay. The headline names what the customer gave: "5 institutes near Ameerpet" or "5 shops near 500016".
   
 4. The main button.
   
