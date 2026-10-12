@@ -1,4 +1,4 @@
-import { internalMutation } from "./_generated/server";
+import { internalMutation } from "./mutationSafety";
 import { v } from "convex/values";
 import { hashToken, requireUser } from "./access";
 import { isMcpResource } from './mcpAddresses';

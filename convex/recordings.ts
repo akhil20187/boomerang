@@ -1,9 +1,5 @@
-import {
-  internalAction,
-  internalMutation,
-  internalQuery,
-  mutation,
-} from "./_generated/server";
+import { internalAction, internalQuery } from "./_generated/server";
+import { internalMutation, mutation } from "./mutationSafety";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
 import { requireUser, hashToken } from "./access";

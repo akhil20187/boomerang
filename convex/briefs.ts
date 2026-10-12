@@ -1,4 +1,5 @@
-import { action, query, internalMutation, internalQuery } from "./_generated/server";
+import { action, query, internalQuery } from "./_generated/server";
+import { internalMutation } from "./mutationSafety";
 import { v, ConvexError } from "convex/values";
 import { internal } from "./_generated/api";
 import { requireUser } from "./access";

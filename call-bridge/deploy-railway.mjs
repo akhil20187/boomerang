@@ -43,7 +43,7 @@ if (mode === 'configure-sarvam') {
   const variables = Object.fromEntries(required.map(key => [key, process.env[key]]));
   Object.assign(variables, {
     CALL_BRIDGE_SECRET: secret, CALL_BRIDGE_PUBLIC_URL: publicUrl,
-    CONVEX_CALLBACK_URL: 'https://little-kangaroo-718.convex.site/api/call-event',
+    CONVEX_CALLBACK_URL: 'https://coordinated-barracuda-687.convex.site/api/call-event',
     PORT: '3212', CALL_BRIDGE_BIND_HOST: '0.0.0.0',
     CALL_BRIDGE_JOURNAL: '/var/lib/human-mcp/attempts.json',
     CALL_BRIDGE_MAX_CONCURRENT: '5', CALL_BRIDGE_MAX_SECONDS: '180',

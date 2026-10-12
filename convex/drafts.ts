@@ -1,4 +1,5 @@
-import { query, internalMutation } from "./_generated/server";
+import { query } from "./_generated/server";
+import { internalMutation } from "./mutationSafety";
 import { v } from "convex/values";
 import { requireUser } from "./access";
 import { callingQuote, balances } from "./credits";

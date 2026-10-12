@@ -1,4 +1,4 @@
-import { internalMutation } from "./_generated/server";
+import { internalMutation } from "./mutationSafety";
 import { v } from "convex/values";
 import { approveWithWelcomeCredit } from "./onboarding";
 export const approve = internalMutation({

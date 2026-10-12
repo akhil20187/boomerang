@@ -5,7 +5,7 @@ import {StreamableHTTPClientTransport} from '@modelcontextprotocol/sdk/client/st
 import {discoverOAuthServerInfo,selectResourceURL} from '@modelcontextprotocol/sdk/client/auth.js';
 
 // Controlled verification only. This script never invokes start_calls or shop search.
-const origin=process.env.MCP_PUBLIC_URL ?? 'https://askboomerang.vercel.app';
+const origin=process.env.MCP_PUBLIC_URL ?? 'https://www.askboomerang.online';
 const endpoint=new URL('/mcp',origin);
 const resourceResponse=await fetch(new URL('/.well-known/oauth-protected-resource/mcp',origin));
 assert.equal(resourceResponse.status,200);
@@ -32,7 +32,7 @@ const client=new Client({name:'Boomerang controlled verification',version:'1.0.0
 try{
  await client.connect(new StreamableHTTPClientTransport(endpoint,{requestInit:{headers:{Authorization:`Bearer ${process.env.MCP_TEST_TOKEN}`}}}));
  const {tools}=await client.listTools();
- assert.deepEqual(tools.map(t=>t.name).sort(),['account_status','find_shops','get_recording','more_shops','start_calls','task_status']);
+ assert.deepEqual(tools.map(t=>t.name).sort(),['account_status','find_shops','get_recording','more_shops','prepare_brief','prepare_contacts','start_calls','task_status']);
  const {resources}=await client.listResources();
  assert.equal(resources.length,1);
  const widget=await client.readResource({uri:resources[0].uri});

@@ -2,7 +2,10 @@ import { convexAuth } from "@convex-dev/auth/server";
 import { Email } from "@convex-dev/auth/providers/Email";
 import { approveWithWelcomeCredit } from './onboarding';
 import { websiteRedirect } from './websiteOrigins';
-export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
+import { action, internalMutation } from './_generated/server';
+import { v } from 'convex/values';
+import { assertWritable, invokeHandler } from './migration';
+const authSystem = convexAuth({
   providers: [
     Email({
       id: "resend",
@@ -46,4 +49,18 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
       return websiteRedirect(redirectTo);
     },
   },
+});
+export const { auth, isAuthenticated } = authSystem;
+export const signIn = action({
+  args: {provider:v.optional(v.string()),params:v.optional(v.any()),verifier:v.optional(v.string()),refreshToken:v.optional(v.string()),calledBy:v.optional(v.string())},
+  returns:v.any(),
+  handler:async(ctx,args)=>{assertWritable();return invokeHandler(authSystem.signIn,ctx,args);},
+});
+export const signOut = action({
+  args:{}, returns:v.null(),
+  handler:async(ctx,args)=>{assertWritable();await invokeHandler(authSystem.signOut,ctx,args);return null;},
+});
+export const store = internalMutation({
+  args:{args:v.any()}, returns:v.any(),
+  handler:async(ctx,args)=>{assertWritable();return invokeHandler(authSystem.store,ctx,args);},
 });

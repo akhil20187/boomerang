@@ -2,8 +2,8 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
-const website = 'https://askboomerang.vercel.app';
-const backend = 'https://little-kangaroo-718.convex.site';
+const website = 'https://www.askboomerang.online';
+const backend = 'https://coordinated-barracuda-687.convex.site';
 const bridge = 'https://voice-bridge-development.up.railway.app';
 const get = async url => {
   const response = await fetch(url, { signal: AbortSignal.timeout(15000), redirect: 'manual' });
@@ -29,7 +29,7 @@ if (!asset) throw new Error('App bundle not found');
 const bundle = await get(new URL(asset[1], website));
 result.frontend = {
   status: app.response.status,
-  convexConnection: bundle.text.includes('https://little-kangaroo-718.convex.cloud'),
+  convexConnection: bundle.text.includes('https://coordinated-barracuda-687.convex.cloud'),
   customerLinks: bundle.text.includes(website),
   creditHistory: bundle.text.includes('credits:history') && bundle.text.includes('Credit & charges'),
 };

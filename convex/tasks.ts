@@ -1,11 +1,7 @@
 import type { Id } from "./_generated/dataModel";
 import { notChargedReason } from "./domain";
-import {
-  mutation,
-  query,
-  internalQuery,
-  internalMutation,
-} from "./_generated/server";
+import { query, internalQuery } from "./_generated/server";
+import { mutation, internalMutation } from "./mutationSafety";
 import { internal } from "./_generated/api";
 import { v, ConvexError } from "convex/values";
 import type { Doc } from "./_generated/dataModel";

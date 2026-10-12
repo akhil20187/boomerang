@@ -25,6 +25,8 @@ import type * as intake from "../intake.js";
 import type * as maintenance from "../maintenance.js";
 import type * as mcp from "../mcp.js";
 import type * as mcpAddresses from "../mcpAddresses.js";
+import type * as migration from "../migration.js";
+import type * as mutationSafety from "../mutationSafety.js";
 import type * as notifications from "../notifications.js";
 import type * as oauth from "../oauth.js";
 import type * as onboarding from "../onboarding.js";
@@ -61,6 +63,8 @@ declare const fullApi: ApiFromModules<{
   maintenance: typeof maintenance;
   mcp: typeof mcp;
   mcpAddresses: typeof mcpAddresses;
+  migration: typeof migration;
+  mutationSafety: typeof mutationSafety;
   notifications: typeof notifications;
   oauth: typeof oauth;
   onboarding: typeof onboarding;

@@ -2,20 +2,20 @@
 
 Project: `akhil20187s-projects/boomerang`.
 Preferred frontend URL: https://www.askboomerang.online (since 12 October 2026; apex redirects to www).
-Public MCP URL: https://askboomerang.vercel.app/mcp
-Convex runs the backend on `little-kangaroo-718`; Vercel forwards the public MCP endpoint and resource discovery to it. The OAuth sign-in issuer remains Convex, preserving existing grants and callbacks. Existing Convex connections remain supported.
+Public MCP URL: https://www.askboomerang.online/mcp
+Convex production runs on `coordinated-barracuda-687`; Vercel forwards MCP, discovery and API requests there. OAuth issuer is `https://coordinated-barracuda-687.convex.site`. The retired `little-kangaroo-718` database is read-only; its HTTP routes forward to production. Existing test connections may need reconnecting (D155).
 
 ## Deployment
 
-Live Convex `SITE_URL` is now `https://www.askboomerang.online`. The deployment examples and 7 October checks below describe the earlier Vercel-domain release; avoid restoring that old `SITE_URL`. The custom-domain sign-in form and Resend simulator delivery were verified on 12 October; real inbox delivery and link redemption remain unverified. Public MCP settings have not been migrated by this sign-in fix.
+Live Convex `SITE_URL` and `MCP_PUBLIC_URL` are `https://www.askboomerang.online`. Production `MCP_LEGACY_PUBLIC_URLS=https://askboomerang.vercel.app,https://little-kangaroo-718.convex.site` preserves both old resource aliases. Vercel production settings are `VITE_CONVEX_URL=https://coordinated-barracuda-687.convex.cloud`, `VITE_MCP_PUBLIC_URL=https://www.askboomerang.online`, and `VITE_APP_PUBLIC_URL=https://www.askboomerang.online`. Live browser signup, welcome credit and public MCP account linking/refresh were verified after the 12 October cutover; see [migration report](2026-10-12-convex-production-migration.md). Historical 7 October checks below describe the earlier release.
 
-Automatic Git deployment is enabled for `main` only in `vercel.json`. Commit authors must belong to the connected `akhil20187` account. Backend changes still require a separate Convex deployment; money migrations must finish and pass reconciliation before the website is published. The assistant widget is served by Convex, so card changes also need `CONVEX_DEPLOYMENT=dev:little-kangaroo-718 npx static-hosting upload --dist web/dist` after building with the approved live URLs. Run `scripts/audit-public-endpoints.mjs` to verify both the website and widget.
+Automatic Git deployment is enabled for `main` only in `vercel.json`. Commit authors must belong to the connected `akhil20187` account. Backend changes require `npx convex deploy`; money migrations must finish and pass reconciliation before publishing the website. Assistant card changes also need `npx static-hosting upload --prod --dist web/dist` after building with production URLs. Run `scripts/audit-public-endpoints.mjs` to verify website, widget and Railway callback. Keep development on a separate deployment; do not restore writes to the retired forwarding deployment.
 
 The local folder is linked through ignored `.vercel/project.json`.
 Only built public assets are uploaded; no credentials or backend source are needed.
 
 ```sh
-VITE_CONVEX_URL=https://little-kangaroo-718.convex.cloud VITE_MCP_PUBLIC_URL=https://askboomerang.vercel.app VITE_APP_PUBLIC_URL=https://askboomerang.vercel.app vercel build --prod
+VITE_CONVEX_URL=https://coordinated-barracuda-687.convex.cloud VITE_MCP_PUBLIC_URL=https://www.askboomerang.online VITE_APP_PUBLIC_URL=https://www.askboomerang.online vercel build --prod
 node scripts/verify-vercel-build.mjs
 deploy_stage=$(mktemp -d /tmp/boomerang-vercel.XXXXXX)
 mkdir -p "$deploy_stage/.vercel"
@@ -24,7 +24,7 @@ cp -R .vercel/output "$deploy_stage/.vercel/output"
 vercel deploy --prebuilt --prod --yes --cwd "$deploy_stage"
 ```
 
-Routes in `vercel.json` serve the landing page at `/`, React pages at `/app`, `/account`, `/tasks`, `/status`, `/connect`, `/demo`, and sample audio from `/sample-audio`. Backend API requests, `/mcp`, protected-resource discovery, and browser connection request/approval are forwarded to the existing Convex deployment. Set `MCP_PUBLIC_URL=https://askboomerang.vercel.app` on that deployment and `VITE_MCP_PUBLIC_URL=https://askboomerang.vercel.app` for the website build. New MCP connections use the public Vercel address; existing Convex connections remain valid. Authorization codes and refresh tokens stay bound to the exact resource they were issued for.
+Routes in `vercel.json` serve the landing page at `/`, React pages at `/app`, `/account`, `/tasks`, `/status`, `/connect`, `/demo`, and sample audio from `/sample-audio`. Backend API requests, `/mcp`, protected-resource discovery and browser connection approval forward to production Convex. New MCP connections use the custom domain; old resource aliases remain valid. Authorization codes and refresh tokens remain bound to their original resource. Railway `CONVEX_CALLBACK_URL` is `https://coordinated-barracuda-687.convex.site/api/call-event`; the existing bridge hostname and persistent journal are retained.
 
 The public address follows Vercel's [external forwarding](https://vercel.com/docs/routing/rewrites) and MCP's [protected-resource discovery](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization). MCP permits a separate sign-in issuer; changing the public connection address does not require changing account authentication.
 

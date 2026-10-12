@@ -4,6 +4,7 @@ import { internal, components } from "./_generated/api";
 import { registerStaticRoutes } from "@convex-dev/static-hosting";
 import { auth } from "./auth";
 import { endpoint, oauthHttp } from "./mcp";
+import { forwardRequest, invokeHandler } from './migration';
 const http = httpRouter();
 auth.addHttpRoutes(http);
 // Website bookmarks go to the canonical frontend; service endpoints stay here.
@@ -210,4 +211,12 @@ http.route({
     });
   }),
 });
-export default http;
+const entry = httpRouter();
+for (const method of ['GET','POST','PUT','PATCH','DELETE','OPTIONS'] as const)
+  entry.route({pathPrefix:'/',method,handler:httpAction(async(ctx,request)=>{
+    const forwarded=await forwardRequest(request);
+    if(forwarded)return forwarded;
+    const match=http.lookup(new URL(request.url).pathname,method);
+    return match ? invokeHandler(match[0],ctx,request) : new Response('Not found',{status:404});
+  })});
+export default entry;

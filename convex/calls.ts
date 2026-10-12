@@ -1,9 +1,6 @@
 import { inquiryFromBrief } from "./intake";
-import {
-  internalAction,
-  internalMutation,
-  internalQuery,
-} from "./_generated/server";
+import { internalAction, internalQuery } from "./_generated/server";
+import { internalMutation } from "./mutationSafety";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
 import { nextOutcome, briefItems, isChargeable, objectiveComplete, type ItemResult } from "./domain";

@@ -1,4 +1,4 @@
-import {mutation} from './_generated/server';
+import { mutation } from "./mutationSafety";
 import {v, ConvexError} from 'convex/values';
 import {requireUser} from './access';
 import {balances, callingQuote} from './credits';

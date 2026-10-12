@@ -163,10 +163,11 @@ it("serves OAuth discovery and stateless MCP tools behind account bearer authent
     "This request could not be completed. Try again.",
   );
 });
-it.each(["https://chatgpt.com/connector_platform_oauth_redirect", "http://127.0.0.1:54321/callback", "http://localhost:54321/oauth/callback"].flatMap(callback => ['https://app.convex.site/mcp', 'https://askboomerang.vercel.app/mcp'].map(resource => ({callback, resource}))))("binds approval and tokens to $callback and $resource, consumes codes, rotates refresh and revokes replay", async ({callback, resource}) => {
+it.each(["https://chatgpt.com/connector_platform_oauth_redirect", "http://127.0.0.1:54321/callback", "http://localhost:54321/oauth/callback"].flatMap(callback => ['https://app.convex.site/mcp', 'https://askboomerang.vercel.app/mcp', 'https://www.askboomerang.online/mcp'].map(resource => ({callback, resource}))))("binds approval and tokens to $callback and $resource, consumes codes, rotates refresh and revokes replay", async ({callback, resource}) => {
   vi.stubEnv("CONVEX_SITE_URL", "https://app.convex.site");
   vi.stubEnv("SITE_URL", "https://app.convex.site");
-  vi.stubEnv('MCP_PUBLIC_URL', 'https://askboomerang.vercel.app');
+  vi.stubEnv('MCP_PUBLIC_URL', 'https://www.askboomerang.online');
+  vi.stubEnv('MCP_LEGACY_PUBLIC_URLS', 'https://askboomerang.vercel.app');
   const t = convexTest(schema, modules);
   const userId = await t.run((ctx) =>
     ctx.db.insert("users", { email: "owner@example.com" }),

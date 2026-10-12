@@ -1,4 +1,5 @@
-import { query, mutation, internalQuery } from "./_generated/server";
+import { query, internalQuery } from "./_generated/server";
+import { mutation } from "./mutationSafety";
 import { v } from "convex/values";
 import { requireUser, hashToken } from "./access";
 import { balances, configuredPrice, formatINR } from "./credits";
