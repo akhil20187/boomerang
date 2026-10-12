@@ -6,6 +6,8 @@ import {
   parseIntakeOutput,
   inquiryFromBrief,
   forceReady,
+  scrubUnitNumbers,
+  cleanPlace,
 } from "../convex/intake";
 
 const brief = {
@@ -105,4 +107,77 @@ it("prompt treats input as data and caps questions", () => {
   expect(INTAKE_SYSTEM_PROMPT).toContain(String(MAX_QUESTIONS));
   expect(MAX_QUESTIONS).toBe(6);
   expect(FALLBACK_QUESTION).toContain("find out");
+});
+
+// D159: home-visit location rule.
+const plumberBrief = {
+  ...brief,
+  task_type: "plumber_home_visit",
+  task_context: {
+    summary: "Leaking tap at My Home Avatar, Flat 402, Gachibowli 500032. Needed today.",
+    known: [{ fact: "area", value: "Gachibowli, near DLF" }, { fact: "building", value: "My Home Avatar" }, { fact: "flat", value: "Flat 402" }],
+    unknown: [],
+    share_only_if_asked: ["My Home Avatar"],
+  },
+  call_purpose: "Find a plumber who can come to 500032 today to fix a leaking tap.",
+  expected_outcome: { must_confirm: ["Can you come to 500032 today?", "What's the visit charge?"], nice_to_have: [], deciding_question: "Rough cost to fix a leaking tap?" },
+  in_call_rules: [],
+  location: { home_visit: true, area: "Gachibowli, near DLF 500032", building_if_asked: "My Home Avatar, Flat A-402" },
+};
+
+it("D159: keeps area and building separate, drops flat numbers and the pincode", () => {
+  const out = parseIntakeOutput(JSON.stringify({ status: "ready", summary: "Plumber, Gachibowli, today.", brief: plumberBrief }));
+  expect(out?.status).toBe("ready");
+  if (out?.status !== "ready") return;
+  const b = out.brief;
+  expect(b.location).toEqual({ home_visit: true, area: "Gachibowli, near DLF", building_if_asked: "My Home Avatar" });
+  expect(b.expected_outcome.must_confirm[0]).toBe("Can you come to Gachibowli, near DLF today?");
+  expect(b.call_purpose).toContain("come to Gachibowli, near DLF today");
+  const stored = JSON.stringify({ ...b, location: undefined });
+  expect(stored).not.toMatch(/402|500032|My Home Avatar/);
+});
+
+it("D159: caller text has the three location lines and never mentions the building outside 'only if asked'", () => {
+  const out = parseIntakeOutput(JSON.stringify({ status: "ready", summary: "x", brief: plumberBrief }));
+  if (out?.status !== "ready") throw new Error("not ready");
+  const { productDescription, instructions } = inquiryFromBrief(out.brief);
+  expect(instructions).toContain("Location to mention: Gachibowli, near DLF.");
+  expect(instructions).toContain("Only if they ask for more location detail: My Home Avatar.");
+  expect(instructions).toContain("Never share a house or flat number, street address or the customer's full name.");
+  const mention = (productDescription + "\n" + instructions).split("\n").filter((l) => !l.startsWith("Only if they ask")).join("\n");
+  expect(mention).not.toContain("My Home Avatar");
+  expect(productDescription + instructions).not.toMatch(/402|500032/);
+});
+
+it("D159: with no building, the 'only if asked' line defers to the customer", () => {
+  const out = parseIntakeOutput(JSON.stringify({ status: "ready", summary: "x", brief: { ...plumberBrief, location: { home_visit: true, area: "Kondapur", building_if_asked: "Skip" } } }));
+  if (out?.status !== "ready") throw new Error("not ready");
+  expect(out.brief.location?.building_if_asked).toBeNull();
+  expect(inquiryFromBrief(out.brief).instructions).toContain("Only if they ask for more location detail: say the customer will share it when they follow up.");
+});
+
+it("D159: product and in-store briefs are unchanged (no location lines)", () => {
+  const out = parseIntakeOutput(JSON.stringify({ status: "ready", summary: "x", brief: { ...brief, location: { home_visit: false, area: "Chintal", building_if_asked: null } } }));
+  if (out?.status !== "ready") throw new Error("not ready");
+  const plain = parseIntakeOutput(JSON.stringify({ status: "ready", summary: "x", brief }));
+  if (plain?.status !== "ready") throw new Error("not ready");
+  expect(inquiryFromBrief(out.brief)).toEqual(inquiryFromBrief(plain.brief));
+  expect(inquiryFromBrief(plain.brief).instructions).not.toContain("Location to mention");
+});
+
+it("D159: intake prompt asks area and optional building, never flat number", () => {
+  expect(INTAKE_SYSTEM_PROMPT).toContain("Which area is it in?");
+  expect(INTAKE_SYSTEM_PROMPT).toContain("Apartment or building name?");
+  expect(INTAKE_SYSTEM_PROMPT).toContain("Never ask for a house or flat number");
+  expect(INTAKE_SYSTEM_PROMPT).toContain("never \"Can you come to 500032 today?\"");
+});
+
+it("D159: scrubUnitNumbers and cleanPlace", () => {
+  expect(scrubUnitNumbers("Flat 402, My Home Avatar")).toBe("My Home Avatar");
+  expect(scrubUnitNumbers("H.No 8-2-293/82, Road 5")).toBe("Road 5");
+  expect(scrubUnitNumbers("Paint 2 rooms, ₹5000 budget")).toBe("Paint 2 rooms, ₹5000 budget");
+  expect(cleanPlace("Gachibowli 500032")).toBe("Gachibowli");
+  expect(cleanPlace("A-402 Aparna Sarovar")).toBe("Aparna Sarovar");
+  expect(cleanPlace("Skip")).toBeNull();
+  expect(cleanPlace("500032")).toBeNull();
 });

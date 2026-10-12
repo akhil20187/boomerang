@@ -164,3 +164,44 @@ it("ties a brief to its search: start_calls refuses a brief from another search"
   const { taskId } = await user.mutation(api.tasks.start, { draftId, selectedPlaceIds: ["p1"], idempotencyKey: "brief-op-4", expectedAnswerPriceCents: 1000 });
   expect((await t.run((ctx) => ctx.db.get(taskId)))?.briefId).toBe(a.briefId);
 });
+
+it("D159: home-visit intake stores area and building apart, never a flat number, and the call text follows the rule", async () => {
+  const plumber = {
+    ...readyBrief,
+    task_type: "plumber_home_visit",
+    task_context: { summary: "Leaking tap in Gachibowli, today.", known: [{ fact: "area", value: "Gachibowli" }], unknown: [], share_only_if_asked: [] },
+    call_purpose: "Find a plumber who can come today.",
+    expected_outcome: { must_confirm: ["Can you come to 500032 today?", "What's the visit charge?"], nice_to_have: [], deciding_question: "Rough cost to fix a leaking tap?" },
+    in_call_rules: [],
+    location: { home_visit: true, area: "Gachibowli", building_if_asked: "My Home Avatar" },
+  };
+  const { t, user, id, calls } = await setup([
+    { status: "question", question: "Which area is it in?", choices: [] },
+    { status: "question", question: "Apartment or building name? It is shared only if the business asks for more location detail.", choices: ["Skip"] },
+    { status: "ready", summary: "Plumber in Gachibowli today.", brief: plumber },
+  ]);
+  vi.stubEnv("LIVE_CALLS_ENABLED", "true"); vi.stubEnv("CALL_BRIDGE_URL", "https://bridge.example"); vi.stubEnv("CALL_BRIDGE_SECRET", "secret"); vi.stubEnv("ANSWER_PRICE_CENTS", "1000");
+  const q1 = await user.action(api.briefs.prepare, { request: "Need a plumber for a leaking tap today, flat no 402", pincode: "500032" });
+  const q2 = await user.action(api.briefs.prepare, { briefId: q1.briefId, answer: "Gachibowli" });
+  const ready = await user.action(api.briefs.prepare, { briefId: q2.briefId, answer: "Flat A-402, My Home Avatar" });
+  expect(ready.status).toBe("ready");
+  const stored = await user.query(api.briefs.get, { briefId: q1.briefId });
+  expect(stored.request).not.toMatch(/402/);
+  expect(stored.turns[1].answer).toBe("My Home Avatar");
+  expect(JSON.stringify(calls)).not.toMatch(/402/);
+  expect(stored.brief.location).toEqual({ home_visit: true, area: "Gachibowli", building_if_asked: "My Home Avatar" });
+  expect(stored.brief.expected_outcome.must_confirm[0]).toBe("Can you come to Gachibowli today?");
+  const shop = { placeId: "p1", name: "Sri Sai Plumbing", address: "Gachibowli", phone: "+919876543210", ratingCount: 3, distanceKm: 1, mapsUrl: "https://maps.example/p1", fewRatings: true };
+  const draftId = await t.run((ctx) => ctx.db.insert("drafts", { userId: id, productInput: "x", product: { name: "Plumber" }, pincode: "500032", cards: [], comments: "", radiusKm: 10, shops: [shop], expiresAt: Date.now() + 100000 }));
+  await t.run((ctx) => ctx.db.insert("creditAccounts", { userId: id, balanceCents: 10000, reservedCents: 0 }));
+  const { taskId } = await user.mutation(api.tasks.start, { draftId, selectedPlaceIds: ["p1"], idempotencyKey: "brief-op-d159", expectedAnswerPriceCents: 1000, briefId: ready.briefId });
+  const job = await t.run(async (ctx) => (await ctx.db.query("shopJobs").withIndex("by_task", (q) => q.eq("taskId", taskId)).first())!);
+  const request = await t.mutation(internal.calls.prepare, { shopJobId: job._id });
+  const text = `${request?.productDescription}\n${request?.instructions}`;
+  expect(text).toContain("Location to mention: Gachibowli.");
+  expect(text).toContain("Only if they ask for more location detail: My Home Avatar.");
+  expect(text).toContain("Never share a house or flat number, street address or the customer's full name.");
+  expect(text.split("\n").filter((l) => !l.startsWith("Only if they ask")).join("\n")).not.toContain("My Home Avatar");
+  expect(text).not.toMatch(/402|500032/);
+  expect(request?.items?.[0]?.text).toBe("Can you come to Gachibowli today?");
+});

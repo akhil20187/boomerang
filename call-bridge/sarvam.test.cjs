@@ -42,3 +42,8 @@ test('brief mode sends the brief text and drops the fixed product checklist',()=
  assert.match(d,/Lined blouse in Chintal/);assert.match(d,/price per blouse/);assert.match(d,/enquiry only/i);
  assert.match(buildSarvamPayload(record,env).app_config.agent_variables.inquiry_details,/Ask about this exact product/);
 });
+test('D159 location lines from Convex reach inquiry_details unchanged (no bridge change needed)',()=>{
+ const lines='Purpose: find a plumber who can come today.\nLocation to mention: Gachibowli.\nOnly if they ask for more location detail: My Home Avatar.\nNever share a house or flat number, street address or the customer\'s full name.';
+ const d=buildSarvamPayload({...record,briefMode:true,productDescription:'Leaking tap in Gachibowli.',instructions:lines},env).app_config.agent_variables.inquiry_details;
+ assert.ok(d.includes(lines));
+});
