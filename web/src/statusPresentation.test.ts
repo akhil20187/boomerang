@@ -81,8 +81,8 @@ test('service / brief tasks never show stock wording',()=>{
  assert.deepEqual(shopStatus({...shop,state:'answered',answer:{stock:'unavailable'}},true),['Answered · see notes','grey']);
  const items=[{id:'a',text:'Visit today?',kind:'must_confirm' as const,status:'answered' as const}];
  assert.deepEqual(shopStatus({...shop,state:'answered',answer:{stock:'available',items}},true),['Answered your questions','green']);
- const tags=summaryTags([{...shop,state:'answered',answer:{stock:'available',items}},{...shop,state:'personal_call_needed',answer:{stock:'available'}},{...shop,state:'calling'}],true);
- assert.deepEqual(tags,[['1 answered','green'],['1 calling','blue'],['1 prefers a personal call','amber']]);
+ const tags=summaryTags([{...shop,state:'answered',answer:{stock:'available',items}},{...shop,state:'answered',answer:{stock:'available'}},{...shop,state:'personal_call_needed',answer:{stock:'available'}},{...shop,state:'calling'}],true);
+ assert.deepEqual(tags,[['1 answered','green'],['1 partly answered','amber'],['1 calling','blue'],['1 prefers a personal call','amber']]);
  assert.ok(tags.every(([t])=>!/stock/.test(t)));
 });
 test('call card title counts one business, not "1 businesses"',()=>{
