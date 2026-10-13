@@ -144,7 +144,11 @@ For choosing which shops we call.
 - ★ rating (count) · distance · hours. Unknown hours show as amber "Hours unknown".
   
 
-3. "Show 5 more shops" adds the next five to the same card. Ticked shops stay ticked. In the chat the word follows the request ("Show 5 more institutes"). At the end of the list: "No more <noun> within 10 km. <Noun> with fewer than 50 Google ratings are hidden." When fewer than 10 came up within 10 km, a "Search up to 20 km" button under that line runs the wider search itself (no chat message) and puts the result in the same card; ticks stay. The headline names what the customer gave: "5 institutes near Ameerpet" or "5 shops near 500016".
+3. "Show 5 more shops" adds the next five to the same card. Ticked shops stay ticked. In the chat the word follows the request ("Show 5 more institutes"). At the end of the list: "No more <noun> within 10 km. <Noun> with fewer than 50 Google ratings are hidden." When fewer than 10 came up within 10 km, a "Search up to 20 km" button under that line runs the wider search itself (no chat message) and puts the result in the same card; ticks stay. The headline names what the customer gave: "5 institutes near Ameerpet" or "5 shops near 500016". One result reads "1 office", never "1 offices" (D163).
+   - Named business (D163): when the customer names one business, the card lists only Google listings whose name matches, headlined "Matches for “Ainapur Consultants and Engineers” near Miyapur", nearest first; no 50-ratings line and no "Search up to 20 km". If nothing matches, no card: Luna says "I couldn’t find <name> on Google or the web near <area>. If you have their phone number, send it and I’ll set up the call. Or I can look for other <noun> nearby."
+   - Numbers from the web (D164): "Web results for “<name>”". Each row shows the name, number and address, then "Found on <site> · number from a website, may be out of date" with the site linked. Only numbers printed on a page the web search cited are shown.
+   - Numbers the customer typed (D148): "2 businesses you sent". Rows show name and number, then "Provided by you".
+   - Ticking rows is still the approval (D149); Luna never starts calls.
   
 4. The main button.
   
