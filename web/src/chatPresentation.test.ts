@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {composerHint,one,count,pickerFoot,pickerPlace,pickerKind,pickerTitle,type ChatItem} from './chatPresentation.ts';
+import {callsDoneLine,composerHint,one,count,pickerFoot,pickerPlace,pickerKind,pickerTitle,type ChatItem} from './chatPresentation.ts';
 const m=(kind:ChatItem['kind'],role:ChatItem['role']='assistant',payload?:ChatItem['payload']):ChatItem=>({_id:Math.random().toString(),role,kind,text:'x',payload});
 test('composer hint follows the conversation',()=>{
  assert.equal(composerHint([]),'Ask us to call about anything nearby…');
@@ -39,4 +39,11 @@ test('picker title by kind: nearby, named matches, numbers sent, web results',()
  assert.equal(pickerTitle('named',2,'offices','Miyapur','Ainapur Consultants and Engineers'),'Matches for “Ainapur Consultants and Engineers” near Miyapur');
  assert.equal(pickerTitle('sent',1,'businesses','x'),'1 business you sent');
  assert.equal(pickerTitle('web',1,'offices','x','Ainapur'),'Web results for “Ainapur”');
+});
+
+test('line under a finished call card reads naturally for one business',()=>{
+ assert.equal(callsDoneLine(0,1,'businesses'),'The business couldn’t answer this time. You haven’t been charged.');
+ assert.equal(callsDoneLine(0,3,'plumbers'),'None of the 3 plumbers could answer this time. You haven’t been charged for them.');
+ assert.equal(callsDoneLine(1,1,'offices'),'The office answered. Open the row to see what they said and hear the call.');
+ assert.equal(callsDoneLine(2,3,'plumbers'),'2 of 3 plumbers answered. Open a row to see what they said and hear the call.');
 });

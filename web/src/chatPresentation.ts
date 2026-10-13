@@ -4,6 +4,12 @@ export type ChatItem={_id:string;role:'user'|'assistant';kind:'text'|'question'|
 /** "offices" → "office", "businesses" → "business", "branches" → "branch" (same rule as convex/domain.ts singularNoun). */
 export const one=(noun:string)=>{const n=noun.trim();if(/(?:ss|sh|ch|x|z)es$/i.test(n))return n.slice(0,-2);if(/[^aeiou]ies$/i.test(n))return n.slice(0,-3)+'y';return /[^s]s$/i.test(n)?n.slice(0,-1):n};
 export const count=(n:number,noun:string)=>`${n} ${n===1?one(noun):noun}`;
+/** The chat line under a finished call card: "2 of 3 plumbers answered…", "The business couldn’t answer this time…". */
+export function callsDoneLine(answered:number,total:number,noun:string){
+ const single=one(noun);
+ if(answered)return total===1?`The ${single} answered. Open the row to see what they said and hear the call.`:`${answered} of ${count(total,noun)} answered. Open a row to see what they said and hear the call.`;
+ return total===1?`The ${single} couldn’t answer this time. You haven’t been charged.`:`None of the ${total} ${noun} could answer this time. You haven’t been charged for them.`;
+}
 export const STARTERS={service:'Plumber near 500032 to fix a leaking tap',product:'iPhone 17 256GB near 500032, best price after card offers',test:'Call me first, so I hear how it sounds'};
 
 /** Composer hint from where the conversation is (spec "Chat flow"). */

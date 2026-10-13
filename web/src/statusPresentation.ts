@@ -1,20 +1,49 @@
 /** Shared status wording and colours (DESIGN.md "one meaning per colour") for the call card, task pages, sidebar and call log. */
 import type {Shop,TaskSummary} from './types';
 import {itemsStatus,taskDate,taskLabel,taskOutcome,type ChargeNote} from './taskPresentation.ts';
+import {count} from './chatPresentation.ts';
 export type Tone='green'|'blue'|'amber'|'grey'|'error';
 export const rupees=(n:number)=>'₹'+n.toLocaleString('en-IN');
 export const clock=(t:number)=>new Date(t).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'}).toLowerCase();
 /** Shop states after which no more calls happen for that shop. */
 export const terminal=new Set(['answered','unreachable','personal_call_needed','incomplete_answer','technical_error','completed','failed']);
-/** One status line per shop on the call card (chat card, website card, call log). */
-export function shopStatus(s:Shop):[string,Tone]{if(s.state==='reconciling')return ['Call status unconfirmed · checking provider','amber'];const byItems=(s.state==='answered'||s.state==='incomplete_answer')&&itemsStatus(s.answer?.items);if(byItems)return byItems as [string,Tone];if(s.answer?.stock==='available')return [`In stock${s.answer.finalPrice!==undefined?' · '+rupees(s.answer.finalPrice):''}`,'green'];if(s.answer?.stock==='unavailable')return ['No stock','grey'];switch(s.state){case'calling':return ['AI agent calling','blue'];case'retry_scheduled':return ['No answer · retry scheduled','amber'];case'personal_call_needed':return ['Prefers a personal call','amber'];case'unreachable':return ['Couldn’t reach · 2 attempts','amber'];case'incomplete_answer':return ['Partial answer · details unconfirmed','amber'];case'technical_error':return ['Call interrupted · try again','error'];case'answered':return ['Answered · stock unconfirmed','grey'];default:return ['Waiting to call','grey']}}
+/** A service / brief task (supplied contacts, or answers with questions): its wording follows the questions, never stock. */
+export const isBriefTask=(supplied:boolean,shops:Shop[])=>supplied||shops.some(s=>!!s.answer?.items?.length);
+/** One status line per shop on the call card (chat card, website card, call log). `brief`: never stock wording. A shop that prefers a personal call never also reads "In stock". */
+export function shopStatus(s:Shop,brief=false):[string,Tone]{if(s.state==='reconciling')return ['Call status unconfirmed · checking provider','amber'];if(s.state==='personal_call_needed')return ['Prefers a personal call','amber'];const byItems=(s.state==='answered'||s.state==='incomplete_answer')&&itemsStatus(s.answer?.items);if(byItems)return byItems as [string,Tone];if(!brief&&s.answer?.stock==='available')return [`In stock${s.answer.finalPrice!==undefined?' · '+rupees(s.answer.finalPrice):''}`,'green'];if(!brief&&s.answer?.stock==='unavailable')return ['No stock','grey'];switch(s.state){case'calling':return ['AI agent calling','blue'];case'retry_scheduled':return ['No answer · retry scheduled','amber'];case'unreachable':return ['Couldn’t reach · 2 attempts','amber'];case'incomplete_answer':return ['Partial answer · details unconfirmed','amber'];case'technical_error':return ['Call interrupted · try again','error'];case'answered':return brief?['Answered · see notes','grey']:['Answered · stock unconfirmed','grey'];default:return ['Waiting to call','grey']}}
 /** Status line on the full task page (/status). Kept word-for-word from the previous TaskDetails. */
 export function taskPageStatus(s:Shop):[string,Tone]{if(s.state==='reconciling')return ['Call status unconfirmed · checking provider','amber'];if(s.state==='calling')return ['AI agent calling','blue'];if(s.state==='waiting')return ['Waiting to call','grey'];if(s.state==='retry_scheduled')return ['No answer · retry scheduled','amber'];if(s.state==='personal_call_needed')return ['Prefers a personal call','amber'];if(s.state==='unreachable')return ['Couldn’t reach the shop','amber'];if(s.state==='technical_error')return ['Call interrupted','error'];const byItems=(s.state==='answered'||s.state==='incomplete_answer')&&itemsStatus(s.answer?.items);if(byItems)return byItems as [string,Tone];if(s.answer?.stock==='available')return [`In stock${s.answer.finalPrice!==undefined?' · '+rupees(s.answer.finalPrice):''}`,'green'];if(s.answer?.stock==='unavailable')return ['No stock','grey'];return ['Some details unconfirmed','amber']}
 /** Timeline marks: ✓ ok, • live, ! warn, … wait, × fail. */
 export type StepKind='ok'|'live'|'warn'|'wait'|'fail';
 export const stepMark:Record<StepKind,string>={ok:'✓',live:'•',warn:'!',wait:'…',fail:'×'};
 export function stepKind(text:string,live:boolean):StepKind{if(live)return 'live';if(/no answer|busy|not in service|unreachable|couldn|fail|interrupt/i.test(text))return 'fail';if(/person|ended the call|hung up|refus/i.test(text))return 'warn';if(/retry|try once more|scheduled|waiting|requested|start|best to call/i.test(text))return 'wait';return 'ok'}
-export function summaryTags(shops:Shop[]):[string,Tone][]{const count=(test:(s:Shop)=>boolean)=>shops.filter(test).length;const tags:[number,string,Tone][]=[[count(s=>s.answer?.stock==='available'),'in stock','green'],[count(s=>s.answer?.stock==='unavailable'),'no stock','grey'],[count(s=>s.state==='calling'),'calling','blue'],[count(s=>s.state==='personal_call_needed'),'prefer a personal call','amber'],[count(s=>s.state==='retry_scheduled'),'retrying','amber'],[count(s=>s.state==='unreachable'),'couldn’t reach','amber'],[count(s=>shopStatus(s)[0]==='Waiting to call'),'waiting','grey']];return tags.filter(([n])=>n>0).map(([n,text,color])=>[`${n} ${text}`,color])}
+/** Chips above the call card. Stock chips follow each shop's status line; a brief task counts answers instead of stock. */
+export function summaryTags(shops:Shop[],brief=false):[string,Tone][]{const count=(test:(s:Shop)=>boolean)=>shops.filter(test).length;const line=(s:Shop)=>shopStatus(s,brief)[0];const answers:[number,string,Tone][]=brief?[[count(s=>s.state==='answered'||s.state==='incomplete_answer'),'answered','green']]:[[count(s=>line(s).startsWith('In stock')),'in stock','green'],[count(s=>line(s)==='No stock'),'no stock','grey']];const tags:[number,string,Tone][]=[...answers,[count(s=>s.state==='calling'),'calling','blue'],[count(s=>s.state==='personal_call_needed'),'prefer a personal call','amber'],[count(s=>s.state==='retry_scheduled'),'retrying','amber'],[count(s=>s.state==='unreachable'),'couldn’t reach','amber'],[count(s=>line(s)==='Waiting to call'),'waiting','grey']];return tags.filter(([n])=>n>0).map(([n,text,color])=>[`${n} ${n===1&&text==='prefer a personal call'?'prefers a personal call':text}`,color])}
+/** Where a call card is shown: the Boomerang website (chat, /app) or the ChatGPT/Claude widget. */
+export type CardPlace='website'|'assistant';
+/**
+ * Call card footer link (DESIGN.md "Call card"). Website: "See full call details" to /status on this site, same tab,
+ * no external icon. Assistant widget: "Open full results on website" to the public site, with the external icon.
+ * The demo card stays on /demo.
+ */
+export function resultsLink({place,taskId,done,origin,publicUrl}:{place:CardPlace;taskId:string;done:boolean;origin:string;publicUrl?:string}):{href:string;text:string;external:boolean}{
+ const path=`/status?task=${encodeURIComponent(taskId)}`;
+ if(place==='website')return {href:taskId==='demo'?'/demo':origin+path,text:done?'See full call details':'See live call details',external:false};
+ return {href:taskId==='demo'?'/demo':(publicUrl||origin)+path,text:done?'Open full results on website':'Open live status on website',external:true};
+}
+/** /status "Back" link: the chat the task was started from, else the Call log. */
+export function taskBackLink(chatId:string|null):{href:string;text:string}{return chatId?{href:`/app?chat=${encodeURIComponent(chatId)}`,text:'Back to chat'}:{href:'/calls',text:'Back to Call log'}}
+/** Call card headline. Counts read "1 business called", never "1 businesses". */
+export function callCardTitle({shops,noun,done,brief}:{shops:Shop[];noun:string;done:boolean;brief:boolean}){
+ const n=shops.length;const resolved=shops.filter(s=>terminal.has(s.state||'')).length;
+ if(brief)return done?`${count(n,noun)} called`:`${resolved} of ${count(n,noun)} done`;
+ if(!done)return resolved?`${resolved} of ${count(n,'shops')} done`:`Calling ${count(n,'shops')}…`;
+ const available=shops.filter(s=>shopStatus(s)[0].startsWith('In stock')).length;
+ if(available)return `${count(n,'shops')} called · ${available} ${available===1?'has':'have'} it`;
+ if(shops.every(s=>s.state==='unreachable'))return n===1?'Couldn’t reach the shop. You haven’t been charged.':`Couldn’t reach any of the ${n} shops. You haven’t been charged.`;
+ if(shops.every(s=>s.answer?.stock==='unavailable'))return 'No stock found at the shops we called.';
+ return `${count(n,'shops')} checked · some details unconfirmed`;
+}
 /** Shop prepared for the opened-call view: clock times and plain variant wording. Safe to apply twice. */
 export function displayShop(s:Shop):Shop{return {...s,timeline:s.timeline?.map(e=>({...e,time:typeof e.time==='number'?clock(e.time):e.time})),answer:s.answer?{...s.answer,variantMatch:s.answer.variantMatch==='yes'?'Confirmed':s.answer.variantMatch==='no'?'Different variant':s.answer.variantMatch==='unconfirmed'?'Unconfirmed':s.answer.variantMatch}:undefined}}
 
