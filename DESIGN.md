@@ -213,7 +213,10 @@ For following the calls and reading the answers.
 - the recording player when there's a recording. Otherwise: "No recording for this call. The answer comes from the caller's notes."
   
 
-6. "Show 5 more shops", then "Open live status on website", which becomes "Open full results on website" when done. Under it: "We also emailed you this link."
+6. "Show 5 more shops", then the results link. Under it: "We also emailed you this link."
+   - **On the website** (chat, `/app`): "See live call details", which becomes "See full call details" when done. It opens this site's `/status?task=` in the same tab, with no external-link icon. That page starts with "‹ Back to chat" when the task came from one of the customer's chats, otherwise "‹ Back to Call log". Result emails link to the chat (`/app?chat=`) when there is one, otherwise to `/status?task=`.
+   - **In ChatGPT or Claude** (the widget): "Open live status on website", which becomes "Open full results on website" when done, with the external-link icon, pointing at the public site.
+   - Counts are singular for one ("1 business called"). Service tasks (businesses the assistant or customer sent, or answers with questions) never use stock words in the status line or chips: "Answered your questions", "Prefers a personal call".
   
 
 **Main action:** none while calls run, because the card updates by itself. Per shop: the call icon → opens the phone dialer to call that shop from the user's own number. The map icon → directions. When everything is done, the card posts a short summary into the chat.
