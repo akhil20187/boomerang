@@ -40,6 +40,7 @@ import type * as testCalls from "../testCalls.js";
 import type * as users from "../users.js";
 import type * as validators from "../validators.js";
 import type * as verification from "../verification.js";
+import type * as webBusiness from "../webBusiness.js";
 import type * as websiteOrigins from "../websiteOrigins.js";
 import type * as workflows from "../workflows.js";
 
@@ -82,6 +83,7 @@ declare const fullApi: ApiFromModules<{
   users: typeof users;
   validators: typeof validators;
   verification: typeof verification;
+  webBusiness: typeof webBusiness;
   websiteOrigins: typeof websiteOrigins;
   workflows: typeof workflows;
 }>;
