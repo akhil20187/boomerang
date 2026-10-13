@@ -62,7 +62,7 @@ export function AccountView({account,totals,connection,rows,more,onLoadMore,filt
   </section>
   <section className="card profile-card credit-card" aria-labelledby="credit-heading">
    <h2 id="credit-heading" className="section-label">Credit</h2>
-   {account?<><strong className="balance">{formatPaise(available)}</strong>{per&&<p className="muted">{per}</p>}{(account.reservedCents??0)>0&&<p className="muted">{formatPaise(account.reservedCents!)} on hold for calls in progress</p>}{account.eligible===false&&<p className="amber">Account approval pending</p>}{account.callingEnabled===false&&<p className="amber">Live calling is being connected</p>}</>:<p role="status" className="muted">Checking your credit…</p>}
+   {account?<><strong className="balance">{formatPaise(available)}</strong>{per&&<p className="muted">{per}</p>}{(account.reservedCents??0)>0&&<p className="muted">{formatPaise(account.reservedCents!)} on hold for calls in progress</p>}{account.eligible===false&&<p className="amber">Account approval pending</p>}{account.callingEnabled===false&&<p className="amber">Calls are switched off right now. You can still search and plan; nothing is called or charged.</p>}</>:<p role="status" className="muted">Checking your credit…</p>}
    <dl className="money-totals"><div><dt>Credits added</dt><dd>{money(totals?.creditsCents)}</dd></div><div><dt>Charged</dt><dd>{money(totals?.chargesCents)}</dd></div><div><dt>Refunded</dt><dd>{money(totals?.refundsCents)}</dd></div></dl>
    <p className="small-note">Totals since you joined. Paid top-ups aren’t available yet.</p>
   </section>
