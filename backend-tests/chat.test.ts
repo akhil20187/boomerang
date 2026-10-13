@@ -125,10 +125,10 @@ it("ask_brief yields a question card; the answer yields a brief box, then find_b
   expect(await t.run((ctx) => ctx.db.query("creditReservations").collect())).toHaveLength(0);
 });
 
-it("offers the model only four tools, none of which starts calls or spends credit", async () => {
+it("offers the model only five tools, none of which starts calls or spends credit", async () => {
   const { chatRequests, user } = await setup([say("ok")]);
   await user.action(api.chat.send, { text: "hi" });
-  expect(TOOL_NAMES).toEqual(["ask_brief", "find_businesses", "look_up_fact", "read_task_results"]);
+  expect(TOOL_NAMES).toEqual(["ask_brief", "find_businesses", "use_contacts", "look_up_fact", "read_task_results"]);
   expect(chatRequests[0].tools.map((x: any) => x.function.name)).toEqual(TOOL_NAMES);
   for (const name of TOOL_NAMES) expect(name).not.toMatch(/start|reserve|charge|pay|book|spend/);
 });
