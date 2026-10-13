@@ -1,7 +1,8 @@
 /**
  * D160: Luna may look up GENERAL FACTS on the web (pincodes, landmarks, what a course or term means).
  * Businesses to call still come only from Google Maps search or customer-supplied contacts (D148):
- * this never finds businesses, websites or phone numbers. Uses the OpenAI Responses API `web_search` tool.
+ * this never finds businesses, websites or phone numbers. A named business not on Google is looked up on the web by
+ * webBusiness.ts instead (D164), through find_businesses. Uses the OpenAI Responses API `web_search` tool.
  * No database access; the caller counts the lookup against the customer's limits.
  */
 import { ConvexError } from "convex/values";
@@ -72,7 +73,7 @@ export type FactResult =
 const REFUSAL: FactResult = {
   status: "refused",
   error:
-    "look_up_fact is for general facts only (pincodes, landmarks, meanings). It never finds businesses, websites or phone numbers. Businesses come only from find_businesses (Google Maps) or contacts the customer gives.",
+    "look_up_fact is for general facts only (pincodes, landmarks, meanings). It never finds businesses, websites or phone numbers. Businesses come only from find_businesses (Google Maps) or contacts the customer gives. To find one named business's phone number on the web (D164), call find_businesses with business_name and search_web true.",
 };
 
 /** One general-fact lookup. Refuses business searches before any network call. */
