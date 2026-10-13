@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Opened call details</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: #1A1A19; background: #FFFFFF; display: flex; flex-direction: column; gap: 12px; font-size: 13px; line-height: 18px; padding-top: 4px">
+
+<ol aria-label="What happened" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{steps}}" as="t" hint-placeholder-count="3">
+<li style="display: flex; align-items: flex-start; gap: 8px; color: {{t.fg}}">
+<span aria-hidden="true" style="width: 18px; height: 18px; flex-shrink: 0; border-radius: 9px; color: #FFFFFF; background: {{t.bg}}; display: grid; place-items: center; font-size: 10px; font-weight: 700">{{t.mark}}</span>
+<span style="flex: 1">{{t.text}}</span>
+<time style="color: #8F8C85; white-space: nowrap; font-variant-numeric: tabular-nums">{{t.time}}</time>
+</li>
+</sc-for>
+</ol>
+
+<sc-if value="{{personal}}" hint-placeholder-val="{{ false }}">
+<p style="margin: 0">Best to call them directly. No charge for this one.</p>
+</sc-if>
+
+<sc-if value="{{hasAnswer}}" hint-placeholder-val="{{ true }}">
+<dl style="margin: 0; display: grid; grid-template-columns: {{cols}}; column-gap: 12px; row-gap: 6px; border-top: 1px solid #E7E5E0; padding-top: 10px">
+<sc-for list="{{items}}" as="q" hint-placeholder-count="3">
+<div style="display: contents"><dt style="color: #6B6A66">{{q.label}}</dt><dd style="margin: 0; color: {{q.color}}">{{q.value}}</dd></div>
+</sc-for>
+</dl>
+</sc-if>
+
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: #6B6A66">{{address}}</p>
+
+<sc-if value="{{hasRec}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="display: flex; align-items: center; gap: 6px">
+<button aria-label="Playback speed" style="min-width: 44px; height: 44px; padding: 0; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; font: inherit"><span style="min-width: 40px; height: 28px; padding: 0 8px; border-radius: 14px; background: #F2F1EE; font-size: 13px; font-weight: 600; display: grid; place-items: center; box-sizing: border-box; color: #1A1A19">1x</span></button>
+<button aria-label="Play call recording" style="width: 44px; height: 44px; flex-shrink: 0; padding: 0; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; color: #1A1A19"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg></button>
+<div aria-hidden="true" style="flex: 1; min-width: 0; height: 44px; position: relative; display: flex; align-items: center; justify-content: space-between; gap: 2px">
+<sc-for list="{{bars}}" as="b" hint-placeholder-count="42"><i style="width: 3px; max-width: 3px; flex: 1; border-radius: 2px; height: {{b.h}}; background: #D4D4D0"></i></sc-for>
+<b style="position: absolute; top: 50%; left: 0; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 6px; background: #1A1A19; box-shadow: 0 0 0 2px #FFFFFF"></b>
+</div>
+</div>
+<div style="display: flex; justify-content: space-between; padding: 0 2px 0 94px; font-size: 12px; color: #6B6A66; font-variant-numeric: tabular-nums"><span>0:00</span><span>Called {{calledAt}}</span></div>
+</div>
+</sc-if>
+
+<sc-if value="{{noRecNote}}" hint-placeholder-val="{{ false }}">
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: #6B6A66">No recording for this call. The answer comes from the caller’s notes.</p>
+</sc-if>
+<sc-if value="{{hasPending}}" hint-placeholder-val="{{ false }}">
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: #6B6A66">{{pending}}</p>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"call":{"editor":null},"$preview":{"width":360,"height":330}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const sample = {
+      steps: [['Call requested', '4:01 pm', 'ok'], ['AI called on your behalf', '4:02 pm', 'ok'], ['Shop answered · notes saved', '4:04 pm', 'ok'], ['Call recording ready', '4:04 pm', 'ok']],
+      items: [['✓ Can you come today?', '"Yes, at 4 pm."'], ['✓ Visit charge?', '"₹200 for the visit."'], ['~ Cost to fix the tap?', '"Usually ₹150 to ₹300, parts extra."']],
+      cols: 'items', address: 'Plot 12, Gachibowli Main Road, Hyderabad 500032', rec: true, calledAt: '4:02 pm'
+    };
+    const c = this.props.call || sample;
+    const kinds = { ok: ['✓', '#55544F', '#1A1A19'], live: ['•', '#2341B5', '#1A1A19'], warn: ['!', '#B26B00', '#1A1A19'], wait: ['…', '#A8A59D', '#6B6A66'], fail: ['×', '#8F8C85', '#6B6A66'] };
+    const steps = (c.steps || []).map(([text, time, kind]) => { const k = kinds[kind] || kinds.ok; return { text, time, mark: k[0], bg: k[1], fg: k[2] }; });
+    const items = (c.items || []).map(([label, value]) => ({ label, value, color: value === 'Unconfirmed' ? '#7A4A00' : '#1A1A19' }));
+    const hasAnswer = items.length > 0;
+    return {
+      steps, items, hasAnswer, personal: !!c.personal,
+      cols: c.cols === 'items' ? 'minmax(0, 1fr) minmax(0, 1fr)' : '84px minmax(0, 1fr)',
+      address: c.address || 'Address unconfirmed', calledAt: c.calledAt || '',
+      hasRec: !!c.rec, noRecNote: hasAnswer && !c.rec, hasPending: !hasAnswer && !c.personal && !!c.pending, pending: c.pending || '',
+      bars: Array.from({ length: 42 }, (_, i) => ({ h: (8 + ((i * 17) % 24)) + 'px' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

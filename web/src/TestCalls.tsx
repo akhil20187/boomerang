@@ -20,8 +20,8 @@ export function TestCalls(){
   history.replaceState(null,'',`/app?test=${encodeURIComponent(result.taskId)}`);
  }}/>{selected&&status?.calls.some(c=>c.taskId===selected)&&<TestCallResult taskId={selected}/>}</>;
 }
-export function TestCallsView({status,onCall,onSelect}:{status?:TrialStatus;onCall:(phone:string)=>Promise<void>;onSelect:(taskId:string)=>void}){
- const [expanded,setExpanded]=useState(false),[phone,setPhone]=useState(''),[own,setOwn]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('');
+export function TestCallsView({status,onCall,onSelect,defaultExpanded=false}:{status?:TrialStatus;onCall:(phone:string)=>Promise<void>;onSelect:(taskId:string)=>void;/** chat card: open the form straight away */defaultExpanded?:boolean}){
+ const [expanded,setExpanded]=useState(defaultExpanded),[phone,setPhone]=useState(''),[own,setOwn]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const active=status?.calls.some(c=>c.active),exhausted=status?.remaining===0;
  return <section className="test-call card" aria-labelledby="test-call-heading">
   <div className="test-call-heading"><div><h2 id="test-call-heading">Try a call to yourself</h2><p>Hear how Boomerang asks a shop for answers.</p></div><button type="button" aria-expanded={expanded} aria-controls="test-call-form" onClick={()=>setExpanded(!expanded)}>{expanded?'Close':'Try it'}</button></div>

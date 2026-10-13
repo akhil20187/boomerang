@@ -1,0 +1,108 @@
+/* Signed-in pages (D153): call log, Use in ChatGPT or Claude, profile and credit. DESIGN.md: 8px corners, #DAD7D0 borders, black only on the main button, charge lines never green. */
+.app-main.wide-main{max-width:1080px}
+.page{display:flex;flex-direction:column;gap:20px;min-width:0}
+.page-heading{display:flex;flex-direction:column;gap:6px}.page-heading h1{font-size:28px;letter-spacing:-.6px}.page-heading p{font-size:15px;color:#55544f}
+.page-empty{padding:28px 0;color:#55544f;font-size:14px}.page-empty a{display:inline-block;margin-top:8px;font-weight:500}
+.page-foot{margin-top:4px}
+.secondary{min-height:44px;padding:0 14px;font-size:14px;border:1px solid #dad7d0;border-radius:8px;background:#fff;color:#1a1a19}.secondary:hover:not(:disabled){border-color:#8f8c85}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.nowrap{white-space:nowrap}
+.log-sub{display:block;font-size:12px;line-height:16px;color:#55544f;margin-top:2px}
+/* Totals */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.stat{display:flex;flex-direction:column;gap:2px;padding:14px 16px;border:1px solid #dad7d0;border-radius:8px}
+.stat strong{font-size:24px;font-weight:700;letter-spacing:-.02em}.stat-label{font-size:12px;color:#55544f}.stat-note{font-size:12px;color:#55544f}.stat a{font-size:12px;min-height:24px}
+.stat-loading{color:#55544f}
+/* Filters */
+.log-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.filter-chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 14px;border:1px solid #dad7d0;border-radius:999px;font-size:14px;background:#fff}
+.chip[aria-pressed=true]{background:#f2f1ee;border-color:#1a1a19;font-weight:500}
+/* Laptop table */
+.log-table-box{border:1px solid #dad7d0;border-radius:8px;overflow-x:auto}
+.log-table{width:100%;border-collapse:collapse;min-width:860px;font-size:13px}
+.log-table th{text-align:left;font-size:12px;font-weight:500;color:#55544f;padding:10px 14px;border-bottom:1px solid #dad7d0}
+.log-table td{padding:12px 14px;border-bottom:1px solid #eeece7;vertical-align:top}
+.log-table tbody tr:last-child td{border-bottom:0}
+.log-table tr.is-open td{border-bottom:0}
+.log-biz{font-size:14px;font-weight:500}
+.log-sub a{display:inline-flex;align-items:center;min-height:24px}
+.log-result{font-weight:500}.log-result .pulse{display:inline-block;margin-right:6px;vertical-align:middle}
+.log-card .log-result{display:flex;align-items:center}
+.log-charge{color:#6b6a66;font-size:12px}
+.row-toggle{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 10px;font-size:13px}
+.log-open td{padding:0 14px 16px}
+.log-open-body{display:flex;gap:24px;align-items:flex-start}
+.log-open-detail{flex:1;max-width:620px}.log-open-detail .shop-detail{margin:0}
+/* Phone cards */
+.log-days{border:1px solid #dad7d0;border-radius:8px;overflow:hidden}
+.log-day{font-size:12px;font-weight:500;color:#55544f;padding:14px 16px 6px}
+.log-card{border-top:1px solid #dad7d0;padding:8px 0}
+.log-card-summary{display:flex;flex-direction:column;gap:3px;width:100%;text-align:left;border:0;border-radius:0;padding:6px 16px;background:transparent;font-size:13px}
+.log-card-line{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%}.log-card-line svg{color:#55544f;flex-shrink:0}
+.log-card-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 4px 0 0}
+.log-card-actions .shop-phone{margin:0;padding:0 16px}
+.log-card-detail .shop-detail{margin:4px 16px 10px}
+.log-top{height:0;outline:none;scroll-margin-top:72px}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pager button{min-height:44px;min-width:112px}
+.pager button:disabled{opacity:.45;cursor:not-allowed}
+.pager-label{font-size:13px;color:#55544f;text-align:center;flex:1}
+@media(max-width:400px){.pager button{min-width:0;padding-left:12px;padding-right:12px}}
+/* Connect page */
+.connect-page{max-width:640px;margin:0 auto;width:100%}
+.segmented{display:inline-flex;align-self:flex-start;border:1px solid #dad7d0;border-radius:8px;padding:3px;gap:3px}
+.segmented [role=tab]{min-height:40px;min-width:96px;border:0;border-radius:6px;font-size:14px;background:transparent}
+.segmented [role=tab][aria-selected=true]{background:#f2f1ee;font-weight:600;box-shadow:inset 0 0 0 1px #1a1a19}
+.connect-card{display:flex;flex-direction:column}.connect-card>section{padding:18px 20px;border-top:1px solid #eeece7}.connect-card>section:first-child{border-top:0}
+.connect-card h2,.paste-card h2{font-size:15px;margin-bottom:10px}
+.copy-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.copy-row code{flex:1 1 220px;min-width:0;overflow-wrap:anywhere;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;padding:10px 12px;border:1px solid #dad7d0;border-radius:8px}
+.copy-button{min-width:88px}
+.steps{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-direction:column;gap:10px;font-size:14px}
+.steps li{display:flex;gap:10px;align-items:flex-start}.step-n{width:22px;height:22px;flex-shrink:0;border:1px solid #dad7d0;border-radius:11px;display:grid;place-items:center;font-size:12px}
+.connection-lines{list-style:none;margin:10px 0 0;padding:0;font-size:14px}
+.paste-card{padding:18px 20px}
+.advanced{padding:0 20px}.advanced summary{min-height:52px;display:flex;align-items:center;cursor:pointer;font-weight:500;font-size:15px}.advanced[open]{padding-bottom:14px}.advanced .account-details{margin:12px 0 0}
+/* Profile and credit (Wallet.dc.html, ProfileLaptop.dc.html, reworked 2026-10-13 after owner feedback): one centred
+   640px column, every fact once. Rows use one grid (label · value · action) so labels and values line up across cards. */
+.profile-page{max-width:640px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:16px}
+.profile-page .page-heading{margin-bottom:0}
+.profile-card{padding:20px 24px;display:flex;flex-direction:column;min-width:0}
+.profile-card h2{font-size:16px;font-weight:600;margin:0}
+.profile-head{display:flex;align-items:center;gap:14px;min-width:0;padding-bottom:16px}
+.profile-badge{width:48px;height:48px;border-radius:24px;background:#f2f1ee;display:grid;place-items:center;font-size:19px;font-weight:600;flex-shrink:0}
+.profile-who{display:flex;flex-direction:column;gap:2px;min-width:0}
+.profile-card .profile-name{font-size:18px;letter-spacing:-.01em;overflow-wrap:anywhere}
+.profile-meta{font-size:14px;color:#55544f;overflow-wrap:anywhere}
+.detail-row{display:grid;grid-template-columns:132px minmax(0,1fr) auto;align-items:center;column-gap:16px;min-height:52px;padding:10px 0;border-top:1px solid #eeece7;font-size:14px;color:#1a1a19}
+.detail-label{font-size:14px;color:#55544f}
+.detail-value{display:flex;flex-direction:column;gap:2px;min-width:0;overflow-wrap:anywhere}
+.detail-row>svg{color:#8f8c85}
+.detail-link{text-decoration:none}.detail-link:hover{background:#faf9f7}
+.link-button{min-height:44px;padding:0 4px;border:0;background:none;font-size:14px;font-weight:500;color:#1a1a19;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.name-form{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px solid #eeece7}
+.name-form input:not([type=checkbox]){font-size:15px;min-height:44px;border-radius:8px}
+.name-actions{display:flex;gap:8px}.name-actions button{min-height:44px;min-width:88px;padding:0 16px;font-size:14px}
+.name-saved{font-size:12px;color:#55544f}.name-saved:empty{display:none}.name-saved:not(:empty){padding:0 0 8px}
+.credit-card .section-label{font-size:14px;font-weight:500;color:#55544f}
+.credit-card .balance{font-size:36px;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-top:4px}
+.credit-card p{font-size:14px;margin-top:4px}
+.money-totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:18px 0 0;border-top:1px solid #eeece7;padding-top:14px}
+.money-totals>div{display:flex;flex-direction:column;gap:2px;padding-left:16px;border-left:1px solid #eeece7}.money-totals>div:first-child{padding-left:0;border-left:0}
+.money-totals dt{font-size:13px;color:#55544f}.money-totals dd{margin:0;font-size:17px;font-weight:600}
+.credit-card .small-note{font-size:13px;margin-top:14px;color:#55544f}
+.history-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:14px}
+.segmented{display:inline-flex;border:1px solid #dad7d0;border-radius:8px;padding:2px;gap:2px;background:#fff}
+.segmented button{min-height:40px;padding:0 12px;border:0;border-radius:6px;background:none;font-size:14px;color:#55544f;cursor:pointer}
+.segmented button[aria-pressed=true]{background:#f2f1ee;color:#1a1a19;font-weight:500}
+.history-empty{padding:16px 0;font-size:14px;border-top:1px solid #eeece7}
+.money-rows{list-style:none;margin:0;padding:0}.money-rows li{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;border-top:1px solid #eeece7}
+.money-rows li>span:first-child{min-width:0;overflow-wrap:anywhere;display:flex;flex-direction:column;gap:2px}
+.money-title{font-size:14px;font-weight:500}.money-amount{font-size:14px;font-weight:500;white-space:nowrap;color:#1a1a19}
+.history-pager{border-top:1px solid #eeece7;padding-top:12px}.history-pager .pager-label{text-align:left}
+.profile-signout{align-self:flex-start}
+@media(max-width:600px){.profile-card{padding:16px}.detail-row{grid-template-columns:minmax(0,1fr) auto;row-gap:2px}.detail-row>.detail-label{grid-column:1/-1}.detail-link>svg{grid-column:2;grid-row:2}.segmented{width:100%}.segmented button{flex:1;padding:0 6px}}
+.pager-buttons{display:flex;gap:8px}
+.sign-out{align-self:flex-start}
+@media(max-width:600px){.page-heading h1{font-size:24px}.page-heading p{font-size:14px}.stat{padding:12px}.stat strong{font-size:20px}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.connect-card>section,.paste-card,.profile-card{padding-left:16px;padding-right:16px}.advanced{padding:0 16px}}

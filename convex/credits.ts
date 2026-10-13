@@ -240,15 +240,22 @@ export const availableFor = internalQuery({
 });
 // Money movements for the signed-in user. Holds are left out: a call appears
 // once, when it settles; money currently held is shown separately.
+// `type` narrows the list to one kind (Profile page filters); without it every
+// movement except holds is returned, including "not charged" releases.
 export const history = query({
-  args: { paginationOpts: paginationOptsValidator, accessToken: v.optional(v.string()) },
+  args: {
+    paginationOpts: paginationOptsValidator,
+    accessToken: v.optional(v.string()),
+    type: v.optional(v.union(v.literal("charge"), v.literal("refund"), v.literal("grant"))),
+  },
   returns: v.any(),
   handler: async (ctx, args) => {
     const userId = await requireUser(ctx, args.accessToken);
+    const type = args.type;
     const result = await ctx.db.query("creditEntries")
       .withIndex("by_user", q => q.eq("userId", userId))
       .order("desc")
-      .filter(q => q.neq(q.field("type"), "reservation"))
+      .filter(q => type ? q.eq(q.field("type"), type) : q.neq(q.field("type"), "reservation"))
       .paginate(args.paginationOpts);
     const page = await Promise.all(result.page.map(async e => {
       const task = e.taskId ? await ctx.db.get(e.taskId) : null;
@@ -258,8 +265,34 @@ export const history = query({
         amountCents: e.amountCents ?? Math.round(e.amount * 100),
         taskId: e.taskId, productName: task?.product.name, shopName: job?.shop.name,
         note: e.type === "release" ? notChargedReason(job?.state) : undefined,
+        welcome: e.type === "grant" && !!e.operationId?.startsWith("welcome:") ? true : undefined,
       };
     }));
     return { ...result, page };
+  },
+});
+
+// All-time totals for the Profile page: credit added (grants), charges and
+// refunds, in paise. Holds and "not charged" releases move no money.
+export function sumByType(entries: { type: string; amount: number; amountCents?: number }[]) {
+  const totals = { creditsCents: 0, chargesCents: 0, refundsCents: 0 };
+  for (const e of entries) {
+    const cents = e.amountCents ?? Math.round(e.amount * 100);
+    if (e.type === "grant") totals.creditsCents += cents;
+    else if (e.type === "charge") totals.chargesCents += Math.abs(cents);
+    else if (e.type === "refund") totals.refundsCents += cents;
+  }
+  return totals;
+}
+export const totals = query({
+  args: { accessToken: v.optional(v.string()) },
+  returns: v.object({ creditsCents: v.number(), chargesCents: v.number(), refundsCents: v.number() }),
+  handler: async (ctx, args) => {
+    const userId = await requireUser(ctx, args.accessToken);
+    // Same 10,000-entry ceiling as balances(); one user never gets near it.
+    const entries = await ctx.db.query("creditEntries")
+      .withIndex("by_user", q => q.eq("userId", userId))
+      .take(10000);
+    return sumByType(entries);
   },
 });

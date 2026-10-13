@@ -414,3 +414,63 @@ it("a saved search includes the price label and available credit", async () => {
   const draft = await s.user.query(api.drafts.get, {draftId:s.draftId});
   expect(draft).toMatchObject({answerPriceCents:1000,answerPriceLabel:"₹10",currency:"INR",availableCents:500});
 });
+async function moneyUsers() {
+  const t = convexTest(schema, modules);
+  const ids = await t.run(async ctx => {
+    const mine = await ctx.db.insert("users", {email:"mine@example.com", name:"Asha Rao"});
+    const theirs = await ctx.db.insert("users", {email:"theirs@example.com"});
+    const add = (userId: typeof mine, type: "grant"|"reservation"|"charge"|"release"|"refund", amountCents: number|undefined, operationId: string, amount = 0) =>
+      ctx.db.insert("creditEntries", {userId, type, amount, ...(amountCents === undefined ? {} : {amountCents}), currency:"INR", reason:"test", operationId});
+    await add(mine, "grant", 10000, `welcome:${mine}`, 100);
+    await add(mine, "grant", undefined, "legacy-grant", 5);
+    await add(mine, "reservation", 1000, "reserve:1");
+    await add(mine, "charge", -1000, "settle:1", -10);
+    await add(mine, "reservation", 1000, "reserve:2");
+    await add(mine, "release", 1000, "settle:2");
+    await add(mine, "reservation", 1000, "reserve:3");
+    await add(mine, "charge", -1000, "settle:3", -10);
+    await add(mine, "refund", 1000, "refund:3", 10);
+    await add(theirs, "grant", 50000, "their-grant", 500);
+    await add(theirs, "charge", -2000, "their-charge", -20);
+    await add(theirs, "refund", 2000, "their-refund", 20);
+    return {mine, theirs};
+  });
+  return {t, mine:t.withIdentity({subject:`${ids.mine}|session`}), theirs:t.withIdentity({subject:`${ids.theirs}|session`})};
+}
+const first = {paginationOpts:{numItems:20,cursor:null}};
+it("credit history filters by type on the server, never shows holds, and only the signed-in user's rows", async () => {
+  const s = await moneyUsers();
+  const all = await s.mine.query(api.credits.history, first);
+  expect(all.page.map((r: any) => r.type)).toEqual(["refund", "charge", "release", "charge", "grant", "grant"]);
+  const charges = await s.mine.query(api.credits.history, {...first, type:"charge"});
+  expect(charges.page.map((r: any) => [r.type, r.amountCents])).toEqual([["charge", -1000], ["charge", -1000]]);
+  const refunds = await s.mine.query(api.credits.history, {...first, type:"refund"});
+  expect(refunds.page.map((r: any) => [r.type, r.amountCents])).toEqual([["refund", 1000]]);
+  const grants = await s.mine.query(api.credits.history, {...first, type:"grant"});
+  expect(grants.page.map((r: any) => [r.amountCents, r.welcome ?? false])).toEqual([[500, false], [10000, true]]);
+  for (const page of [all, charges, refunds, grants])
+    expect(page.page.some((r: any) => r.type === "reservation" || r.amountCents === 50000 || r.amountCents === -2000 || r.amountCents === 2000)).toBe(false);
+  const theirs = await s.theirs.query(api.credits.history, {...first, type:"refund"});
+  expect(theirs.page.map((r: any) => r.amountCents)).toEqual([2000]);
+  // Small pages still page through the filtered list.
+  const p1 = await s.mine.query(api.credits.history, {paginationOpts:{numItems:1,cursor:null}, type:"charge"});
+  const p2 = await s.mine.query(api.credits.history, {paginationOpts:{numItems:1,cursor:p1.continueCursor}, type:"charge"});
+  expect([p1.page[0]._id, p2.page[0]._id]).toEqual(charges.page.map((r: any) => r._id));
+  await expect(s.mine.query(api.credits.history, {...first, type:"reservation" as any})).rejects.toThrow();
+  await expect(s.t.query(api.credits.history, {...first, type:"charge"})).rejects.toThrow();
+});
+it("credit totals add up only the signed-in user's credits, charges and refunds", async () => {
+  const s = await moneyUsers();
+  expect(await s.mine.query(api.credits.totals, {})).toEqual({creditsCents:10500, chargesCents:2000, refundsCents:1000});
+  expect(await s.theirs.query(api.credits.totals, {})).toEqual({creditsCents:50000, chargesCents:2000, refundsCents:2000});
+  const fresh = await s.t.run(ctx => ctx.db.insert("users", {email:"new@example.com"}));
+  expect(await s.t.withIdentity({subject:`${fresh}|session`}).query(api.credits.totals, {})).toEqual({creditsCents:0, chargesCents:0, refundsCents:0});
+  await expect(s.t.query(api.credits.totals, {})).rejects.toThrow();
+});
+it("users.me reports when the account was created", async () => {
+  const s = await moneyUsers();
+  const me = await s.mine.query(api.users.me, {});
+  const user = await s.t.run(async ctx => (await ctx.db.query("users").collect()).find(u => u.email === "mine@example.com")!);
+  expect(me.memberSince).toBe(user._creationTime);
+  expect(me.name).toBe("Asha Rao");
+});

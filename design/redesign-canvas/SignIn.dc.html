@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#1A1A19;background:#FFFFFF}
+a{color:#1A1A19}a:hover{color:#000}
+.ex{font-size:14px;border:1px solid #DAD7D0;border-radius:8px;padding:10px 12px;color:#55544F}
+</style>
+</helmet>
+<div style="min-height: 860px; display: flex; flex-direction: column; background: #FFFFFF">
+<header style="display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid #DAD7D0">
+<div style="display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 17px; letter-spacing: -0.02em">
+<svg width="22" height="22" viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-12 50 50)" fill="none" stroke="#1A1A19" stroke-width="13" stroke-linecap="round"><path d="M30 12 V60"></path><path d="M30 56 Q32 38 53 38 Q75 38 75 61 Q75 84 55 84"></path></g><circle cx="32" cy="82" r="8.5" fill="#16A34A" transform="rotate(-12 50 50)"></circle></svg>
+<span>boomerang</span>
+</div>
+<a href="#" style="font-size: 14px">See a demo</a>
+</header>
+
+<main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 16px">
+<div style="width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 22px">
+
+<sc-if value="{{showSignedOut}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="font-size: 14px; border: 1px solid #DAD7D0; border-radius: 8px; padding: 10px 12px">You're signed out. Sign in again any time to see your chats and calls.</div>
+</sc-if>
+<sc-if value="{{notSent}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 28px; letter-spacing: -0.03em; line-height: 1.15">Sign in to Boomerang</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #55544F">We'll email you a link. No password.</p>
+</div>
+<form onSubmit="{{send}}" style="display: flex; flex-direction: column; gap: 10px">
+<label for="email" style="font-size: 13px; font-weight: 500">Email</label>
+<input id="email" type="email" value="{{email}}" onChange="{{typed}}" placeholder="you@example.com" style="font: inherit; font-size: 15px; height: 46px; border: 1px solid #DAD7D0; border-radius: 8px; padding: 0 14px">
+<button type="submit" style="font: inherit; font-size: 15px; font-weight: 500; height: 48px; border: 0; border-radius: 8px; background: #1A1A19; color: #FFFFFF; cursor: pointer">Email me a sign-in link</button>
+</form>
+<p style="margin: 0; font-size: 13px; color: #55544F; line-height: 1.5">New here? You start with ₹100 credit, about 10 answers. You pay ₹10 only when a shop answers what you asked.</p>
+<div style="border-top: 1px solid #DAD7D0; padding-top: 18px; display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 13px; font-weight: 500">Then just tell us what to call about</div>
+<div class="ex">Plumber in Gachibowli who can come today</div>
+<div class="ex">iPhone 17 256GB near Ameerpet, best price after card offers</div>
+<div class="ex">AI training institutes in Ameerpet: fees and next batch</div>
+</div>
+</sc-if>
+
+<sc-if value="{{sent}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="display: flex; flex-direction: column; gap: 10px">
+<h1 style="margin: 0; font-size: 28px; letter-spacing: -0.03em">Check your email</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #55544F">We sent a sign-in link to <strong style="color: #1A1A19">{{email}}</strong>. Open it on this device. It expires in 15 minutes.</p>
+<button onClick="{{reset}}" style="align-self: flex-start; font: inherit; font-size: 14px; background: none; border: 0; padding: 8px 0; text-decoration: underline; cursor: pointer; color: #1A1A19">Use a different email</button>
+<a href="Desktop.dc.html" style="align-self: flex-start; margin-top: 12px; font-size: 12px; border: 1px dashed #A8A59D; border-radius: 6px; background: #FAFAF8; color: #55544F; padding: 6px 10px; text-decoration: none">Prototype only: pretend I opened the email link</a>
+</div>
+</sc-if>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"signedOut":{"editor":"boolean","default":false},"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { email: '', sent: false }; }
+  renderVals() {
+    return {
+      showSignedOut: !!this.props.signedOut && !this.state.sent,
+      email: this.state.email || 'you@example.com', notSent: !this.state.sent, sent: this.state.sent,
+      typed: (e) => this.setState({ email: e.target.value }),
+      send: (e) => { e.preventDefault(); this.setState({ sent: true }); },
+      reset: () => this.setState({ sent: false })
+    };
+  }
+}
+</script>
+</body>
+</html>
