@@ -31,12 +31,12 @@ result.frontend = {
   status: app.response.status,
   convexConnection: bundle.text.includes('https://coordinated-barracuda-687.convex.cloud'),
   customerLinks: bundle.text.includes(website),
-  creditHistory: bundle.text.includes('credits:history') && bundle.text.includes('Credit & charges'),
+  creditHistory: bundle.text.includes('credits:history') && bundle.text.includes('Profile and credit'),
 };
 const widget = await get(`${backend}/widget.html`);
 const builtWidget = new URL('../web/dist/widget.html',import.meta.url);
 const widgetHash = createHash('sha256').update(widget.text).digest('hex');
-result.widget = {status:widget.response.status,rupeeVersion:widget.text.includes('credits:history') && widget.text.includes('Credit & charges'),matchesLocalBuild:existsSync(builtWidget)?widgetHash===createHash('sha256').update(readFileSync(builtWidget)).digest('hex'):null};
+result.widget = {status:widget.response.status,rupeeVersion:widget.text.includes('credits:history') && widget.text.includes('Profile and credit'),matchesLocalBuild:existsSync(builtWidget)?widgetHash===createHash('sha256').update(readFileSync(builtWidget)).digest('hex'):null};
 result.pages = {};
 const protectedResource = await get(`${website}/.well-known/oauth-protected-resource/mcp`);
 const legacyResource = await get(`${backend}/.well-known/oauth-protected-resource/mcp`);
