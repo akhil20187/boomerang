@@ -2,6 +2,14 @@ import { internalAction, internalQuery } from "./_generated/server";
 import { internalMutation } from "./mutationSafety";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
+import type { Doc } from "./_generated/dataModel";
+import { chatIdForTask } from "./chat";
+/** Email link: the website chat the task was started from, else the task page (assistant and older tasks). */
+export async function emailLink(ctx: { db: any }, task: Doc<"tasks">) {
+  const site = process.env.SITE_URL ?? "http://localhost:5173";
+  const chatId = await chatIdForTask(ctx, task._id, task.userId);
+  return chatId ? `${site}/app?chat=${chatId}` : `${site}/status?task=${task._id}`;
+}
 const typeV = v.union(v.literal("started"), v.literal("completed"));
 export const claim = internalMutation({
   args: { taskId: v.id("tasks"), type: typeV },
@@ -25,7 +33,7 @@ export const claim = internalMutation({
     const task = await ctx.db.get(args.taskId);
     if (!task || task.selfTest) return null;
     const user = await ctx.db.get(task.userId);
-    const url = `${process.env.SITE_URL ?? "http://localhost:5173"}/status?task=${args.taskId}`;
+    const url = await emailLink(ctx, task);
     const payload = existing?.payload ?? {
       from: process.env.RESEND_FROM_EMAIL ?? "",
       to: user?.email ?? "",
@@ -93,7 +101,6 @@ export const send = internalAction({
       return null;
     }
     try {
-      const url = `${process.env.SITE_URL ?? "http://localhost:5173"}/status?task=${args.taskId}`;
       const r = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {

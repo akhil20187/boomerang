@@ -306,7 +306,9 @@ export default defineSchema({
     ),
   })
     .index("by_chat", ["chatId"])
-    .index("by_user", ["userId"]),
+    .index("by_user", ["userId"])
+    /** Find the chat a task was started from (the "calls" card stores payload.taskId). */
+    .index("by_task", ["payload.taskId"]),
   /** One row per chat turn that may call the model. Never deleted on failure, so the hourly limit cannot be reset. */
   chatTurns: defineTable({ userId: v.id("users") }).index("by_user", ["userId"]),
   notifications: defineTable({

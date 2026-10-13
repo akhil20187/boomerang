@@ -811,6 +811,33 @@ export const attachTask = mutation({
   },
 });
 
+/**
+ * The chat this user started a task from, or null. Both the task and the chat must belong to the user; tasks started
+ * outside a chat (ChatGPT/Claude, older website tasks, personal test calls) have none.
+ */
+export async function chatIdForTask(ctx: { db: any }, taskId: Id<"tasks">, userId: Id<"users">): Promise<Id<"chats"> | null> {
+  const task = await ctx.db.get(taskId);
+  if (!task || task.userId !== userId || task.selfTest) return null;
+  const cards: Doc<"chatMessages">[] = await ctx.db.query("chatMessages").withIndex("by_task", (q: any) => q.eq("payload.taskId", taskId)).take(10);
+  for (const card of cards) {
+    if (card.kind !== "calls" || card.userId !== userId) continue;
+    const chat = await ctx.db.get(card.chatId);
+    if (chat && chat.userId === userId) return chat._id;
+  }
+  return null;
+}
+
+/** Task page "Back to chat": the signed-in user's chat for this task, or null. */
+export const forTask = query({
+  args: { taskId: v.string() },
+  returns: v.union(v.id("chats"), v.null()),
+  handler: async (ctx, args) => {
+    const userId = await requireUser(ctx);
+    const taskId = ctx.db.normalizeId("tasks", args.taskId);
+    return taskId ? await chatIdForTask(ctx, taskId, userId) : null;
+  },
+});
+
 /** The picker card a widen request is for: must be this user's, in this chat, not yet used to start calls. */
 export const pickerInfo = internalQuery({
   args: { userId: v.id("users"), chatId: v.id("chats"), messageId: v.id("chatMessages") },
