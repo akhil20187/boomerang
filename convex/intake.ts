@@ -47,7 +47,7 @@ export const INTAKE_SYSTEM_PROMPT = `You are Boomerang's intake assistant. A cus
 
 RULES
 1. Ask only what the recipient will ask before giving a useful answer. Work out, for this type of business, what it needs to know before it can answer (a painter asks area, scope, wall condition, who buys paint, room size; a tailor asks the job, design, measurement method, deadline). Ask the customer those things. Nothing else.
-2. One question per turn. Give 2-4 concrete choices where possible. Plain words.
+2. One question per turn. Give 2-4 concrete choices where possible. Plain words. If the customer answers "Something else" or "Other", ask them to say it in their own words with choices set to an empty list; never offer a second list of choices for the same thing, and never ask the same thing again in other words.
 3. Before every question, list to yourself what the request and earlier answers already state. Never ask for any of it again, even in a different form. Zero questions is valid: if the request already covers what the recipient will ask, return the brief immediately.
 4. Order: first the actual job if the request is vague (for "tailor for my saree": blouse stitching, fall and pico, or alteration); then what they want from the call (availability, rough price, or more); then the area; then the recipient's remaining questions, most decisive first.
 4a. The area is always required. The customer is in India; a phrase like "in Chintal" or "near Kondapur" gives the area, and an unfamiliar proper noun is most likely a locality, not a product or fabric. If no area or pincode is known, ask "Which area?" with choices set to an empty list; never suggest locality names. Do not return the brief without an area.
@@ -66,6 +66,21 @@ Ready: {"status":"ready","summary":"one short paragraph for the customer","brief
 Leave unknowns as unknown entries with a fallback; do not invent values.
 CALL QUESTIONS: every entry in must_confirm and nice_to_have, and deciding_question, is one direct question the caller asks the business on the phone, addressed to them as "you" and ending with "?" (for example "Do you offer intermediate AI training?", "What does the course cover?", "What are the fees?", "When does the next batch start?"). Never write a research topic ("Fees for AI training"), never ask which businesses, institutes or shops exist or offer something (the business being called is the one answering), and never put the area or pincode in a question as a search term; finding businesses is done separately.
 For home-visit services, questions in must_confirm and deciding_question name the area, never the pincode (write "Can you come to Gachibowli today?", never "Can you come to 500032 today?"). Keep the apartment or building name only in location.building_if_asked; never put it in the summary, call_purpose, known facts or questions.`;
+
+/** "Something else", "Other", "None of these": the customer wants to type their own answer (D163). */
+export function isEscapeChoice(text: unknown): boolean {
+  if (typeof text !== "string") return false;
+  return /^(?:something\s+else|other(?:s|\s+reason|\s+thing)?|none(?:\s+of\s+(?:these|the\s+above))?|not\s+listed|else|anything\s+else)\s*[.!]?$/i.test(text.trim());
+}
+/**
+ * After an escape answer the next question must be open (no choices), so the customer types it (D163).
+ * Returns the question unchanged otherwise.
+ */
+export function openAfterEscape<T extends { status: string; choices?: string[] }>(turns: Turn[], out: T): T {
+  const last = [...turns].reverse().find((t) => t.answer !== undefined);
+  if (out.status !== "question" || !last || !isEscapeChoice(last.answer)) return out;
+  return { ...out, choices: [] };
+}
 
 /** Known recipients need an enquiry location only when the requested answer depends on it. */
 export function intakePrompt(suppliedContacts: boolean) {

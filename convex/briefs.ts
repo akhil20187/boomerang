@@ -13,6 +13,7 @@ import {
   parseIntakeOutput,
   forceReady,
   scrubUnitNumbers,
+  openAfterEscape,
   type Turn,
   type IntakeOutput,
 } from "./intake";
@@ -198,6 +199,7 @@ export async function prepareBrief(ctx: ActionCtx, userId: Id<"users">, args: Pr
     let out = await askModel(request, pincode, turns, finish, contacts);
     if (finish && (!out || out.status !== "ready")) out = forceReady(request, turns);
     if (!out) out = { status: "question", question: FALLBACK_QUESTION, choices: [] };
+    out = openAfterEscape(turns, out);
     if (out.status === "question") {
       turns.push({ question: out.question, choices: out.choices });
       await ctx.runMutation(internal.briefs.record, { briefId, expectedTurns, turns, status: "question" });

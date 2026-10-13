@@ -8,6 +8,8 @@ import {
   guessRequestKind,
   fallbackSearchQuery,
   parseSearchClassification,
+  nameMatches,
+  briefSearchPhrase,
   SEARCH_CLASSIFIER_PROMPT,
 } from "./domain";
 import { callingQuote } from "./credits";
@@ -159,17 +161,54 @@ export const search = action({
   },
 });
 
-export type SearchArgs = { productInput?: string; briefId?: Id<"briefs">; pincode?: string; area?: string; cards?: string[]; comments?: string; radiusKm?: number };
+export type SearchArgs = { productInput?: string; briefId?: Id<"briefs">; pincode?: string; area?: string; cards?: string[]; comments?: string; radiusKm?: number; /** D163: search Google for this one business by name instead of a category. */ businessName?: string };
+const PLACES_FIELDS =
+  "places.id,places.displayName,places.formattedAddress,places.location,places.internationalPhoneNumber,places.rating,places.userRatingCount,places.currentOpeningHours,places.googleMapsUri,places.businessStatus,places.attributions,places.primaryType";
+function placesSearch(key: string, textQuery: string, center: { latitude: number; longitude: number }, radiusMeters: number) {
+  return fetchJson("https://places.googleapis.com/v1/places:searchText", {
+    method: "POST",
+    headers: { "X-Goog-Api-Key": key, "Content-Type": "application/json", "X-Goog-FieldMask": PLACES_FIELDS },
+    body: JSON.stringify({ textQuery, locationBias: { circle: { center, radius: Math.min(50000, radiusMeters) } }, regionCode: "IN", languageCode: "en", pageSize: 20 }),
+  });
+}
+/** A Google Places result as a picker row. */
+function toShop(p: any, center: { latitude: number; longitude: number }) {
+  return {
+    placeId: p.id,
+    name: p.displayName?.text ?? "Shop",
+    address: p.formattedAddress ?? "",
+    phone:
+      typeof p.internationalPhoneNumber === "string" && /^\+[1-9]\d{7,14}$/.test(p.internationalPhoneNumber.replace(/[\s()-]/g, ""))
+        ? p.internationalPhoneNumber.replace(/[\s()-]/g, "")
+        : undefined,
+    rating: p.rating,
+    ratingCount: p.userRatingCount ?? 0,
+    distanceKm: distance(center, p.location),
+    hours: typeof p.currentOpeningHours?.openNow === "boolean" ? (p.currentOpeningHours.openNow ? "Open now" : "Closed now") : undefined,
+    mapsUrl:
+      p.googleMapsUri ??
+      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.displayName?.text ?? "Shop")}&query_place_id=${encodeURIComponent(p.id)}`,
+    fewRatings: (p.userRatingCount ?? 0) < 50,
+  };
+}
+const dropUndefined = (s: object) => Object.fromEntries(Object.entries(s).filter(([, value]) => value !== undefined));
+/** The city or locality name from a geocoding result ("Hyderabad"), for a wider named search. */
+export function cityOf(place: any): string | undefined {
+  const parts: any[] = place?.address_components ?? [];
+  return (parts.find((c) => (c.types ?? []).includes("locality")) ?? parts.find((c) => (c.types ?? []).includes("administrative_area_level_2")))?.long_name;
+}
 /** Shared by the `search` action and the website chat engine (convex/chat.ts). The caller resolves the user. */
 export async function searchBusinesses(ctx: ActionCtx, userId: Id<"users">, args: SearchArgs): Promise<any> {
     let input = (args.productInput ?? "").trim();
     let taskType: string | undefined;
+    let briefPhrase: string | undefined;
     if (args.briefId) {
       const brief = await ctx.runQuery(internal.briefs.load, { briefId: args.briefId, userId });
       if (brief.status !== "ready" || !brief.brief) throw new ConvexError("Finish the brief first.");
       if (brief.contacts?.length) throw new ConvexError('This brief already has business contacts. Use prepare_contacts instead of searching for other shops.');
       if (!input) input = brief.brief.task_context.summary;
       taskType = brief.brief.task_type;
+      briefPhrase = briefSearchPhrase(brief.brief);
     }
     if (input.length < 3 || input.length > 2000)
       throw new ConvexError(
@@ -196,8 +235,30 @@ export async function searchBusinesses(ctx: ActionCtx, userId: Id<"users">, args
       );
     const location = place.geometry.location,
       center = { latitude: location.lat, longitude: location.lng };
+    const businessName = args.businessName?.replace(/\s+/g, " ").trim().slice(0, 120);
+    if (businessName) {
+      // D163: look for this one business by name near the area, then across the city. Only listings whose name
+      // plausibly matches are kept; unrelated businesses are never shown as if they were the one asked for.
+      const keep = (places: any[]) => places.filter((p: any) => p.location && p.businessStatus !== "CLOSED_PERMANENTLY" && nameMatches(businessName, p.displayName?.text ?? ""));
+      let matched = keep((await placesSearch(key, businessName, center, 20000)).places ?? []);
+      const city = cityOf(place);
+      const wider = [businessName, where.area ?? city].filter(Boolean).join(" ");
+      if (!matched.length) matched = keep((await placesSearch(key, city && !wider.toLowerCase().includes(city.toLowerCase()) ? `${wider} ${city}` : wider, center, 50000)).places ?? []);
+      const shops = [...new Map(matched.map((p: any) => [p.id, dropUndefined(toShop(p, center))])).values()]
+        .sort((a: any, b: any) => a.distanceKm - b.distanceKm)
+        .slice(0, 10);
+      const base = { businessName, city, product, ...callingQuote(), attribution: "Google Maps", requestKind: guessRequestKind(input, taskType), ...(where.pincode ? { pincode: where.pincode } : { area: where.area }) };
+      if (!shops.length) return { ...base, shops: [], notFound: true };
+      const draftId = await ctx.runMutation(internal.drafts.save, {
+        userId, briefId: args.briefId, productInput: input, product,
+        ...(where.pincode ? { pincode: where.pincode } : { area: where.area }),
+        cards: args.cards ?? [], comments: args.comments ?? "", radiusKm: 20, shops: shops as any,
+      });
+      return { ...base, draftId, shops, radiusKm: 20, availableCents: await ctx.runQuery(internal.credits.availableFor, { userId: userId ?? null }) };
+    }
     let kind = guessRequestKind(input, taskType);
-    let textQuery = fallbackSearchQuery(product.name, kind);
+    // A brief searches for the kind of business ("ESG and Sustainability services"), never its long summary sentence.
+    let textQuery = fallbackSearchQuery(briefPhrase ?? product.name, kind);
     if (process.env.OPENAI_API_KEY) {
       try {
         const description = product.description ?? product.name;

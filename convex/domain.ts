@@ -159,3 +159,73 @@ export function isChargeable(
   if (hasItems) return objectiveMet(answer.items ?? []);
   return answer.stock !== "unconfirmed" || answer.finalPrice !== undefined || !!answer.notes?.trim() || !!answer.offers?.trim();
 }
+
+// ---------- nouns (redesign step 9, D163) ----------
+/** "offices" → "office", "businesses" → "business", "branches" → "branch", "shops" → "shop". */
+export function singularNoun(noun: string) {
+  const n = noun.trim();
+  if (/(?:ss|sh|ch|x|z)es$/i.test(n)) return n.slice(0, -2);
+  if (/[^aeiou]ies$/i.test(n)) return n.slice(0, -3) + "y";
+  return /[^s]s$/i.test(n) ? n.slice(0, -1) : n;
+}
+/** "1 office", "2 offices", "0 offices". */
+export function countNoun(count: number, noun: string) {
+  return `${count} ${count === 1 ? singularNoun(noun) : noun}`;
+}
+
+// ---------- named business search (D163) ----------
+/** Words that describe the kind of business, not which one. A name made only of these needs every word to match. */
+const GENERIC_NAME_WORDS = new Set(
+  "consultant consultants consultancy consulting engineer engineers engineering associates associate services service solutions solution enterprises enterprise traders trading shop shops store stores clinic clinics hospital hospitals institute institutes academy center centre centers centres technologies technology tech group infra infrastructure constructions construction builders developers agency agencies studio studios works industries industry systems corporation corp international global india indian hyderabad bangalore bengaluru mumbai delhi chennai pune kolkata office offices company firm partners labs lab care medical dental school college classes training coaching institute".split(" "),
+);
+const FILLER_NAME_WORDS = new Set("and the of a an & pvt private ltd limited llp co inc opc".split(" "));
+const nameTokens = (s: string) =>
+  s.toLowerCase().replace(/&/g, " and ").replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w && !FILLER_NAME_WORDS.has(w));
+function editDistance(a: string, b: string) {
+  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = row[0];
+    row[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const keep = row[j];
+      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = keep;
+    }
+  }
+  return row[b.length];
+}
+/** One word of the asked name appears in the listing: exact, a plural/prefix form, or one typo in a long word. */
+function wordFound(word: string, words: string[], squashed: string) {
+  return words.some((w) => w === word || (word.length >= 4 && w.length >= 4 && (w.startsWith(word) || word.startsWith(w))) || (word.length >= 6 && Math.abs(w.length - word.length) <= 1 && editDistance(w, word) <= 1)) || (word.length >= 5 && squashed.includes(word));
+}
+/**
+ * Does a Google listing name plausibly belong to the business the customer named? Every distinctive word of the asked
+ * name ("ainapur" in "Ainapur Consultants and Engineers") must appear in the listing; if the asked name has only generic
+ * words ("Consultants and Engineers"), all of them must appear. "Ainapur Consultants" matches "AINAPUR CONSULTANTS &
+ * ENGINEERS PVT LTD"; "SG Analytics" or "Falcon Resilient Infra Consultants" do not.
+ */
+export function nameMatches(asked: string, listing: string) {
+  const want = nameTokens(asked);
+  if (!want.length) return false;
+  const have = nameTokens(listing);
+  const squashed = have.join("");
+  const distinctive = want.filter((w) => !GENERIC_NAME_WORDS.has(w));
+  const needed = distinctive.length ? distinctive : want;
+  if (needed.every((w) => wordFound(w, have, squashed))) return true;
+  // "Aar Vee Associates" asked, "AarVee Associates" listed (or the reverse).
+  const joined = needed.join("");
+  return joined.length >= 5 && (squashed.includes(joined) || nameTokens(listing).filter((w) => !GENERIC_NAME_WORDS.has(w)).join("").includes(joined));
+}
+
+/**
+ * Short Google Maps phrase for a brief when the search classifier is unavailable: the brief's kind of task
+ * ("ESG and Sustainability services"), never the long summary sentence. Falls back to the plural noun.
+ */
+export function briefSearchPhrase(brief: { task_type?: string; task_context?: { summary?: string } } | null | undefined, noun?: string) {
+  const type = (brief?.task_type ?? "").replace(/_/g, " ").replace(/\s+/g, " ").trim();
+  const cleaned = type.replace(/^(?:an?\s+)?(?:enquiry|inquiry|request|question|check|call)s?\s+(?:about|for|on|regarding|into)\s+/i, "").replace(/\s+(?:enquiry|inquiry|request|check)$/i, "").trim();
+  if (cleaned && cleaned.split(" ").length <= 6 && cleaned.length <= 60) return cleaned;
+  const word = noun && noun !== "businesses" && noun !== "shops" ? noun : undefined;
+  if (word) return word;
+  return (brief?.task_context?.summary ?? type).split(/[.;]/)[0].split(" ").slice(0, 8).join(" ");
+}
