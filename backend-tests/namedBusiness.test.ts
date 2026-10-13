@@ -7,7 +7,7 @@ import { convexTest } from "convex-test";
 import schema from "../convex/schema";
 import { api } from "../convex/_generated/api";
 import { nameMatches, countNoun, singularNoun, briefSearchPhrase } from "../convex/domain";
-import { isEscapeChoice, openAfterEscape } from "../convex/intake";
+import { isEscapeChoice, openAfterEscape, cleanPlace } from "../convex/intake";
 import { normalizeIndianPhone, pageHasNumber, verifyCandidates, parseWebBusinessResponse, fetchableUrl, loadPageText } from "../convex/webBusiness";
 import { pickerRepeat, pickerText, notFoundText, carryRequest, escapeReply, CHAT_SYSTEM_PROMPT } from "../convex/chat";
 import { lookUpFact } from "../convex/facts";
@@ -54,6 +54,14 @@ describe("nouns", () => {
     expect(pickerText({ count: 3, noun: "offices", place: "Miyapur", businessName: "Ainapur Consultants and Engineers" })).toBe("Matches for “Ainapur Consultants and Engineers” near Miyapur");
     expect(pickerText({ count: 1, noun: "businesses", supplied: "customer" })).toBe("1 business you sent");
     expect(pickerText({ count: 2, noun: "offices", supplied: "web", businessName: "X" })).toBe("Web results for “X”");
+  });
+});
+
+describe("area text", () => {
+  it("drops brackets left empty when the pincode is removed", () => {
+    expect(cleanPlace("Miyapur (500049)")).toBe("Miyapur");
+    expect(cleanPlace("Miyapur, Hyderabad (500049)")).toBe("Miyapur, Hyderabad");
+    expect(cleanPlace("Kondapur (near DLF)")).toBe("Kondapur (near DLF)");
   });
 });
 

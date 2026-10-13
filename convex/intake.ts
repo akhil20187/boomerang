@@ -108,7 +108,8 @@ export function scrubUnitNumbers(text: string): string {
 /** A location field (area or building) with every unit number, pincode and street-address shape removed. Null when nothing useful remains. */
 export function cleanPlace(raw: unknown, max = 80): string | null {
   if (!isStr(raw)) return null;
-  const out = tidy(raw.replace(LABELLED_UNIT, "").replace(PINCODE, "").replace(BARE_UNIT, "")).slice(0, max);
+  // "Miyapur (500049)" → "Miyapur": brackets left empty by the removals go too.
+  const out = tidy(raw.replace(LABELLED_UNIT, "").replace(PINCODE, "").replace(BARE_UNIT, "").replace(/[(\[]\s*[,;-]?\s*[)\]]/g, "")).slice(0, max);
   return /[a-z]/i.test(out) && !/^(?:skip|none|no|n\/a|na|don'?t know|not sure|-)$/i.test(out) ? out : null;
 }
 

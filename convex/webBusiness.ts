@@ -124,7 +124,7 @@ const hostOf = (url: string) => new URL(url).hostname.replace(/^www\./, "");
  * Keeps a candidate only when its name matches the asked name, its source page is fetchable and the page text
  * prints the number. One contact per phone number. `loadPage` returns page text or null.
  */
-export async function verifyCandidates(asked: string, candidates: WebCandidate[], cited: string[], loadPage: (url: URL) => Promise<string | null>): Promise<{ contacts: WebContact[]; dropped: { name: string; reason: string }[] }> {
+export async function verifyCandidates(asked: string, candidates: WebCandidate[], cited: string[], loadPage: (url: URL) => Promise<string | null>): Promise<{ contacts: WebContact[]; dropped: { name: string; site?: string; reason: string }[] }> {
   // Only pages the web search actually cited are trusted and fetched; a URL the model wrote itself (perhaps steered
   // by text on a web page) is never used.
   const citedPages = new Map<string, string>();
@@ -133,23 +133,23 @@ export async function verifyCandidates(asked: string, candidates: WebCandidate[]
     if (k && !citedPages.has(k)) citedPages.set(k, u);
   }
   const contacts: WebContact[] = [];
-  const dropped: { name: string; reason: string }[] = [];
+  const dropped: { name: string; site?: string; reason: string }[] = [];
   const pages = new Map<string, Promise<string | null>>();
   const seen = new Set<string>();
   for (const c of candidates) {
-    if (!nameMatches(asked, c.name)) { dropped.push({ name: c.name, reason: "name does not match" }); continue; }
+    if (!nameMatches(asked, c.name)) { dropped.push({ name: c.name, site: pageKey(c.sourceUrl)?.split("/")[0], reason: "name does not match" }); continue; }
     const key = pageKey(c.sourceUrl);
     const citedUrl = key ? citedPages.get(key) : undefined;
-    if (!citedUrl) { dropped.push({ name: c.name, reason: "source not from the web search" }); continue; }
+    if (!citedUrl) { dropped.push({ name: c.name, site: pageKey(c.sourceUrl)?.split("/")[0], reason: "source not from the web search" }); continue; }
     const url = fetchableUrl(citedUrl);
-    if (!url) { dropped.push({ name: c.name, reason: "no usable source page" }); continue; }
+    if (!url) { dropped.push({ name: c.name, site: pageKey(c.sourceUrl)?.split("/")[0], reason: "no usable source page" }); continue; }
     const phones = c.phones.map(normalizeIndianPhone).filter((p): p is string => !!p);
-    if (!phones.length) { dropped.push({ name: c.name, reason: "no valid Indian phone number" }); continue; }
+    if (!phones.length) { dropped.push({ name: c.name, site: pageKey(c.sourceUrl)?.split("/")[0], reason: "no valid Indian phone number" }); continue; }
     if (!pages.has(url.href)) pages.set(url.href, loadPage(url).catch(() => null));
     const page = await pages.get(url.href)!;
-    if (!page) { dropped.push({ name: c.name, reason: "source page could not be read to check the number" }); continue; }
+    if (!page) { dropped.push({ name: c.name, site: pageKey(c.sourceUrl)?.split("/")[0], reason: "source page could not be read to check the number" }); continue; }
     const shown = phones.filter((p) => pageHasNumber(page, p) && !seen.has(p));
-    if (!shown.length) { dropped.push({ name: c.name, reason: "number not printed on the source page" }); continue; }
+    if (!shown.length) { dropped.push({ name: c.name, site: pageKey(c.sourceUrl)?.split("/")[0], reason: "number not printed on the source page" }); continue; }
     const domain = hostOf(url.href);
     for (const phone of shown.slice(0, 2)) {
       seen.add(phone);
@@ -190,7 +190,7 @@ export async function loadPageText(url: URL): Promise<string | null> {
   return body.replace(/href="tel:([^"]+)"/gi, " $1 ").replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ");
 }
 
-export type WebLookup = { contacts: WebContact[]; dropped: { name: string; reason: string }[]; searched: boolean };
+export type WebLookup = { contacts: WebContact[]; dropped: { name: string; site?: string; reason: string }[]; searched: boolean };
 
 /** One web lookup for a named business near a place. */
 export async function lookUpBusinessOnWeb(name: string, place: string, loadPage: (url: URL) => Promise<string | null> = loadPageText): Promise<WebLookup> {

@@ -633,7 +633,7 @@ async function runTool(ctx: ActionCtx, s: State, name: string, rawArgs: string):
         await ctx.runMutation(internal.chat.useTurn, { userId: s.userId });
         const city = found?.city;
         const web = await lookUpBusinessOnWeb(businessName, [spoken, city].filter((x, i, all) => x && all.indexOf(x) === i).join(", "));
-        console.log("web business lookup", JSON.stringify({ searched: web.searched, kept: web.contacts.length, dropped: web.dropped.map((d) => d.reason) }));
+        console.log("web business lookup", JSON.stringify({ searched: web.searched, kept: web.contacts.map((c) => ({ name: c.name, site: c.sourceUrl.split("/")[2] })), dropped: web.dropped }));
         if (web.contacts.length) return startContactsBrief(ctx, s, web.contacts, { businessName, web: true });
         const text = notFoundText(businessName, spoken, noun, web.searched);
         return {
