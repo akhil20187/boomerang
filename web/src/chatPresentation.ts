@@ -1,7 +1,8 @@
 /** Pure chat wording helpers (no React), shared by the live and demo chat. */
 /** One saved chat message (`chat.messages`), or a scripted one on /demo. */
-export type ChatItem={_id:string;role:'user'|'assistant';kind:'text'|'question'|'brief'|'picker'|'calls'|'test_call';text:string;payload?:{briefId?:string;question?:string;choices?:string[];index?:number;total?:number;questions?:string[];noun?:string;draftId?:string;taskId?:string}};
-export const one=(noun:string)=>noun==='businesses'?'business':noun.replace(/s$/,'');
+export type ChatItem={_id:string;role:'user'|'assistant';kind:'text'|'question'|'brief'|'picker'|'calls'|'test_call';text:string;payload?:{briefId?:string;question?:string;choices?:string[];index?:number;total?:number;questions?:string[];noun?:string;draftId?:string;taskId?:string;businessName?:string}};
+/** "offices" → "office", "businesses" → "business", "branches" → "branch" (same rule as convex/domain.ts singularNoun). */
+export const one=(noun:string)=>{const n=noun.trim();if(/(?:ss|sh|ch|x|z)es$/i.test(n))return n.slice(0,-2);if(/[^aeiou]ies$/i.test(n))return n.slice(0,-3)+'y';return /[^s]s$/i.test(n)?n.slice(0,-1):n};
 export const count=(n:number,noun:string)=>`${n} ${n===1?one(noun):noun}`;
 export const STARTERS={service:'Plumber near 500032 to fix a leaking tap',product:'iPhone 17 256GB near 500032, best price after card offers',test:'Call me first, so I hear how it sounds'};
 
@@ -21,4 +22,15 @@ export function pickerFoot(total:number,visible:number,radiusKm:number|undefined
  const Noun=noun.charAt(0).toUpperCase()+noun.slice(1);
  const end=left>0?undefined:total?`No more ${noun} within ${radius} km. ${Noun} with fewer than 50 Google ratings are hidden.`:`No ${noun} came up within ${radius} km.`;
  return {more,end,widen:!more&&radius<20&&total<10};
+}
+
+/** Where a picker's rows came from: Google nearby, Google matches for a named business, numbers the customer sent, or numbers found on the web. */
+export type PickerKind='nearby'|'named'|'sent'|'web';
+export function pickerKind(d:{source?:string;shops:{source?:string}[]},businessName?:string):PickerKind{if(d.source==='supplied')return d.shops.some(s=>s.source==='assistant')?'web':'sent';return businessName?'named':'nearby'}
+/** Picker headline (D163): "1 office near Miyapur", "Matches for “X” near Miyapur", "2 businesses you sent", "Web results for “X”". */
+export function pickerTitle(kind:PickerKind,total:number,noun:string,place:string,businessName?:string){
+ if(kind==='web')return `Web results for “${businessName||'this business'}”`;
+ if(kind==='sent')return `${count(total,noun)} you sent`;
+ if(kind==='named')return `Matches for “${businessName}” near ${place}`;
+ return `${count(total,noun)} near ${place}`;
 }

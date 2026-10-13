@@ -13,7 +13,8 @@ import {isNewAccount,markWelcomeSeen,welcomeLine,welcomeSeen} from './signInPres
 import './chat.css';
 import './signin.css';
 
-import {composerHint,one,count,pickerFoot,pickerPlace,STARTERS,type ChatItem} from './chatPresentation';
+import {composerHint,one,count,pickerFoot,pickerPlace,pickerKind,pickerTitle,STARTERS,type ChatItem} from './chatPresentation';
+import {ContactSource} from './ContactSource';
 export {STARTERS};
 export type {ChatItem};
 type ViewProps={items:ChatItem[];thinking:boolean;error:string;onSend:(text:string)=>Promise<boolean>;onTestStarter:()=>void;balanceCents?:number;priceCents?:number|null;loading?:boolean;/** one-time note on a new account's first empty chat */welcome?:string;renderCard:(item:ChatItem,latest:boolean)=>ReactNode};
@@ -43,7 +44,7 @@ function QuestionCard({item,open,onChoice}:{item:ChatItem;open:boolean;onChoice:
 function BriefBox({item}:{item:ChatItem}){const questions=item.payload?.questions||[];return <div className="brief-box"><p className="brief-head">We’ll ask each {one(item.payload?.noun||'businesses')}</p><ol>{questions.map((q,i)=><li key={i}>{q}</li>)}</ol><p className="brief-note">We share only what changes their answer: the area, never your flat number, street address or full name. No booking.</p></div>}
 
 /** Business picker inside the chat: rows, tick boxes, "Show 5 more", and the price + Call button inside the card (spec step 4). */
-export function ChatPicker({data,noun,busy,error,onCall,onWiden}:{data:Discovery;noun:string;busy:boolean;error?:string;onCall:(selected:string[])=>void;onWiden?:()=>void}){
+export function ChatPicker({data,noun,busy,error,onCall,onWiden,businessName}:{data:Discovery;noun:string;busy:boolean;error?:string;onCall:(selected:string[])=>void;onWiden?:()=>void;/** D163: the card lists matches for this named business */businessName?:string}){
  const [ticked,setSelected]=useState<string[]>([]);const [visible,setVisible]=useState(5);const shown=data.shops.slice(0,visible);
  // Ticks survive "Show more" and a wider search; only shops still in the list count.
  const selected=ticked.filter(id=>data.shops.some(s=>s.placeId===id));
@@ -51,12 +52,12 @@ export function ChatPicker({data,noun,busy,error,onCall,onWiden}:{data:Discovery
  const affordable=price&&available!==undefined?Math.floor(Math.max(0,available)/price):null;const short=affordable!==null&&selected.length>affordable;
  const toggle=(id:string)=>setSelected(selected.includes(id)?selected.filter(x=>x!==id):[...selected,id]);
  const rule=noun==='shops'?CHARGE_RULE:CHARGE_RULE.replace(/a shop/g,'a '+one(noun));
- const place=pickerPlace(data);const foot=pickerFoot(data.shops.length,Math.min(visible,data.shops.length),data.radiusKm,noun);
+ const place=pickerPlace(data);const kind=pickerKind(data,businessName);const listed=kind==='nearby';const foot0=pickerFoot(data.shops.length,Math.min(visible,data.shops.length),data.radiusKm,noun);const foot=listed?foot0:{...foot0,end:undefined,widen:false};
  const widen=foot.widen&&<button type="button" className="show-more" onClick={onWiden} disabled={!onWiden||busy}>Search up to 20 km</button>;
  return <section className="card chat-card chat-picker" aria-label={`${noun} to call`}>
-  <div className="chat-card-head"><h2>{data.shops.length} {noun} near {place}</h2><p>{data.shops.length?'Pick who we call. Highest rated first.':'Nothing found nearby yet.'}</p></div>
+  <div className="chat-card-head"><h2>{pickerTitle(kind,data.shops.length,noun,place,businessName)}</h2><p>{!data.shops.length?'Nothing found nearby yet.':kind==='nearby'?'Pick who we call. Highest rated first.':kind==='named'?'Pick who we call. Only listings with a matching name.':kind==='web'?'Pick who we call. Check the name and source first.':'Pick who we call.'}</p></div>
   {!data.shops.length?<div className="chat-card-body"><p>No {noun} near {place} came up. Search a wider area?</p>{widen||<p className="end-list">{foot.end}</p>}</div>:<>
-   <div className="chat-rows">{shown.map(s=>{const on=selected.includes(s.placeId);return <button type="button" key={s.placeId} className="chat-row" aria-pressed={on} onClick={()=>toggle(s.placeId)} disabled={busy}><span className="tick" aria-hidden="true">{on&&<Icon name="check"/>}</span><span className="chat-row-text"><span className="shop-name">{s.name}{s.area&&` · ${s.area}`}</span><span className="chat-row-meta"><Rating shop={s}/>{s.distanceKm!==undefined&&` · ${s.distanceKm.toFixed(1)} km`} · <span className={s.hours?'':'amber'}>{s.hours||'Hours unknown'}</span></span></span></button>})}</div>
+   <div className="chat-rows">{shown.map(s=>{const on=selected.includes(s.placeId);return <Fragment key={s.placeId}><button type="button" className="chat-row" aria-pressed={on} onClick={()=>toggle(s.placeId)} disabled={busy}><span className="tick" aria-hidden="true">{on&&<Icon name="check"/>}</span><span className="chat-row-text"><span className="shop-name">{s.name}{s.area&&` · ${s.area}`}</span>{s.source?<span className="chat-row-meta">{[s.phone,s.address].filter(Boolean).join(' · ')}</span>:<span className="chat-row-meta"><Rating shop={s}/>{s.distanceKm!==undefined&&` · ${s.distanceKm.toFixed(1)} km`} · <span className={s.hours?'':'amber'}>{s.hours||'Hours unknown'}</span></span>}</span></button>{s.source&&<ContactSource shop={s} row/>}</Fragment>})}</div>
    <div className="chat-card-body">{foot.more?<button type="button" className="show-more" onClick={()=>setVisible(visible+5)}><Icon name="plus"/>{foot.more}</button>:<><p className="end-list">{foot.end}</p>{widen}</>}</div>
    <div className="chat-card-foot">
     {blocked?<p className="blocked">{data.callingUnavailableMessage||'Calling is not available yet. Calls cannot start.'}</p>:<div className="chat-price"><p><span>{selected.length?<><strong>Up to {formatPaise(price*selected.length)}</strong> for {count(selected.length,noun)} · </>:null}{formatPaise(price)} per answer</span>{available!==undefined&&!short&&<span className="grey">You have {formatPaise(available)}</span>}</p>{short&&<p className="blocked">You have {formatPaise(available??0)}, enough for {count(affordable??0,noun)}. Pick fewer {noun}.</p>}</div>}
@@ -132,7 +133,7 @@ function LivePicker({item,chatId}:{item:ChatItem;chatId:string}){
  if(folded)return null;
  if(!draft)return <p className="chat-note" role="status">Loading {noun}…</p>;
  const discovery:Discovery={...draft,draftId:draft._id};
- return <ChatPicker data={discovery} noun={noun} busy={busy} error={error} onWiden={async()=>{setBusy(true);setError('');try{await widenSearch({chatId,messageId:item._id})}catch(e){setError(customerError(e,'Couldn’t search a wider area. Try again.'))}finally{setBusy(false)}}} onCall={async selected=>{setBusy(true);setError('');try{const {taskId}=await start({draftId:discovery.draftId,selectedPlaceIds:selected,expectedAnswerPriceCents:discovery.answerPriceCents,idempotencyKey:approvalKey(discovery.draftId,selected,discovery.answerPriceCents),...(draft.briefId?{briefId:draft.briefId}:{})});await attach({chatId,taskId})}catch(e){setError(customerError(e,'Calls couldn’t start. You haven’t been charged. Try again.'))}finally{setBusy(false)}}}/>
+ return <ChatPicker data={discovery} noun={noun} businessName={item.payload?.businessName} busy={busy} error={error} onWiden={async()=>{setBusy(true);setError('');try{await widenSearch({chatId,messageId:item._id})}catch(e){setError(customerError(e,'Couldn’t search a wider area. Try again.'))}finally{setBusy(false)}}} onCall={async selected=>{setBusy(true);setError('');try{const {taskId}=await start({draftId:discovery.draftId,selectedPlaceIds:selected,expectedAnswerPriceCents:discovery.answerPriceCents,idempotencyKey:approvalKey(discovery.draftId,selected,discovery.answerPriceCents),...(draft.briefId?{briefId:draft.briefId}:{})});await attach({chatId,taskId})}catch(e){setError(customerError(e,'Calls couldn’t start. You haven’t been charged. Try again.'))}finally{setBusy(false)}}}/>
 }
 function LiveCalls({item,latest,onSend}:{item:ChatItem;latest:boolean;onSend:(text:string)=>Promise<boolean>}){
  const taskId=item.payload?.taskId!;const data=useQuery(taskRef,{taskId}) as TaskView|undefined;const playback=useMutation(playbackRef);const noun=item.payload?.noun||'shops';

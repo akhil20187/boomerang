@@ -54,3 +54,4 @@
 .composer .send:disabled{background:#8f8c85;opacity:1}
 @media(max-width:899px){.app-main.chat-main{min-height:calc(100dvh - 53px)}}
 @media(max-width:600px){.app-main.chat-main{padding:16px 16px 0}.chat-empty{padding-top:20px}.composer{padding:10px 0 14px}}
+.chat-rows .contact-source-row{margin:0;padding:0 14px 12px 46px;background:#fff}

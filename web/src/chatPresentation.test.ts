@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {composerHint,one,count,pickerFoot,pickerPlace,type ChatItem} from './chatPresentation.ts';
+import {composerHint,one,count,pickerFoot,pickerPlace,pickerKind,pickerTitle,type ChatItem} from './chatPresentation.ts';
 const m=(kind:ChatItem['kind'],role:ChatItem['role']='assistant',payload?:ChatItem['payload']):ChatItem=>({_id:Math.random().toString(),role,kind,text:'x',payload});
 test('composer hint follows the conversation',()=>{
  assert.equal(composerHint([]),'Ask us to call about anything nearby…');
@@ -27,4 +27,16 @@ test('picker headline names what the customer gave',()=>{
  assert.equal(pickerPlace({area:'Ameerpet',pincode:undefined}),'Ameerpet');
  assert.equal(pickerPlace({pincode:'500016'}),'500016');
  assert.equal(one('institutes'),'institute');
+});
+test('one and count say 1 office, 1 business, 1 branch',()=>{
+ assert.equal(count(1,'offices'),'1 office');assert.equal(count(1,'institutes'),'1 institute');assert.equal(count(1,'businesses'),'1 business');
+ assert.equal(one('branches'),'branch');assert.equal(one('agencies'),'agency');assert.equal(count(2,'offices'),'2 offices');
+});
+test('picker title by kind: nearby, named matches, numbers sent, web results',()=>{
+ assert.equal(pickerKind({shops:[]}),'nearby');assert.equal(pickerKind({shops:[]},'X'),'named');
+ assert.equal(pickerKind({source:'supplied',shops:[{source:'customer'}]}),'sent');assert.equal(pickerKind({source:'supplied',shops:[{source:'assistant'}]},'X'),'web');
+ assert.equal(pickerTitle('nearby',1,'offices','Miyapur'),'1 office near Miyapur');
+ assert.equal(pickerTitle('named',2,'offices','Miyapur','Ainapur Consultants and Engineers'),'Matches for “Ainapur Consultants and Engineers” near Miyapur');
+ assert.equal(pickerTitle('sent',1,'businesses','x'),'1 business you sent');
+ assert.equal(pickerTitle('web',1,'offices','x','Ainapur'),'Web results for “Ainapur”');
 });
