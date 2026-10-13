@@ -300,6 +300,8 @@ export default defineSchema({
         noun: v.optional(v.string()),
         draftId: v.optional(v.id("drafts")),
         taskId: v.optional(v.id("tasks")),
+        /** D163: the picker lists matches for this business the customer named. */
+        businessName: v.optional(v.string()),
       }),
     ),
   })
