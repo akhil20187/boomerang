@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {shopStatus,taskPageStatus,stepKind,stepMark,summaryTags,displayShop,callLogDetail,sidebarGroups,sidebarTask} from './statusPresentation.ts';
+import {isBriefTask,resultsLink,callCardTitle,taskBackLink,shopStatus,taskPageStatus,stepKind,stepMark,summaryTags,displayShop,callLogDetail,sidebarGroups,sidebarTask} from './statusPresentation.ts';
 const shop={placeId:'p',name:'Croma'};
 test('call card status line follows the shop state, one colour per meaning',()=>{
  assert.deepEqual(shopStatus({...shop,state:'calling'}),['AI agent calling','blue']);
@@ -66,4 +66,44 @@ test('sidebar rows: product label first, test calls link to the test page',()=>{
  const row=sidebarTask(t('x',{product:{name:'Samsung M47 | Big battery'},selfTest:true}));
  assert.equal(row.label,'Samsung M47');assert.equal(row.href,'/app?test=x');assert.deepEqual(row.status,['Test call finished','grey']);
  assert.equal(sidebarGroups([t('err',{status:'error',summary:{...summary,availableCount:1}})])[0].heading,'Needs you');
+});
+
+test('a shop that prefers a personal call never also reads "In stock"',()=>{
+ const s={...shop,state:'personal_call_needed',answer:{stock:'available' as const}};
+ assert.deepEqual(shopStatus(s),['Prefers a personal call','amber']);
+ assert.deepEqual(summaryTags([s]),[['1 prefers a personal call','amber']]);
+});
+test('service / brief tasks never show stock wording',()=>{
+ assert.equal(isBriefTask(true,[]),true);
+ assert.equal(isBriefTask(false,[{...shop,answer:{stock:'unconfirmed',items:[{id:'a',text:'Q',kind:'must_confirm',status:'answered'}]}}]),true);
+ assert.equal(isBriefTask(false,[{...shop,answer:{stock:'available'}}]),false);
+ assert.deepEqual(shopStatus({...shop,state:'answered',answer:{stock:'available'}},true),['Answered · see notes','grey']);
+ assert.deepEqual(shopStatus({...shop,state:'answered',answer:{stock:'unavailable'}},true),['Answered · see notes','grey']);
+ const items=[{id:'a',text:'Visit today?',kind:'must_confirm' as const,status:'answered' as const}];
+ assert.deepEqual(shopStatus({...shop,state:'answered',answer:{stock:'available',items}},true),['Answered your questions','green']);
+ const tags=summaryTags([{...shop,state:'answered',answer:{stock:'available',items}},{...shop,state:'answered',answer:{stock:'available'}},{...shop,state:'personal_call_needed',answer:{stock:'available'}},{...shop,state:'calling'}],true);
+ assert.deepEqual(tags,[['1 answered','green'],['1 partly answered','amber'],['1 calling','blue'],['1 prefers a personal call','amber']]);
+ assert.ok(tags.every(([t])=>!/stock/.test(t)));
+});
+test('call card title counts one business, not "1 businesses"',()=>{
+ const pc={...shop,state:'personal_call_needed'};
+ assert.equal(callCardTitle({shops:[pc],noun:'businesses',done:true,brief:true}),'1 business called');
+ assert.equal(callCardTitle({shops:[pc,pc],noun:'businesses',done:true,brief:true}),'2 businesses called');
+ assert.equal(callCardTitle({shops:[{...shop,state:'calling'}],noun:'offices',done:false,brief:true}),'0 of 1 office done');
+ assert.equal(callCardTitle({shops:[{...shop,state:'calling'}],noun:'shops',done:false,brief:false}),'Calling 1 shop…');
+ assert.equal(callCardTitle({shops:[{...shop,state:'unreachable'}],noun:'shops',done:true,brief:false}),'Couldn’t reach the shop. You haven’t been charged.');
+ assert.equal(callCardTitle({shops:[{...shop,state:'answered',answer:{stock:'available'}}],noun:'shops',done:true,brief:false}),'1 shop called · 1 has it');
+ assert.equal(callCardTitle({shops:[{...shop,state:'answered',answer:{stock:'available'}},{...shop,state:'answered'}],noun:'shops',done:true,brief:false}),'2 shops called · 1 has it');
+});
+test('call card link: website stays on this site, the assistant widget keeps its wording and icon',()=>{
+ const base={taskId:'t1',origin:'https://boomerang.example',publicUrl:'https://public.example'};
+ assert.deepEqual(resultsLink({...base,place:'website',done:true}),{href:'https://boomerang.example/status?task=t1',text:'See full call details',external:false});
+ assert.deepEqual(resultsLink({...base,place:'website',done:false}),{href:'https://boomerang.example/status?task=t1',text:'See live call details',external:false});
+ assert.deepEqual(resultsLink({...base,place:'assistant',done:true}),{href:'https://public.example/status?task=t1',text:'Open full results on website',external:true});
+ assert.deepEqual(resultsLink({...base,place:'assistant',done:false,publicUrl:undefined}),{href:'https://boomerang.example/status?task=t1',text:'Open live status on website',external:true});
+ assert.equal(resultsLink({...base,place:'website',done:true,taskId:'demo'}).href,'/demo');
+});
+test('task page back link: the chat, else the Call log',()=>{
+ assert.deepEqual(taskBackLink('c1'),{href:'/app?chat=c1',text:'Back to chat'});
+ assert.deepEqual(taskBackLink(null),{href:'/calls',text:'Back to Call log'});
 });

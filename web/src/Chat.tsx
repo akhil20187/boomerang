@@ -13,7 +13,7 @@ import {isNewAccount,markWelcomeSeen,welcomeLine,welcomeSeen} from './signInPres
 import './chat.css';
 import './signin.css';
 
-import {composerHint,one,count,pickerFoot,pickerPlace,pickerKind,pickerTitle,STARTERS,type ChatItem} from './chatPresentation';
+import {callsDoneLine,composerHint,one,count,pickerFoot,pickerPlace,pickerKind,pickerTitle,STARTERS,type ChatItem} from './chatPresentation';
 import {ContactSource} from './ContactSource';
 export {STARTERS};
 export type {ChatItem};
@@ -74,7 +74,7 @@ export function ChatPicker({data,noun,busy,error,onCall,onWiden,businessName}:{d
 export function ChatCalls({data,taskId,noun,latest,loadRecording,onMore,onNew}:{data:TaskView;taskId:string;noun:string;latest:boolean;loadRecording?:RecordingLoader;onMore:()=>void;onNew:()=>void}){
  const done=data.task.status==='finished'||data.task.status==='error';const shops=data.shops;
  const answered=shops.filter(s=>s.state==='answered'||s.state==='incomplete_answer').length;const resolved=shops.filter(s=>terminal.has(s.state||'')).length;
- return <><CallCard data={data} taskId={taskId} noun={noun} loadRecording={loadRecording}/>{done&&<div className="bubble-assistant">{answered?`${count(answered,noun)} of ${shops.length} answered. Open a row to see what they said and hear the call.`:`None of the ${count(shops.length,noun)} could answer this time. You haven’t been charged for them.`}</div>}{done&&latest&&<div className="choices"><button type="button" className="choice" onClick={onMore}>Call more {noun}</button><button type="button" className="choice" onClick={onNew}>New request</button></div>}{!done&&<span className="visually-hidden" role="status">{resolved} of {shops.length} done</span>}</>
+ return <><CallCard place="website" data={data} taskId={taskId} noun={noun} loadRecording={loadRecording}/>{done&&<div className="bubble-assistant">{callsDoneLine(answered,shops.length,noun)}</div>}{done&&latest&&<div className="choices"><button type="button" className="choice" onClick={onMore}>Call more {noun}</button><button type="button" className="choice" onClick={onNew}>New request</button></div>}{!done&&<span className="visually-hidden" role="status">{resolved} of {shops.length} done</span>}</>
 }
 
 /** A card that failed to load (expired search, missing task) shows a plain message instead of breaking the chat. */
