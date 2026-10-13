@@ -38,22 +38,42 @@ export function normalizeIndianPhone(raw: unknown): string | null {
   return `+91${d}`;
 }
 
-/** Does this page text print the number? Separators between digits are ignored; the 10-digit national number must appear. */
+/**
+ * Does this page text print the number? Separators between digits are ignored. The 10-digit national number must
+ * stand alone on a digit boundary, optionally after +91, 91 or 0 ("919876543210123" does not contain 9876543210).
+ */
 export function pageHasNumber(pageText: string, phone: string) {
   const national = phone.replace(/^\+91/, "");
-  const squashed = pageText.replace(/(\d)[\s ().\-\/]+(?=\d)/g, "$1").replace(/\+91/g, "");
-  return squashed.includes(national);
+  if (!/^\d{10}$/.test(national)) return false;
+  const squashed = pageText.replace(/(\d)[\s ().\-\/]+(?=\d)/g, "$1");
+  return new RegExp(`(?<!\\d)(?:\\+?91|0)?${national}(?!\\d)`).test(squashed);
 }
 
-/** A public http(s) page we may fetch to check a number: not localhost, not an IP address, not an internal name. */
+/**
+ * A public http(s) page we may fetch to check a number: default port only, a DNS name (no IPv4 in any notation,
+ * which `new URL` normalises to dotted form; no IPv6 literal; no trailing dot), not localhost or an internal name.
+ * A Convex action cannot see what a DNS name resolves to, so a public-looking name that points at a private address
+ * cannot be fully excluded here. That is why only URLs the web search itself cited are fetched (verifyCandidates)
+ * and every redirect hop is checked again (loadPageText).
+ */
 export function fetchableUrl(raw: unknown): URL | null {
-  if (typeof raw !== "string") return null;
+  if (typeof raw !== "string" && !(raw instanceof URL)) return null;
+  try {
+    const url = new URL(String(raw));
+    const host = url.hostname.toLowerCase();
+    if (!["http:", "https:"].includes(url.protocol) || url.username || url.password || url.port !== "") return null;
+    if (!host.includes(".") || host.endsWith(".") || host.startsWith("[") || host.includes(":") || /^[\d.]+$/.test(host)) return null;
+    if (/(^|\.)(localhost|local|localdomain|internal|lan|home|corp|arpa)$/.test(host)) return null;
+    return url;
+  } catch {
+    return null;
+  }
+}
+/** Same page for citation checks: host without "www." plus path without a trailing slash; query and fragment ignored. */
+export function pageKey(raw: string): string | null {
   try {
     const url = new URL(raw);
-    const host = url.hostname.toLowerCase();
-    if (!["http:", "https:"].includes(url.protocol) || url.username || url.password) return null;
-    if (!host.includes(".") || /^[\d.]+$/.test(host) || host.includes(":") || /(^|\.)(localhost|local|internal|lan|home|corp)$/.test(host)) return null;
-    return url;
+    return `${url.hostname.toLowerCase().replace(/^www\./, "")}${url.pathname.replace(/\/+$/, "")}`;
   } catch {
     return null;
   }
@@ -67,6 +87,9 @@ export function parseWebBusinessResponse(data: any): { candidates: WebCandidate[
   const texts: string[] = [];
   const cited: string[] = [];
   for (const item of Array.isArray(data?.output) ? data.output : []) {
+    // Pages the web_search call itself returned (requested with include: web_search_call.action.sources).
+    if (item?.type === "web_search_call")
+      for (const src of Array.isArray(item.action?.sources) ? item.action.sources : []) if (typeof src?.url === "string" && !cited.includes(src.url)) cited.push(src.url);
     if (item?.type !== "message" || !Array.isArray(item.content)) continue;
     for (const part of item.content) {
       if (part?.type !== "output_text" || typeof part.text !== "string") continue;
@@ -101,14 +124,24 @@ const hostOf = (url: string) => new URL(url).hostname.replace(/^www\./, "");
  * Keeps a candidate only when its name matches the asked name, its source page is fetchable and the page text
  * prints the number. One contact per phone number. `loadPage` returns page text or null.
  */
-export async function verifyCandidates(asked: string, candidates: WebCandidate[], loadPage: (url: URL) => Promise<string | null>): Promise<{ contacts: WebContact[]; dropped: { name: string; reason: string }[] }> {
+export async function verifyCandidates(asked: string, candidates: WebCandidate[], cited: string[], loadPage: (url: URL) => Promise<string | null>): Promise<{ contacts: WebContact[]; dropped: { name: string; reason: string }[] }> {
+  // Only pages the web search actually cited are trusted and fetched; a URL the model wrote itself (perhaps steered
+  // by text on a web page) is never used.
+  const citedPages = new Map<string, string>();
+  for (const u of cited) {
+    const k = pageKey(u);
+    if (k && !citedPages.has(k)) citedPages.set(k, u);
+  }
   const contacts: WebContact[] = [];
   const dropped: { name: string; reason: string }[] = [];
   const pages = new Map<string, Promise<string | null>>();
   const seen = new Set<string>();
   for (const c of candidates) {
     if (!nameMatches(asked, c.name)) { dropped.push({ name: c.name, reason: "name does not match" }); continue; }
-    const url = fetchableUrl(c.sourceUrl);
+    const key = pageKey(c.sourceUrl);
+    const citedUrl = key ? citedPages.get(key) : undefined;
+    if (!citedUrl) { dropped.push({ name: c.name, reason: "source not from the web search" }); continue; }
+    const url = fetchableUrl(citedUrl);
     if (!url) { dropped.push({ name: c.name, reason: "no usable source page" }); continue; }
     const phones = c.phones.map(normalizeIndianPhone).filter((p): p is string => !!p);
     if (!phones.length) { dropped.push({ name: c.name, reason: "no valid Indian phone number" }); continue; }
@@ -127,12 +160,29 @@ export async function verifyCandidates(asked: string, candidates: WebCandidate[]
   return { contacts: contacts.slice(0, MAX_WEB_RESULTS), dropped };
 }
 
-/** Fetches a page's text (HTML tags removed) for the number check. Small pages only. */
+export const MAX_REDIRECTS = 3;
+/**
+ * Fetches a page's text (HTML tags removed) for the number check. Small pages only. Redirects are followed by hand,
+ * at most 3 hops, and each Location is checked with fetchableUrl before it is requested.
+ */
 export async function loadPageText(url: URL): Promise<string | null> {
-  const response = await fetch(url.href, { headers: { "User-Agent": "Mozilla/5.0 (compatible; BoomerangBot/1.0)", Accept: "text/html,text/plain" }, redirect: "follow", signal: AbortSignal.timeout(10000) }).catch(() => null);
-  if (!response?.ok) return null;
-  const final = fetchableUrl(response.url || url.href);
-  if (!final) return null;
+  let current = fetchableUrl(url);
+  let response: Response | null = null;
+  for (let hop = 0; current; hop++) {
+    response = await fetch(current.href, { headers: { "User-Agent": "Mozilla/5.0 (compatible; BoomerangBot/1.0)", Accept: "text/html,text/plain" }, redirect: "manual", signal: AbortSignal.timeout(10000) }).catch(() => null);
+    if (!response || response.status < 300 || response.status >= 400) break;
+    if (hop >= MAX_REDIRECTS) return null;
+    const location = response.headers.get("location");
+    let next: URL | null = null;
+    try {
+      next = location ? fetchableUrl(new URL(location, current)) : null;
+    } catch {
+      next = null;
+    }
+    if (!next) return null;
+    current = next;
+  }
+  if (!current || !response?.ok) return null;
   const type = response.headers.get("content-type") ?? "";
   if (type && !/text\/|html|json|xml/.test(type)) return null;
   const body = (await response.text().catch(() => "")).slice(0, PAGE_BYTES);
@@ -154,6 +204,7 @@ export async function lookUpBusinessOnWeb(name: string, place: string, loadPage:
       instructions: WEB_BUSINESS_INSTRUCTIONS,
       input: `Business name: ${name.slice(0, 120)}\nNear: ${place.slice(0, 100)}, India`,
       tools: [{ type: "web_search", search_context_size: "medium" }],
+      include: ["web_search_call.action.sources"],
       reasoning: { effort: "low" },
       max_output_tokens: 1200,
       store: false,
@@ -161,7 +212,7 @@ export async function lookUpBusinessOnWeb(name: string, place: string, loadPage:
     signal: AbortSignal.timeout(45000),
   }).catch(() => null);
   if (!response?.ok) return { contacts: [], dropped: [], searched: false };
-  const { candidates } = parseWebBusinessResponse(await response.json().catch(() => null));
-  const out = await verifyCandidates(name, candidates, loadPage);
+  const { candidates, cited } = parseWebBusinessResponse(await response.json().catch(() => null));
+  const out = await verifyCandidates(name, candidates, cited, loadPage);
   return { ...out, searched: true };
 }
