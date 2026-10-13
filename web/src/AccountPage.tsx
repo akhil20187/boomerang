@@ -5,7 +5,7 @@ import {Icon} from './Icon';
 import {NameRow} from './CustomerName';
 import {formatPaise} from './taskPresentation';
 import {pageInfo,ROWS_PER_PAGE,type MoreState} from './callLogPresentation';
-import {answersLine,connectionLines,historyRow,memberSinceDate,memberSinceMonth,profileInitial,totalsBoxes,HISTORY_FILTERS,type ConnectionStatus,type CreditTotals,type HistoryEntry,type HistoryFilter} from './accountPresentation';
+import {answersLine,connectionLines,historyRow,memberSinceDate,profileInitial,HISTORY_FILTERS,type ConnectionStatus,type CreditTotals,type HistoryEntry,type HistoryFilter} from './accountPresentation';
 import {SignOutDialog,useLiveSignOut} from './SignOutDialog';
 import './pages.css';
 const meRef=makeFunctionReference<'query'>('users:me');
@@ -48,40 +48,36 @@ export function AccountView({account,totals,connection,rows,more,onLoadMore,filt
  const go=(next:number)=>{moved.current=true;setPage(next)};
  const name=account?.name?.trim();const empty=HISTORY_FILTERS.find(f=>f.id===filter)!.empty;
  const connectionText=connection?.connected?connectionLines(connection)[0]:connection?'Not connected':'Checking…';
+ const money=(cents?:number)=>cents===undefined?'…':formatPaise(cents);
  return <section className="page profile-page">
   <header className="page-heading"><h1>Profile and credit</h1></header>
-  <div className="profile-grid">
-   <section className="profile-head" aria-label="You">
+  <section className="card profile-card" aria-labelledby="you-heading">
+   <div className="profile-head">
     <span className="profile-badge" aria-hidden="true">{account?profileInitial(name,account.email):''}</span>
-    <span className="profile-who"><span className={`profile-name${name?'':' muted'}`}>{account?name||'Add your name':'…'}</span><span className="profile-meta">{[account?.email,account?.memberSince?`Member since ${memberSinceMonth(account.memberSince)}`:''].filter(Boolean).join(' · ')}</span></span>
-   </section>
-   <section className="card profile-card details-card" aria-labelledby="details-heading">
-    <h2 id="details-heading">Your details</h2>
-    <NameRow saved={account?(account.name??''):undefined} onSave={onSaveName}/>
-    <div className="detail-row"><span className="detail-label">Email</span><span className="detail-value">{account?.email??'…'}<span className="log-sub">Used to sign in. Can’t be changed here.</span></span></div>
-    <div className="detail-row"><span className="detail-label">Member since</span><span className="detail-value">{account?.memberSince?memberSinceDate(account.memberSince):'…'}</span></div>
-    <a className="detail-row detail-link" href={`${prefix}/connect-assistant`}><span className="detail-label">ChatGPT or Claude</span><span className="detail-value muted">{connectionText}<Icon name="right" size={16}/></span></a>
-   </section>
-   <div className="profile-money">
-    <section className="card profile-card credit-card" aria-labelledby="credit-heading">
-     <h2 id="credit-heading">Credit</h2>
-     {account?<><strong className="balance">{formatPaise(available)}</strong>{per&&<p className="muted">{per}</p>}{(account.reservedCents??0)>0&&<p className="muted">{formatPaise(account.reservedCents!)} on hold for calls in progress</p>}{account.eligible===false&&<p className="amber">Account approval pending</p>}{account.callingEnabled===false&&<p className="amber">Live calling is being connected</p>}</>:<p role="status" className="muted">Checking your credit…</p>}
-     <div className="money-totals">{totalsBoxes(totals).map(b=><div className="stat" key={b.label}><span className="stat-label">{b.label}</span><strong>{b.value}</strong></div>)}</div>
-     <p className="small-note">All time. Paid top-ups aren’t available yet.</p>
-    </section>
-    <section className="card profile-card history-card" aria-labelledby="history-heading">
-     <h2 id="history-heading">Credits, charges and refunds</h2>
-     <div role="group" aria-label="Show" className="filter-chips">{HISTORY_FILTERS.map(f=><button key={f.id} type="button" className="chip" aria-pressed={filter===f.id} onClick={()=>{if(f.id===filter)return;onFilter(f.id);setPage(1)}}>{f.label}</button>)}</div>
-     <div ref={top} tabIndex={-1} className="log-top" aria-label={`Credits, charges and refunds, ${info.label}`}/>
-     {rows===undefined||(!shown!.length&&more!=='done')?<p className="muted history-empty" role="status">Loading…</p>:shown!.length===0?<p className="muted history-empty">{empty}</p>:<ul className="money-rows">{shown!.map(row=>{const text=historyRow(row);return <li key={row._id}><span><span className="money-title">{text.title}</span><span className="log-sub">{text.sub}</span></span><span className="money-amount">{text.amount}</span></li>})}</ul>}
-     {rows!==undefined&&rows.length>0&&!info.single&&<nav className="pager history-pager" aria-label="Credit history pages">
-      <span className="pager-label" aria-live="polite">{info.label}</span>
-      <span className="pager-buttons"><button type="button" className="secondary" disabled={!info.hasPrev} onClick={()=>go(page-1)}><span aria-hidden="true">‹ </span>Previous</button><button type="button" className="secondary" disabled={!info.hasNext||info.needsMore} onClick={()=>go(page+1)}>Next<span aria-hidden="true"> ›</span></button></span>
-     </nav>}
-    </section>
+    <span className="profile-who"><h2 id="you-heading" className={`profile-name${name?'':' muted'}`}>{account?name||'Add your name':'…'}</h2><span className="profile-meta">{account?.email??''}</span></span>
    </div>
-   <div className="profile-signout"><button type="button" className="secondary sign-out" onClick={()=>setConfirm(true)}>Sign out</button></div>
-  </div>
+   <NameRow saved={account?(account.name??''):undefined} onSave={onSaveName}/>
+   <div className="detail-row"><span className="detail-label">Member since</span><span className="detail-value">{account?.memberSince?memberSinceDate(account.memberSince):'…'}</span></div>
+   <a className="detail-row detail-link" href={`${prefix}/connect-assistant`}><span className="detail-label">ChatGPT or Claude</span><span className="detail-value">{connectionText}</span><Icon name="right" size={16}/></a>
+  </section>
+  <section className="card profile-card credit-card" aria-labelledby="credit-heading">
+   <h2 id="credit-heading" className="section-label">Credit</h2>
+   {account?<><strong className="balance">{formatPaise(available)}</strong>{per&&<p className="muted">{per}</p>}{(account.reservedCents??0)>0&&<p className="muted">{formatPaise(account.reservedCents!)} on hold for calls in progress</p>}{account.eligible===false&&<p className="amber">Account approval pending</p>}{account.callingEnabled===false&&<p className="amber">Live calling is being connected</p>}</>:<p role="status" className="muted">Checking your credit…</p>}
+   <dl className="money-totals"><div><dt>Credits added</dt><dd>{money(totals?.creditsCents)}</dd></div><div><dt>Charged</dt><dd>{money(totals?.chargesCents)}</dd></div><div><dt>Refunded</dt><dd>{money(totals?.refundsCents)}</dd></div></dl>
+   <p className="small-note">Totals since you joined. Paid top-ups aren’t available yet.</p>
+  </section>
+  <section className="card profile-card history-card" aria-labelledby="history-heading">
+   <div className="history-head"><h2 id="history-heading">Credits, charges and refunds</h2>
+    <div role="group" aria-label="Show" className="segmented">{HISTORY_FILTERS.map(f=><button key={f.id} type="button" aria-pressed={filter===f.id} onClick={()=>{if(f.id===filter)return;onFilter(f.id);setPage(1)}}>{f.label}</button>)}</div>
+   </div>
+   <div ref={top} tabIndex={-1} className="log-top" aria-label={`Credits, charges and refunds, ${info.label}`}/>
+   {rows===undefined||(!shown!.length&&more!=='done')?<p className="muted history-empty" role="status">Loading…</p>:shown!.length===0?<p className="muted history-empty">{empty}</p>:<ul className="money-rows">{shown!.map(row=>{const text=historyRow(row);return <li key={row._id}><span><span className="money-title">{text.title}</span><span className="log-sub">{text.sub}</span></span><span className="money-amount">{text.amount}</span></li>})}</ul>}
+   {rows!==undefined&&rows.length>0&&!info.single&&<nav className="pager history-pager" aria-label="Credit history pages">
+    <span className="pager-label" aria-live="polite">{info.label}</span>
+    <span className="pager-buttons"><button type="button" className="secondary" disabled={!info.hasPrev} onClick={()=>go(page-1)}><span aria-hidden="true">‹ </span>Previous</button><button type="button" className="secondary" disabled={!info.hasNext||info.needsMore} onClick={()=>go(page+1)}>Next<span aria-hidden="true"> ›</span></button></span>
+   </nav>}
+  </section>
+  <button type="button" className="secondary sign-out profile-signout" onClick={()=>setConfirm(true)}>Sign out</button>
   <SignOutDialog open={confirm} onClose={()=>setConfirm(false)} onConfirm={onSignOut}/>
  </section>;
 }

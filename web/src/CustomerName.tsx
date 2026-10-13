@@ -22,9 +22,10 @@ export function NameRow({saved,onSave}:{/** undefined while loading */saved?:str
    <div className="name-actions"><button type="submit" className="primary" disabled={busy}>{busy?'Saving…':'Save'}</button><button type="button" className="secondary" disabled={busy} onClick={close}>Cancel</button></div>
    <p role="alert" className="error">{error}</p>
   </form>
-  :<div className="detail-row">
-   <span className="detail-text"><span className="detail-label">Name</span><span>{saved===undefined?'…':saved||'Not added yet'}</span><span className="log-sub">{saved===undefined?'':firstNameNote(saved)}</span></span>
-   <button ref={editButton} type="button" className="secondary" aria-label={saved?'Edit name':'Add your name'} disabled={saved===undefined} onClick={()=>{setDraft(saved??'');setMessage('');setError('');setEditing(true)}}>{saved?'Edit':'Add'}</button>
+  :<div className="detail-row name-row">
+   <span className="detail-label">Name</span>
+   <span className="detail-value"><span>{saved===undefined?'…':saved||'Not added yet'}</span><span className="log-sub">{saved===undefined?'':firstNameNote(saved)}</span></span>
+   <button ref={editButton} type="button" className="link-button" aria-label={saved?'Edit name':'Add your name'} disabled={saved===undefined} onClick={()=>{setDraft(saved??'');setMessage('');setError('');setEditing(true)}}>{saved?'Edit':'Add'}</button>
   </div>}
   <p role="status" className="name-saved">{message}</p>
  </div>;

@@ -24,7 +24,7 @@ export function profileInitial(name?:string,email?:string){const source=(name?.t
 /** The name our AI says on calls. Mirrors convex/calls.ts: the first word of the saved name, or "our customer". */
 export function callerFirstName(name?:string){return name?.trim().split(' ')[0]||'our customer'}
 /** Line under the Name row (D159: shops never get the full name). */
-export function firstNameNote(name?:string){return name?.trim()?`Shops hear only your first name: “calling for ${callerFirstName(name)}”.`:'No name yet. Shops hear “calling for our customer”.'}
+export function firstNameNote(name?:string){return name?.trim()?`Shops hear only your first name: “calling for ${callerFirstName(name)}”.`:'Until you add one, shops hear “calling for our customer”.'}
 const IST='Asia/Kolkata';
 /** "Oct 2026" for the profile header; "1 Oct 2026" for the Member since row. India time. */
 export function memberSinceMonth(t:number){return new Date(t).toLocaleDateString('en-IN',{month:'short',year:'numeric',timeZone:IST})}

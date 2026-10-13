@@ -13,7 +13,7 @@ test('first-name note matches what calls say (first word, else "our customer")',
  assert.equal(callerFirstName(''),'our customer');
  assert.equal(callerFirstName(undefined),'our customer');
  assert.equal(firstNameNote('Akhil Gupta'),'Shops hear only your first name: “calling for Akhil”.');
- assert.equal(firstNameNote(undefined),'No name yet. Shops hear “calling for our customer”.');
+ assert.equal(firstNameNote(undefined),'Until you add one, shops hear “calling for our customer”.');
 });
 
 test('member since is shown in India time', () => {

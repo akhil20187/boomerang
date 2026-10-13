@@ -64,39 +64,45 @@
 .connection-lines{list-style:none;margin:10px 0 0;padding:0;font-size:14px}
 .paste-card{padding:18px 20px}
 .advanced{padding:0 20px}.advanced summary{min-height:52px;display:flex;align-items:center;cursor:pointer;font-weight:500;font-size:15px}.advanced[open]{padding-bottom:14px}.advanced .account-details{margin:12px 0 0}
-/* Profile and credit (Wallet.dc.html phone, ProfileLaptop.dc.html laptop). Phone: one column. Wide page: left 380px
-   (you, your details, sign out) and right (credit, history). A container query, so the sidebar's width is accounted for. */
-.profile-page{max-width:1000px;margin:0 auto;width:100%;container-type:inline-size}
-.profile-grid{display:flex;flex-direction:column;gap:16px;min-width:0}
-.profile-money{display:flex;flex-direction:column;gap:16px;min-width:0}
-@container (min-width:700px){.profile-grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);grid-template-rows:auto auto auto 1fr;gap:16px 20px;align-items:start}.profile-head{grid-area:1/1}.details-card{grid-area:2/1}.profile-signout{grid-area:3/1}.profile-money{grid-column:2;grid-row:1/span 4}}
-.profile-head{display:flex;align-items:center;gap:14px;min-width:0}
-.profile-badge{width:56px;height:56px;border-radius:28px;background:#f2f1ee;border:1px solid #dad7d0;display:grid;place-items:center;font-size:22px;font-weight:600;flex-shrink:0}
-.profile-who{display:flex;flex-direction:column;min-width:0}
-.profile-name{font-size:20px;font-weight:600;letter-spacing:-.02em;overflow-wrap:anywhere}
-.profile-meta{font-size:13px;color:#55544f;overflow-wrap:anywhere}
-.profile-card{padding:18px 20px;display:flex;flex-direction:column;gap:2px;min-width:0}
-.profile-card h2{font-size:16px;margin-bottom:6px}
-.detail-row{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px;padding:8px 0;border-top:1px solid #eeece7;font-size:14px}
-.detail-text{display:flex;flex-direction:column;min-width:0;overflow-wrap:anywhere}
-.detail-label{font-size:13px;color:#55544f}.detail-text .detail-label{display:block}
-.detail-value{text-align:right;overflow-wrap:anywhere;min-width:0}
-.detail-row>.secondary{flex-shrink:0;min-width:64px}
-.detail-link{text-decoration:none}.detail-link .detail-value{display:inline-flex;align-items:center;gap:2px}.detail-link svg{flex-shrink:0}
+/* Profile and credit (Wallet.dc.html, ProfileLaptop.dc.html, reworked 2026-10-13 after owner feedback): one centred
+   640px column, every fact once. Rows use one grid (label · value · action) so labels and values line up across cards. */
+.profile-page{max-width:640px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:16px}
+.profile-page .page-heading{margin-bottom:0}
+.profile-card{padding:20px 24px;display:flex;flex-direction:column;min-width:0}
+.profile-card h2{font-size:16px;font-weight:600;margin:0}
+.profile-head{display:flex;align-items:center;gap:14px;min-width:0;padding-bottom:16px}
+.profile-badge{width:48px;height:48px;border-radius:24px;background:#f2f1ee;display:grid;place-items:center;font-size:19px;font-weight:600;flex-shrink:0}
+.profile-who{display:flex;flex-direction:column;gap:2px;min-width:0}
+.profile-card .profile-name{font-size:18px;letter-spacing:-.01em;overflow-wrap:anywhere}
+.profile-meta{font-size:14px;color:#55544f;overflow-wrap:anywhere}
+.detail-row{display:grid;grid-template-columns:132px minmax(0,1fr) auto;align-items:center;column-gap:16px;min-height:52px;padding:10px 0;border-top:1px solid #eeece7;font-size:14px;color:#1a1a19}
+.detail-label{font-size:14px;color:#55544f}
+.detail-value{display:flex;flex-direction:column;gap:2px;min-width:0;overflow-wrap:anywhere}
+.detail-row>svg{color:#8f8c85}
+.detail-link{text-decoration:none}.detail-link:hover{background:#faf9f7}
+.link-button{min-height:44px;padding:0 4px;border:0;background:none;font-size:14px;font-weight:500;color:#1a1a19;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .name-form{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px solid #eeece7}
 .name-form input:not([type=checkbox]){font-size:15px;min-height:44px;border-radius:8px}
 .name-actions{display:flex;gap:8px}.name-actions button{min-height:44px;min-width:88px;padding:0 16px;font-size:14px}
-.name-saved{font-size:12px;color:#55544f}.name-saved:not(:empty){padding-bottom:8px}
-.credit-card .balance{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1.2}.credit-card p{font-size:13px}
-.money-totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
-.money-totals .stat{padding:12px 14px}.money-totals .stat strong{font-size:18px}
-.credit-card .small-note{font-size:12px;margin-top:10px;color:#55544f}
-.history-card .filter-chips{padding-bottom:10px}
-.history-empty{padding:14px 0;font-size:14px;border-top:1px solid #eeece7}
-.money-rows{list-style:none;margin:0;padding:0}.money-rows li{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid #eeece7}
-.money-rows li>span:first-child{min-width:0;overflow-wrap:anywhere}
-.money-title{font-size:14px;font-weight:500}.money-amount{font-size:14px;white-space:nowrap;color:#1a1a19}
+.name-saved{font-size:12px;color:#55544f}.name-saved:empty{display:none}.name-saved:not(:empty){padding:0 0 8px}
+.credit-card .section-label{font-size:14px;font-weight:500;color:#55544f}
+.credit-card .balance{font-size:36px;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-top:4px}
+.credit-card p{font-size:14px;margin-top:4px}
+.money-totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:18px 0 0;border-top:1px solid #eeece7;padding-top:14px}
+.money-totals>div{display:flex;flex-direction:column;gap:2px;padding-left:16px;border-left:1px solid #eeece7}.money-totals>div:first-child{padding-left:0;border-left:0}
+.money-totals dt{font-size:13px;color:#55544f}.money-totals dd{margin:0;font-size:17px;font-weight:600}
+.credit-card .small-note{font-size:13px;margin-top:14px;color:#55544f}
+.history-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:14px}
+.segmented{display:inline-flex;border:1px solid #dad7d0;border-radius:8px;padding:2px;gap:2px;background:#fff}
+.segmented button{min-height:40px;padding:0 12px;border:0;border-radius:6px;background:none;font-size:14px;color:#55544f;cursor:pointer}
+.segmented button[aria-pressed=true]{background:#f2f1ee;color:#1a1a19;font-weight:500}
+.history-empty{padding:16px 0;font-size:14px;border-top:1px solid #eeece7}
+.money-rows{list-style:none;margin:0;padding:0}.money-rows li{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;border-top:1px solid #eeece7}
+.money-rows li>span:first-child{min-width:0;overflow-wrap:anywhere;display:flex;flex-direction:column;gap:2px}
+.money-title{font-size:14px;font-weight:500}.money-amount{font-size:14px;font-weight:500;white-space:nowrap;color:#1a1a19}
 .history-pager{border-top:1px solid #eeece7;padding-top:12px}.history-pager .pager-label{text-align:left}
+.profile-signout{align-self:flex-start}
+@media(max-width:600px){.profile-card{padding:16px}.detail-row{grid-template-columns:minmax(0,1fr) auto;row-gap:2px}.detail-row>.detail-label{grid-column:1/-1}.detail-link>svg{grid-column:2;grid-row:2}.segmented{width:100%}.segmented button{flex:1;padding:0 6px}}
 .pager-buttons{display:flex;gap:8px}
 .sign-out{align-self:flex-start}
 @media(max-width:600px){.page-heading h1{font-size:24px}.page-heading p{font-size:14px}.stat{padding:12px}.stat strong{font-size:20px}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.connect-card>section,.paste-card,.profile-card{padding-left:16px;padding-right:16px}.advanced{padding:0 16px}}

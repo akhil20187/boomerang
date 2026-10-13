@@ -3,7 +3,7 @@ import type {Shop,TaskSummary} from './types';
 import {itemsStatus,taskDate,taskLabel,taskOutcome,type ChargeNote} from './taskPresentation.ts';
 export type Tone='green'|'blue'|'amber'|'grey'|'error';
 export const rupees=(n:number)=>'₹'+n.toLocaleString('en-IN');
-export const clock=(t:number)=>new Date(t).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'});
+export const clock=(t:number)=>new Date(t).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'}).toLowerCase();
 /** Shop states after which no more calls happen for that shop. */
 export const terminal=new Set(['answered','unreachable','personal_call_needed','incomplete_answer','technical_error','completed','failed']);
 /** One status line per shop on the call card (chat card, website card, call log). */
