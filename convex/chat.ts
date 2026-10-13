@@ -446,9 +446,10 @@ export function pickerText(o: { count: number; noun: string; place?: string; bus
   return `${countNoun(o.count, o.noun)} near ${o.place}`;
 }
 /** Not found on Google (and the web): say so, ask for the number, offer a category search (D163 scope B). */
-export function notFoundText(businessName: string, place: string, noun: string, web: boolean) {
+export function notFoundText(businessName: string, place: string, noun: string, searched: { google: boolean; web: boolean }) {
+  const where = searched.google && searched.web ? "on Google or the web" : searched.web ? "on the web" : "on Google";
   const other = noun && noun !== "businesses" && noun !== "shops" ? ` Or I can look for other ${noun} nearby.` : " Or I can look for similar businesses nearby.";
-  return `I couldn’t find ${businessName} on Google${web ? " or the web" : ""} near ${place}. If you have their phone number, send it and I’ll set up the call.${other}`;
+  return `I couldn’t find ${businessName} ${where} near ${place}. If you have their phone number, send it and I’ll set up the call.${other}`;
 }
 /** A new brief for supplied contacts carries what the customer already told us, so the intake does not ask again. */
 export function carryRequest(open: { request?: string; turns?: { question: string; answer?: string }[] } | null | undefined, request?: string) {
@@ -635,7 +636,7 @@ async function runTool(ctx: ActionCtx, s: State, name: string, rawArgs: string):
         const web = await lookUpBusinessOnWeb(businessName, [spoken, city].filter((x, i, all) => x && all.indexOf(x) === i).join(", "));
         console.log("web business lookup", JSON.stringify({ searched: web.searched, kept: web.contacts.map((c) => ({ name: c.name, site: c.sourceUrl.split("/")[2] })), dropped: web.dropped }));
         if (web.contacts.length) return startContactsBrief(ctx, s, web.contacts, { businessName, web: true });
-        const text = notFoundText(businessName, spoken, noun, web.searched);
+        const text = notFoundText(businessName, spoken, noun, { google: args.search_web !== true, web: web.searched });
         return {
           stop: true,
           card: { role: "assistant", kind: "text", text },

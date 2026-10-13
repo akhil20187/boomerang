@@ -179,10 +179,11 @@ describe("phone numbers and web results", () => {
 
 describe("chat helpers", () => {
   it("not-found wording asks for the number and offers a category search", () => {
-    expect(notFoundText("Ainapur Consultants and Engineers", "Miyapur", "offices", true)).toBe(
+    expect(notFoundText("Ainapur Consultants and Engineers", "Miyapur", "offices", { google: true, web: true })).toBe(
       "I couldn’t find Ainapur Consultants and Engineers on Google or the web near Miyapur. If you have their phone number, send it and I’ll set up the call. Or I can look for other offices nearby.",
     );
-    expect(notFoundText("X", "Miyapur", "businesses", false)).toContain("on Google near Miyapur");
+    expect(notFoundText("X", "Miyapur", "businesses", { google: true, web: false })).toContain("X on Google near Miyapur");
+    expect(notFoundText("X", "Miyapur", "businesses", { google: false, web: true })).toContain("X on the web near Miyapur");
   });
   it("a contacts brief carries the earlier request and answers, without escape answers", () => {
     const open = { request: "I want you to call Ainapur", turns: [{ question: "What do you want to ask?", answer: "Something else" }, { question: "What do you want to ask?", answer: "ESG services" }, { question: "Which area?", answer: "Miyapur" }] };
@@ -387,7 +388,7 @@ it("search_web skips Google and goes straight to the web", async () => {
     web: [webReply([])],
   });
   const out = await user.action(api.chat.send, { text: "I want you to call ainapur consultants and engineers, ask about ESG services, I am in Miyapur 500049" });
-  expect(out.messages.at(-1).text).toContain("on Google or the web near Miyapur");
+  expect(out.messages.at(-1).text).toContain("Engineers on the web near Miyapur");
   expect(placesBodies).toHaveLength(0);
   expect(webRequests).toHaveLength(1);
 });
