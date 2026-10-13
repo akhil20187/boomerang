@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Profile and credit (laptop)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#1A1A19;background:#FFFFFF}
+a{color:#1A1A19}a:hover{color:#000}
+.card{border:1px solid #DAD7D0;border-radius:8px;padding:18px 20px;display:flex;flex-direction:column;gap:2px}
+.h2{margin:0 0 6px;font-size:16px;font-weight:600}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:52px;border-top:1px solid #EEECE7;font-size:14px}
+.k{font-size:13px;color:#55544F}
+.v{text-align:right;overflow-wrap:anywhere}
+.pill{font:inherit;font-size:13px;height:34px;padding:0 14px;border-radius:999px;border:1px solid #DAD7D0;cursor:pointer;color:#1A1A19}
+.line{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid #EEECE7;font-size:14px}
+.sub{display:block;font-size:12px;color:#55544F;margin-top:2px}
+.stat{border:1px solid #DAD7D0;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.task{display:flex;flex-direction:column;gap:3px;padding:9px 12px;border-radius:8px;text-decoration:none;color:#1A1A19}
+.task:hover{background:#F2F1EE}
+.lbl{font-size:12px;color:#55544F;padding:14px 12px 4px;font-weight:500}
+.ghost{font:inherit;font-size:14px;height:40px;padding:0 16px;border:1px solid #DAD7D0;border-radius:8px;background:#FFFFFF;cursor:pointer;color:#1A1A19}
+.primary{font:inherit;font-size:14px;font-weight:500;height:40px;padding:0 16px;border:0;border-radius:8px;background:#1A1A19;color:#FFFFFF;cursor:pointer}
+</style>
+</helmet>
+<div style="min-height: 860px; background: #FFFFFF; display: flex; flex-wrap: wrap">
+<nav aria-label="Menu" style="flex: 1 1 240px; max-width: 270px; border-right: 1px solid #DAD7D0; padding: 14px 8px; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<div style="display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 17px; letter-spacing: -0.02em; padding: 4px 12px 12px">
+<svg width="22" height="22" viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-12 50 50)" fill="none" stroke="#1A1A19" stroke-width="13" stroke-linecap="round"><path d="M30 12 V60"></path><path d="M30 56 Q32 38 53 38 Q75 38 75 61 Q75 84 55 84"></path></g><circle cx="32" cy="82" r="8.5" fill="#16A34A" transform="rotate(-12 50 50)"></circle></svg>
+<span>boomerang</span>
+</div>
+<a href="Desktop.dc.html" style="display: flex; align-items: center; gap: 8px; border: 1px solid #DAD7D0; border-radius: 8px; height: 40px; padding: 0 12px; margin: 0 4px 6px; text-decoration: none; font-size: 15px; font-weight: 500">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>New request</a>
+<div class="lbl">Today</div>
+<a class="task" href="Desktop.dc.html"><span style="font-size: 14px">Plumber near 500032</span><span style="font-size: 12px; color: #17573A">2 answered</span></a>
+<div class="lbl">Needs you</div>
+<a class="task" href="#"><span style="font-size: 14px">Notary in Balanagar</span><span style="font-size: 12px; color: #7A4A00">1 prefers a personal call</span></a>
+<div class="lbl">Earlier</div>
+<a class="task" href="#"><span style="font-size: 14px">iPhone 17 256GB near 500037</span><span style="font-size: 12px; color: #17573A">4 of 6 have it</span></a>
+<a class="task" href="#"><span style="font-size: 14px">Blouse tailor in Chintal</span><span style="font-size: 12px; color: #17573A">2 answered your questions</span></a>
+<div style="flex: 1; min-height: 24px"></div>
+<a class="task" href="CallLog.dc.html" style="font-size: 14px">Call log</a>
+<a class="task" href="#" style="font-size: 14px">Use in ChatGPT or Claude</a>
+<a class="task" href="ProfileLaptop.dc.html" aria-current="page" style="flex-direction: row; justify-content: space-between; font-size: 14px; background: #F2F1EE; font-weight: 500"><span>Profile and credit</span><span style="color: #55544F">₹80</span></a>
+</nav>
+<div style="flex: 999 1 560px; min-width: 0">
+<main style="max-width: 1000px; margin: 0 auto; padding: 28px 24px 40px; display: flex; flex-direction: column; gap: 20px">
+<h1 style="margin: 0; font-size: 28px; letter-spacing: -0.03em">Profile and credit</h1>
+<div style="display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 20px; align-items: start">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<section style="display: flex; align-items: center; gap: 14px">
+<div aria-hidden="true" style="width: 56px; height: 56px; border-radius: 28px; background: #F2F1EE; border: 1px solid #DAD7D0; display: grid; place-items: center; font-size: 22px; font-weight: 600; flex-shrink: 0">{{initial}}</div>
+<div style="min-width: 0">
+<div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em">{{name}}</div>
+<div style="font-size: 13px; color: #55544F">akhil@altir.co · Member since Oct 2026</div>
+</div>
+</section>
+
+<section class="card" aria-labelledby="details">
+<h2 class="h2" id="details">Your details</h2>
+<sc-if value="{{notEditing}}" hint-placeholder-val="{{ true }}">
+<div class="row"><span><span class="k" style="display: block">Name</span><span>{{name}}</span><span class="sub">Shops hear only your first name: “calling for {{firstName}}”.</span></span><button class="ghost" onClick="{{edit}}">Edit</button></div>
+</sc-if>
+<sc-if value="{{editing}}" hint-placeholder-val="{{ false }}">
+<form onSubmit="{{save}}" style="display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-top: 1px solid #EEECE7">
+<label for="nm" class="k">Name</label>
+<input id="nm" value="{{name}}" onChange="{{typed}}" style="font: inherit; font-size: 15px; height: 44px; border: 1px solid #DAD7D0; border-radius: 8px; padding: 0 12px">
+<span class="sub">Shops hear only your first name. We never share your email, phone or address.</span>
+<div style="display: flex; gap: 8px"><button type="submit" class="primary">Save</button><button type="button" class="ghost" onClick="{{save}}">Cancel</button></div>
+</form>
+</sc-if>
+<div class="row"><span class="k">Email</span><span class="v">akhil@altir.co<span class="sub">Used to sign in. Can’t be changed here.</span></span></div>
+<div class="row"><span class="k">Member since</span><span class="v">1 Oct 2026</span></div>
+<a class="row" href="Connect.dc.html" style="text-decoration: none"><span class="k">ChatGPT or Claude</span><span class="v" style="color: #55544F">Not connected ›</span></a>
+</section>
+<button class="ghost" style="align-self: flex-start">Sign out</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 16px">
+<section class="card" aria-labelledby="credit">
+<h2 class="h2" id="credit">Credit</h2>
+<div style="font-size: 34px; font-weight: 700; letter-spacing: -0.03em">₹80</div>
+<div style="font-size: 13px; color: #55544F">About 8 answers · ₹10 per shop that answers</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px">
+<div class="stat"><span class="k">Credits</span><strong>₹100</strong></div>
+<div class="stat"><span class="k">Charges</span><strong>₹30</strong></div>
+<div class="stat"><span class="k">Refunds</span><strong>₹10</strong></div>
+</div>
+<div style="font-size: 12px; color: #55544F; margin-top: 10px">All time. Paid top-ups aren’t available yet.</div>
+</section>
+
+<section class="card" aria-labelledby="money">
+<h2 class="h2" id="money">Credits, charges and refunds</h2>
+<div role="group" aria-label="Show" style="display: flex; gap: 6px; flex-wrap: wrap; padding-bottom: 10px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="4"><button class="pill" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}" style="background: {{t.bg}}; border-color: {{t.bd}}">{{t.label}}</button></sc-for>
+</div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5"><div class="line"><span>{{r.title}}<span class="sub">{{r.sub}}</span></span><span style="white-space: nowrap">{{r.amt}}</span></div></sc-for>
+<div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #EEECE7; padding-top: 12px; font-size: 13px; color: #55544F"><span>Page 1 · Showing 1–5</span><span style="display: flex; gap: 6px"><button class="ghost" disabled style="opacity: .5">Previous</button><button class="ghost">Next</button></span></div>
+</section>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { filter: 'all', editing: false, name: 'Akhil Gupta' }; }
+  renderVals() {
+    const rows = [
+      { kind: 'charge', title: 'Sri Sai Plumbing Works', sub: 'Charge · Plumber in Gachibowli · today 4:04 pm', amt: '−₹10' },
+      { kind: 'charge', title: 'Quick Fix Plumbers', sub: 'Charge · Plumber in Gachibowli · today 4:03 pm', amt: '−₹10' },
+      { kind: 'refund', title: 'AquaCare Plumbing', sub: 'Refund · didn’t answer your questions · today 4:02 pm', amt: '+₹10' },
+      { kind: 'charge', title: 'Vijay Mobiles', sub: 'Charge · iPhone 17 256GB near Ameerpet · 9 Oct', amt: '−₹10' },
+      { kind: 'credit', title: 'Welcome credit', sub: 'Credit · 1 Oct', amt: '+₹100' }
+    ];
+    const f = this.state.filter;
+    const tab = (key, label) => ({ label, pressed: f === key ? 'true' : 'false', bg: f === key ? '#F2F1EE' : '#FFFFFF', bd: f === key ? '#1A1A19' : '#DAD7D0', pick: () => this.setState({ filter: key }) });
+    const first = (this.state.name || '').trim().split(/\s+/)[0] || 'you';
+    return {
+      tabs: [tab('all', 'All'), tab('charge', 'Charges'), tab('refund', 'Refunds'), tab('credit', 'Credits')],
+      rows: rows.filter(r => f === 'all' || r.kind === f),
+      name: this.state.name, firstName: first, initial: (this.state.name || 'A').trim()[0].toUpperCase(),
+      editing: this.state.editing, notEditing: !this.state.editing,
+      edit: () => this.setState({ editing: true }),
+      typed: (e) => this.setState({ name: e.target.value }),
+      save: (e) => { e.preventDefault(); this.setState({ editing: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
