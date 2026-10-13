@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boomerang · Why I built it</title>
+<style>
+*{box-sizing:border-box} :root{--ink:#1A1A19;--muted:#55544F;--line:#DAD7D0}
+body{margin:0;background:#eee;font-family:-apple-system,BlinkMacSystemFont,system-ui,Helvetica,Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.slide{width:1080px;height:1350px;background:white;position:relative;padding:72px 78px;overflow:hidden;margin:32px auto;break-after:page}
+.top{display:flex;align-items:center;justify-content:space-between;height:58px}.brand{width:238px;height:51px}.series{font-size:22px;font-weight:600;letter-spacing:.04em;color:var(--muted)}
+.content{position:absolute;left:78px;right:78px;top:225px;bottom:160px}
+.eyebrow{font-size:23px;font-weight:650;letter-spacing:.13em;text-transform:uppercase;margin:0 0 38px}
+h1,h2,p{margin:0}h1,h2{font-size:91px;font-weight:780;line-height:1.06;letter-spacing:-5px}p{font-size:35px;line-height:1.4;letter-spacing:-.7px;color:var(--muted)}
+.sub{margin-top:38px;max-width:810px}.footer{position:absolute;bottom:65px;left:78px;right:78px;border-top:1px solid var(--line);padding-top:26px;display:flex;justify-content:space-between;font-size:22px;color:var(--muted)}
+.big-mark{position:absolute;right:44px;bottom:143px;width:440px;height:440px}.cover h1{font-size:111px;letter-spacing:-6px}.cover .sub{max-width:540px}
+.stock{margin-top:68px;border-top:2px solid var(--ink);border-bottom:1px solid var(--line);padding:32px 0;display:flex;justify-content:space-between;align-items:center}.stock span{font-size:28px}.stock strong{font-size:48px;font-weight:720;letter-spacing:-2px}
+.steps{margin-top:54px}.step{padding:30px 0;border-top:1px solid var(--line);display:flex;align-items:center;gap:34px}.step .num{font-size:22px;color:var(--muted);min-width:48px}.step b{font-size:48px;letter-spacing:-1.8px;font-weight:650}
+.quotes{margin-top:46px}.quote{display:flex;gap:25px;border-top:1px solid var(--line);padding:26px 0}.quote:last-child{border-bottom:1px solid var(--line)}.quote svg{width:30px;height:30px;flex-shrink:0;margin-top:7px}.quote p{font-size:35px;color:var(--ink);max-width:805px;line-height:1.28}
+.four h2{font-size:82px}.quiet{margin-top:42px;font-size:30px}.shortlist h2{font-size:94px}.shortlist .lead{margin-top:54px;font-size:42px;line-height:1.3;color:var(--ink)}.shortlist .sub{font-size:34px;max-width:780px}
+.agency .intro{margin-top:42px;font-size:36px;max-width:750px}.workflow{margin-top:56px}.workflow div{padding:25px 0;border-top:1px solid var(--line);font-size:38px;font-weight:600;letter-spacing:-1px;display:flex;gap:28px}.workflow span{font-size:22px;color:var(--muted);padding-top:11px;font-weight:500}.agency .note{font-size:29px;margin-top:30px}
+.closing h2{font-size:96px;max-width:840px}.closing .lockup{width:840px;height:180px;margin:66px 0 50px}.closing .question{font-size:40px;color:var(--ink);max-width:780px;line-height:1.3}.closing .link{font-size:28px;margin-top:35px;color:var(--muted)}
+@page{size:1080px 1350px;margin:0}@media print{body{background:white}.slide{margin:0}}
+</style>
+</head>
+<body>
+<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<symbol id="mark" viewBox="0 0 100 100"><g transform="rotate(-12 50 50)"><path d="M30 12 V60" fill="none" stroke="#0A0A0A" stroke-width="13" stroke-linecap="round"/><path d="M30 56 Q32 38 53 38 Q75 38 75 61 Q75 84 55 84" fill="none" stroke="#0A0A0A" stroke-width="13" stroke-linecap="round"/><circle cx="32" cy="82" r="8.5" fill="#16A34A"/></g></symbol>
+<symbol id="logo" viewBox="0 0 470 100"><use href="#mark" width="100" height="100"/><text x="96" y="74" font-family="-apple-system, BlinkMacSystemFont, system-ui, Helvetica, Arial, sans-serif" font-size="70" font-weight="800" letter-spacing="-3" fill="#0A0A0A">boomerang</text></symbol>
+<symbol id="phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.35 1.9.69 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.28-1.27a2 2 0 0 1 2.11-.45c.9.34 1.84.57 2.8.69A2 2 0 0 1 22 16.92z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</defs></svg>
+<section class="slide cover" aria-label="Slide 1: The frustration">
+<header class="top"><svg class="brand"><use href="#logo"/></svg><span class="series">WHY I BUILT IT</span></header>
+<div class="content"><p class="eyebrow">A very personal problem</p><h1>I hate<br>calling<br>shops.</h1><p class="sub">Just to ask if they<br>have something.</p></div>
+<svg class="big-mark"><use href="#mark"/></svg><footer class="footer"><span>The story behind Boomerang</span><span>01 / 07 →</span></footer>
+</section>
+<section class="slide" aria-label="Slide 2: The phone search">
+<header class="top"><svg class="brand"><use href="#logo"/></svg><span class="series">THE SEARCH</span></header>
+<div class="content"><p class="eyebrow">It started with a phone</p><h2>I knew what<br>I wanted.<br>I couldn’t<br>find it online.</h2><div class="stock"><span>Online availability</span><strong>Out of stock.</strong></div><p class="sub">So I tried nearby shops.</p></div>
+<footer class="footer"><span>Surely someone nearby had it?</span><span>02 / 07 →</span></footer>
+</section>
+<section class="slide" aria-label="Slide 3: The manual process">
+<header class="top"><svg class="brand"><use href="#logo"/></svg><span class="series">THE WORK</span></header>
+<div class="content"><p class="eyebrow">My next move</p><h2>Find a shop.<br>Make a call.<br>Repeat.</h2><div class="steps"><div class="step"><span class="num">01</span><b>Open Google Maps.</b></div><div class="step"><span class="num">02</span><b>Find electronics shops.</b></div><div class="step"><span class="num">03</span><b>Call and ask about stock.</b></div></div></div>
+<footer class="footer"><span>Then came the replies.</span><span>03 / 07 →</span></footer>
+</section>
+<section class="slide four" aria-label="Slide 4: What happened on the calls">
+<header class="top"><svg class="brand"><use href="#logo"/></svg><span class="series">THE REPLIES</span></header>
+<div class="content"><p class="eyebrow">What I got back</p><h2>One enquiry.<br>Four dead ends.</h2><div class="quotes"><div class="quote"><svg><use href="#phone"/></svg><p>No one picked up.</p></div><div class="quote"><svg><use href="#phone"/></svg><p>“Available, but a different colour.”</p></div><div class="quote"><svg><use href="#phone"/></svg><p>“Available, but no offers.”</p></div><div class="quote"><svg><use href="#phone"/></svg><p>“Come to the shop and see.<br>I can’t tell you on the phone.”</p></div></div><p class="quiet">I still had more calls to make.</p></div>
+<footer class="footer"><span>This was the part I wanted help with.</span><span>04 / 07 →</span></footer>
+</section>
+<section class="slide shortlist" aria-label="Slide 5: The help I wanted">
+<header class="top"><svg class="brand"><use href="#logo"/></svg><span class="series">THE WISH</span></header>
+<div class="content"><p class="eyebrow">What I actually wanted</p><h2>Make the<br>first calls<br>for me.</h2><p class="lead">Check stock, colour and offers.</p><p class="sub">Tell me which shops are worth<br>following up with.</p><p class="sub">Then I can call the select few.</p></div>
+<footer class="footer"><span>A personal voice agent for the enquiries.</span><span>05 / 07 →</span></footer>
+</section>
+<section class="slide agency" aria-label="Slide 6: What Boomerang does">
+<header class="top"><svg class="brand"><use href="#logo"/></svg><span class="series">THE IDEA</span></header>
+<div class="content"><p class="eyebrow">Enter Boomerang</p><h2>The enquiries,<br>handled<br>on my behalf.</h2><p class="intro">An AI voice agent that calls shops<br>and brings their answers back.</p><div class="workflow"><div><span>01</span>You say what you need.</div><div><span>02</span>Boomerang calls your chosen shops.</div><div><span>03</span>You get shop-by-shop answers.</div></div><p class="note">Anything they don’t confirm stays unconfirmed.</p></div>
+<footer class="footer"><span>You choose who to follow up with.</span><span>06 / 07 →</span></footer>
+</section>
+<section class="slide closing" aria-label="Slide 7: Why I built Boomerang">
+<header class="top"><svg class="brand"><use href="#logo"/></svg><span class="series">WHY I BUILT IT</span></header>
+<div class="content"><p class="eyebrow">So I built it</p><h2>I built<br>Boomerang<br>for this.</h2><svg class="lockup"><use href="#logo"/></svg><p class="question">What do you hate<br>calling shops about?</p><p class="link">askboomerang.vercel.app</p></div>
+<footer class="footer"><span>Enquiries out. Answers back.</span><span>07 / 07</span></footer>
+</section>
+</body></html>
