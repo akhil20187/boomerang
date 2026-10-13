@@ -19,3 +19,10 @@ test('preview fails closed on production URLs, wrong branch or wrong scoped key'
     assert.throws(() => vercelEnvironment({ ...preview, ...override }));
   assert.throws(() => vercelEnvironment({ ...production, VITE_CONVEX_URL: preview.VITE_CONVEX_URL }));
 });
+test('every website page loads the app directly (refresh, email links)', () => {
+  const pages = vercelRoutes(vercelEnvironment(production)).filter(r => r.dest === '/index.html').map(r => new RegExp(`^${r.src}$`));
+  const opens = path => pages.some(p => p.test(path));
+  for (const path of ['/app', '/account', '/credit', '/calls', '/connect-assistant', '/tasks', '/status', '/connect', '/demo', '/demo/', '/demo/calls', '/demo/connect-assistant', '/demo/account', '/demo/signin', '/demo/welcome'])
+    assert.ok(opens(path), path);
+  for (const path of ['/mcp', '/api/x', '/demo/../mcp', '/SKILL.md']) assert.ok(!opens(path), path);
+});

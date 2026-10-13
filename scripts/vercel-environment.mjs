@@ -21,6 +21,7 @@ export function vercelRoutes({ site }) {
     { src: '/oauth/(request|approve)', dest: `${site}/oauth/$1` },
     { src: '/api/(.*)', dest: `${site}/api/$1` },
     { handle: 'filesystem' },
-    { src: '/(app|account|tasks|credit|status|connect|demo)/?', dest: '/index.html' },
+    { src: '/(app|account|tasks|credit|calls|status|connect|connect-assistant)/?', dest: '/index.html' },
+    { src: '/demo(?:/[a-z-]*)?/?', dest: '/index.html' },
   ];
 }
