@@ -18,7 +18,7 @@ function websiteRedirect(request: Request, path: string) {
     Location: target.href, 'Cache-Control': 'no-store',
   } });
 }
-for (const path of ['/app', '/account', '/tasks', '/status', '/connect', '/demo', '/landing.html', '/index.html']) {
+for (const path of ['/app', '/account', '/credit', '/calls', '/connect-assistant', '/tasks', '/status', '/connect', '/demo', '/landing.html', '/index.html']) {
   const destination = path === '/landing.html' ? '/' : path === '/index.html' ? '/app' : path;
   http.route({ path, method: 'GET', handler: httpAction(async (_ctx, request) =>
     websiteRedirect(request, destination) ?? new Response('Website address is not configured.', { status: 503 })) });
