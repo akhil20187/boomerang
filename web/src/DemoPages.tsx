@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import {CallLogView} from './CallLog';
 import {ConnectView} from './ConnectAssistant';
 import {AccountView,type MoneyRow} from './AccountPage';
-import {CustomerNameForm} from './CustomerName';
+import type {HistoryFilter} from './accountPresentation';
 import {sampleRecording} from './demo';
 import type {LogRow} from './callLogPresentation';
 import type {AnswerItem} from './types';
@@ -35,11 +35,28 @@ export function DemoCallLog(){const [all]=useState(demoLogRows);const [loaded,se
  const more=loading?'loading':loaded<all.length?'can':'done';
  return <CallLogView demo rows={all.slice(0,loaded)} summary={{calls:8,tries:9,answered:4,chargedPaise:4000,refundedPaise:0,notChargedCount:4,availablePaise:8000}} more={more} onLoadMore={()=>{if(loading)return;setLoading(true);timer.current=setTimeout(()=>{setLoaded(n=>n+10);setLoading(false)},400)}} loadRecording={demoLoader}/>}
 export function DemoConnect(){return <ConnectView status={{connected:false,clients:[]}} accessKeys={<p className="small-note">Sign in to create access keys. The demo doesn’t create real keys.</p>}/>}
-const demoMoney=():MoneyRow[]=>[
- {_id:'m1',_creationTime:Date.now()-12*minute,type:'charge',amountCents:-1000,shopName:'Sri Sai Plumbing Works',productName:plumber,taskId:'demo'},
- {_id:'m2',_creationTime:Date.now()-13*minute,type:'charge',amountCents:-1000,shopName:'Quick Fix Plumbers',productName:plumber,taskId:'demo'},
- {_id:'m3',_creationTime:Date.now()-14*minute,type:'release',amountCents:0,shopName:'AquaCare Plumbing',productName:plumber,note:'shop prefers a personal call',taskId:'demo'},
- {_id:'m4',_creationTime:at(3,18,12),type:'charge',amountCents:-1000,shopName:'Aptronix',productName:iphone,taskId:'demo'},
- {_id:'m5',_creationTime:at(7,9,0),type:'grant',amountCents:10000},
-];
-export function DemoAccount(){const [name,setName]=useState('Asha');return <AccountView demo account={{email:'you@example.com',availableCents:8000,reservedCents:0,answerPriceCents:1000,eligible:true,callingEnabled:true,name}} money={demoMoney()} connection={{connected:false,clients:[]}} nameForm={<CustomerNameForm saved={name} onSave={async n=>setName(n)}/>} onSignOut={()=>{location.href=signedOutUrl(true)}}/>}
+/** Sample money movements: ₹100 welcome credit, 4 charges (₹40), 2 refunds (₹20) and 7 "not charged" rows, so the balance is ₹80 and All has two pages. */
+function demoMoney():MoneyRow[]{const now=Date.now();const row=(id:string,t:number,type:string,amountCents:number,shopName?:string,productName?:string,note?:string):MoneyRow=>({_id:id,_creationTime:t,type,amountCents,shopName,productName,note,taskId:'demo'});return [
+ row('m1',now-12*minute,'charge',-1000,'Sri Sai Plumbing Works',plumber),
+ row('m2',now-13*minute,'charge',-1000,'Quick Fix Plumbers',plumber),
+ row('m3',now-14*minute,'release',1000,'AquaCare Plumbing',plumber,'shop prefers a personal call'),
+ row('m4',at(2,11,21),'release',1000,'Balanagar Notary Office',notary,'shop prefers a personal call'),
+ row('m5',at(3,18,30),'refund',1000,'Aptronix',iphone),
+ row('m6',at(3,18,15),'release',1000,'Vijay Sales',iphone,'shop didn’t answer'),
+ row('m7',at(3,18,12),'charge',-1000,'Aptronix',iphone),
+ row('m8',at(14,10,40),'release',1000,'Bright Spark Electricals','Electrician in Kondapur','shop didn’t answer'),
+ row('m9',at(15,12,0),'refund',1000,'Colour Craft Painters','Painter in Madhapur'),
+ row('m10',at(15,11,50),'charge',-1000,'Colour Craft Painters','Painter in Madhapur'),
+ row('m11',at(16,12,20),'release',1000,'CoolAir Services','AC service in Kukatpally','shop didn’t answer'),
+ row('m12',at(17,13,30),'release',1000,'Chintal Ladies Tailors','Tailor in Chintal','shop didn’t answer'),
+ row('m13',at(18,14,10),'release',1000,'WoodWorks Carpentry','Carpenter in Miyapur','shop didn’t answer'),
+ {_id:'m14',_creationTime:at(20,9,0),type:'grant',amountCents:10000,welcome:true},
+]}
+/** Like the live page: the filter picks rows "on the server", which arrive in batches of 10. */
+export function DemoAccount(){
+ const [name,setName]=useState('Asha Rao');const [filter,setFilter]=useState<HistoryFilter>('all');const [all]=useState(demoMoney);const [loaded,setLoaded]=useState(10);const [loading,setLoading]=useState(false);const timer=useRef<ReturnType<typeof setTimeout>>(undefined);useEffect(()=>()=>clearTimeout(timer.current),[]);
+ const matching=all.filter(r=>filter==='all'?r.type!=='reservation':r.type===filter);const sum=(type:string)=>all.filter(r=>r.type===type).reduce((n,r)=>n+Math.abs(r.amountCents),0);
+ return <AccountView demo account={{email:'asha@example.com',availableCents:8000,reservedCents:0,answerPriceCents:1000,eligible:true,callingEnabled:true,name,memberSince:at(20,9,0)}} totals={{creditsCents:sum('grant'),chargesCents:sum('charge'),refundsCents:sum('refund')}} connection={{connected:false,clients:[]}}
+  filter={filter} onFilter={f=>{clearTimeout(timer.current);setLoading(false);setFilter(f);setLoaded(10)}} rows={matching.slice(0,loaded)} more={loading?'loading':loaded<matching.length?'can':'done'} onLoadMore={()=>{if(loading)return;setLoading(true);timer.current=setTimeout(()=>{setLoaded(n=>n+10);setLoading(false)},400)}}
+  onSaveName={async n=>{if(!n||n.length>80)throw new Error('Enter your name using up to 80 characters.');setName(n)}} onSignOut={()=>{location.href=signedOutUrl(true)}}/>;
+}

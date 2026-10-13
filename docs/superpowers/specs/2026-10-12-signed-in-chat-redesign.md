@@ -14,7 +14,7 @@ New users must reach the "wow moment" (hearing our AI call a shop for them) with
 | Menu / sidebar with tasks | `Tasks.dc.html` (phone drawer), sidebar inside `Desktop.dc.html` | on every signed-in page |
 | Call log (phone + laptop) | `CallLogPhone.dc.html`, `CallLog.dc.html` | `/calls` |
 | Use in ChatGPT or Claude | `Connect.dc.html` | `/connect-assistant` |
-| Account and credit | `Wallet.dc.html` | `/account` (signed in) |
+| Profile and credit | `Wallet.dc.html` (phone), `ProfileLaptop.dc.html` (laptop) | `/account` (signed in) |
 | Opened call (shared) | `CallDetail.dc.html` | used in chat results, task page, call log |
 
 ### Chat flow (`/app`)
@@ -27,7 +27,7 @@ New users must reach the "wow moment" (hearing our AI call a shop for them) with
 The noun follows the request: "shops" for products, the service word (e.g. "plumbers") or "businesses" otherwise.
 
 ### Menu / sidebar
-New request · Today / Needs you / Earlier task groups (from `tasks.history`; status line coloured per DESIGN.md; live tasks show the blue pulse) · Call log · Use in ChatGPT or Claude · Account and credit (with balance). Laptop: fixed left sidebar. Phone: drawer from a menu button in the top bar; the top bar also shows the balance pill linking to Account. "Demo" leaves the signed-in navigation.
+New request · Today / Needs you / Earlier task groups (from `tasks.history`; status line coloured per DESIGN.md; live tasks show the blue pulse) · Call log · Use in ChatGPT or Claude · Profile and credit (with balance). Laptop: fixed left sidebar. Phone: drawer from a menu button in the top bar; the top bar also shows the balance pill linking to Profile and credit. "Demo" leaves the signed-in navigation.
 
 ### Opened call (shared component, must match today's app)
 Same as today's `CallCard` opened row: time-stamped timeline with round marks (✓ ok, • live, ! warn, … wait, × fail) → answer table (brief items two columns with ✓ / ~ / – marks, product Price/Offers/Note) → address → `VoicePlayer` or "No recording for this call. The answer comes from the caller's notes." Personal call: "Best to call them directly. No charge for this [shop/business]." Call and directions icons sit at the top right of the row; phone number always visible (D146).
@@ -38,8 +38,8 @@ One row per call attempt across all tasks, newest first, grouped by day on phone
 ### Use in ChatGPT or Claude (`/connect-assistant`)
 ChatGPT/Claude switch → copy the MCP address (from the existing `VITE_MCP_PUBLIC_URL`/app config) → 3 short steps per app → "Check connection" (shows whether this account has an active assistant connection) → "Or paste this into any AI assistant: Set me up with Boomerang using <SKILL.md URL>" → "Advanced: access keys" fold containing the existing access-key UI.
 
-### Account and credit (`/account`, signed in)
-Balance in rupees with "about N answers", recent charges (top 5) with "See all calls" → `/calls`, name the AI gives shops, email, link to Use in ChatGPT or Claude, Sign out. **No top-up buttons**: Dodo payments are planned only (D140); do not add payment UI.
+### Profile and credit (`/account`, signed in)
+Who you are first: initial badge, name, "email · Member since". "Your details": name with what shops hear (first name only, D159) and an inline Edit form (`users.updateProfile`), email, member since (`users.me` `memberSince`), ChatGPT or Claude connection. "Credit": balance, about N answers, all-time Credits / Charges / Refunds (`credits.totals`). "Credits, charges and refunds": All · Charges · Refunds · Credits filtered on the server (`credits.history` `type`), 10 per page with the call log's page controls. Sign out. The old `/credit` page shows this page. **No top-up buttons**: Dodo payments are planned only (D140); do not add payment UI. Only facts we already hold; no new profile fields.
 
 ### Chat engine (D158)
 - The chat is run by OpenAI `gpt-6-luna` (existing OpenAI account; model name configurable through an environment setting, default `gpt-6-luna`). Luna understands the request and calls our existing steps as tools: the brief questions (`briefs.prepare`, D144) and shop/service search (`discovery.search` with `briefId`). It can also read a finished task's results to answer follow-ups ("which one can come today?").

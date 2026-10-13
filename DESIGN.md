@@ -257,7 +257,7 @@ Spec: [signed-in redesign](docs/superpowers/specs/2026-10-12-signed-in-chat-rede
 
 **Sidebar / menu**
 - Laptop (≥900px): fixed 270px left sidebar. Phone: top bar (menu button, logo, balance pill → account) and a drawer.
-- Order: New request · Chats · Live now / Today / Needs you / Earlier · Call log · Use in ChatGPT or Claude · Account and credit (with balance) · Sign out (grey, last).
+- Order: New request · Chats · Live now / Today / Needs you / Earlier · Call log · Use in ChatGPT or Claude · Profile and credit (with balance) · Sign out (grey, last).
 - A new account with no chats or tasks shows "Your requests" and "No requests yet. Your chats and calls will show here."
 - Each task row: label, then one status line in its DESIGN colour; live tasks carry the blue pulse.
 
@@ -280,10 +280,12 @@ Spec: [signed-in redesign](docs/superpowers/specs/2026-10-12-signed-in-chat-rede
 - Steps stay generic ("add a custom connector"); menu names change often, so name only what our SKILL.md names.
 - Then "Or paste this into any AI assistant: Set me up with Boomerang using …/SKILL.md", and a closed fold "Advanced: access keys" with the access-key controls.
 
-**Account and credit (`/account`, signed in)**
-- Balance large in rupees, "About N answers · ₹10 per shop that answers" (price from the server), and "Paid top-ups aren't available yet." No payment or top-up buttons until payments are agreed (D140).
-- "Charges and refunds": latest five movements, amounts in text colour (−₹10, +₹100), never green; links "See all calls" and "Credit & charges".
-- Then: the name the AI gives shops (editable), email, "Use in ChatGPT or Claude" with connection status, and Sign out.
+**Profile and credit (`/account`, signed in; the old `/credit` shows the same page)** (mockups `Wallet.dc.html` phone, `ProfileLaptop.dc.html` laptop)
+- Who you are first: a round grey initial badge (first letter of the name, else the email; no photos), the name (or "Add your name"), and "email · Member since Oct 2026". Only facts we already hold; no new profile fields.
+- "Your details": Name with "Shops hear only your first name: “calling for Asha”." (the first word, exactly what calls say; no name → "calling for our customer") and "Edit". Edit opens an inline form: Name, "Shops hear only your first name. We never share your email, phone or address.", black "Save", "Cancel" (D159). Then Email ("Used to sign in. Can't be changed here."), Member since ("1 Oct 2026", India time), and "ChatGPT or Claude" → `/connect-assistant` with the connection status.
+- "Credit": balance large, "About N answers · ₹10 per shop that answers", the on-hold line when money is held, then three boxes Credits · Charges · Refunds (all-time totals) and "All time. Paid top-ups aren't available yet." No payment or top-up buttons until payments are agreed (D140).
+- "Credits, charges and refunds": pills All · Charges · Refunds · Credits (`aria-pressed`, selected = light grey fill and dark outline). The server filters; "Not charged" rows appear only under All; holds never appear. Rows: title (shop, or "Welcome credit"), "Charge · Plumber in Gachibowli · today 4:04 pm", amount in text colour (−₹10, +₹10, ₹0), never green. Pages of 10 with the call log's controls and wording; changing the filter returns to page 1. Empty: "No charges yet.", "No refunds yet.", "No credits yet.".
+- Phone: one column (you → Your details → Credit → history → Sign out). Wide page (about 700px of content, so laptops ≥1100px with the sidebar): left column 380px (you, Your details, Sign out), right column Credit and history. Sign out opens the usual confirmation.
 
 **Signed out, sign in and sign out** (mockups `SignIn.dc.html`, `JourneyPhone.dc.html`)
 - Every signed-out route (`/app`, `/account`, `/calls`, `/connect-assistant`, `/tasks`, `/status`, `/credit`, and `/connect` before the assistant consent) shows one page: a plain header (logo · "See a demo" → `/demo`, no other links) and a centred 420px column. The email link brings the customer back to the page they were on.

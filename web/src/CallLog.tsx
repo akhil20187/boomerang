@@ -46,7 +46,7 @@ export function CallLogView({rows,summary,more,onLoadMore,loadRecording,demo}:Ca
  const detail=(r:LogRow)=>{const d=callLogDetail(r);return <CallDetail {...d} loadRecording={loadRecording}/>};
  return <section className="page call-log">
   <header className="page-heading"><h1>Call log</h1><p>Every call we made for you, every try, and what it cost.</p></header>
-  <div className="stat-grid" aria-label="This month">{summary?totals(summary).map(t=><div className="stat" key={t.label}><span className="stat-label">{t.label}</span><strong>{t.value}</strong>{t.label==='Credit left'?<a href={`${prefix}/account`}>Account and credit</a>:t.note&&<span className="stat-note">{t.note}</span>}</div>):<p className="stat-loading" role="status">Loading this month’s totals…</p>}</div>
+  <div className="stat-grid" aria-label="This month">{summary?totals(summary).map(t=><div className="stat" key={t.label}><span className="stat-label">{t.label}</span><strong>{t.value}</strong>{t.label==='Credit left'?<a href={`${prefix}/account`}>Profile and credit</a>:t.note&&<span className="stat-note">{t.note}</span>}</div>):<p className="stat-loading" role="status">Loading this month’s totals…</p>}</div>
   {summary?.truncated&&<p className="small-note">Totals count your latest 500 requests this month.</p>}
   <div className="log-tools"><div role="group" aria-label="Show" className="filter-chips">{LOG_FILTERS.map(f=><button key={f.id} type="button" className="chip" aria-pressed={filter===f.id} onClick={()=>{setFilter(f.id);setOpen(undefined);setPage(1)}}>{f.label}</button>)}</div><button type="button" className="secondary" onClick={download} disabled={!shown?.length}>Download CSV</button></div>
   <div ref={top} tabIndex={-1} className="log-top" aria-label={`Calls, ${info.label}`}/>

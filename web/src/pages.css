@@ -1,4 +1,4 @@
-/* Signed-in pages (D153): call log, Use in ChatGPT or Claude, account. DESIGN.md: 8px corners, #DAD7D0 borders, black only on the main button, charge lines never green. */
+/* Signed-in pages (D153): call log, Use in ChatGPT or Claude, profile and credit. DESIGN.md: 8px corners, #DAD7D0 borders, black only on the main button, charge lines never green. */
 .app-main.wide-main{max-width:1080px}
 .page{display:flex;flex-direction:column;gap:20px;min-width:0}
 .page-heading{display:flex;flex-direction:column;gap:6px}.page-heading h1{font-size:28px;letter-spacing:-.6px}.page-heading p{font-size:15px;color:#55544f}
@@ -50,7 +50,7 @@
 .pager-label{font-size:13px;color:#55544f;text-align:center;flex:1}
 @media(max-width:400px){.pager button{min-width:0;padding-left:12px;padding-right:12px}}
 /* Connect page */
-.connect-page,.account-page{max-width:640px;margin:0 auto;width:100%}
+.connect-page{max-width:640px;margin:0 auto;width:100%}
 .segmented{display:inline-flex;align-self:flex-start;border:1px solid #dad7d0;border-radius:8px;padding:3px;gap:3px}
 .segmented [role=tab]{min-height:40px;min-width:96px;border:0;border-radius:6px;font-size:14px;background:transparent}
 .segmented [role=tab][aria-selected=true]{background:#f2f1ee;font-weight:600;box-shadow:inset 0 0 0 1px #1a1a19}
@@ -64,14 +64,39 @@
 .connection-lines{list-style:none;margin:10px 0 0;padding:0;font-size:14px}
 .paste-card{padding:18px 20px}
 .advanced{padding:0 20px}.advanced summary{min-height:52px;display:flex;align-items:center;cursor:pointer;font-weight:500;font-size:15px}.advanced[open]{padding-bottom:14px}.advanced .account-details{margin:12px 0 0}
-/* Account page */
-.balance-card{padding:20px;display:flex;flex-direction:column;gap:4px}.balance{font-size:36px;font-weight:700;letter-spacing:-.03em;line-height:1.2}.balance-card p{font-size:14px}.balance-card .small-note{font-size:12px;margin-top:6px}
-.money-card{padding:18px 20px 8px}.money-card h2{font-size:15px;margin-bottom:6px}
-.money-rows{list-style:none;margin:0;padding:0}.money-rows li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #eeece7}
+/* Profile and credit (Wallet.dc.html phone, ProfileLaptop.dc.html laptop). Phone: one column. Wide page: left 380px
+   (you, your details, sign out) and right (credit, history). A container query, so the sidebar's width is accounted for. */
+.profile-page{max-width:1000px;margin:0 auto;width:100%;container-type:inline-size}
+.profile-grid{display:flex;flex-direction:column;gap:16px;min-width:0}
+.profile-money{display:flex;flex-direction:column;gap:16px;min-width:0}
+@container (min-width:700px){.profile-grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);grid-template-rows:auto auto auto 1fr;gap:16px 20px;align-items:start}.profile-head{grid-area:1/1}.details-card{grid-area:2/1}.profile-signout{grid-area:3/1}.profile-money{grid-column:2;grid-row:1/span 4}}
+.profile-head{display:flex;align-items:center;gap:14px;min-width:0}
+.profile-badge{width:56px;height:56px;border-radius:28px;background:#f2f1ee;border:1px solid #dad7d0;display:grid;place-items:center;font-size:22px;font-weight:600;flex-shrink:0}
+.profile-who{display:flex;flex-direction:column;min-width:0}
+.profile-name{font-size:20px;font-weight:600;letter-spacing:-.02em;overflow-wrap:anywhere}
+.profile-meta{font-size:13px;color:#55544f;overflow-wrap:anywhere}
+.profile-card{padding:18px 20px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.profile-card h2{font-size:16px;margin-bottom:6px}
+.detail-row{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px;padding:8px 0;border-top:1px solid #eeece7;font-size:14px}
+.detail-text{display:flex;flex-direction:column;min-width:0;overflow-wrap:anywhere}
+.detail-label{font-size:13px;color:#55544f}.detail-text .detail-label{display:block}
+.detail-value{text-align:right;overflow-wrap:anywhere;min-width:0}
+.detail-row>.secondary{flex-shrink:0;min-width:64px}
+.detail-link{text-decoration:none}.detail-link .detail-value{display:inline-flex;align-items:center;gap:2px}.detail-link svg{flex-shrink:0}
+.name-form{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px solid #eeece7}
+.name-form input:not([type=checkbox]){font-size:15px;min-height:44px;border-radius:8px}
+.name-actions{display:flex;gap:8px}.name-actions button{min-height:44px;min-width:88px;padding:0 16px;font-size:14px}
+.name-saved{font-size:12px;color:#55544f}.name-saved:not(:empty){padding-bottom:8px}
+.credit-card .balance{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1.2}.credit-card p{font-size:13px}
+.money-totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.money-totals .stat{padding:12px 14px}.money-totals .stat strong{font-size:18px}
+.credit-card .small-note{font-size:12px;margin-top:10px;color:#55544f}
+.history-card .filter-chips{padding-bottom:10px}
+.history-empty{padding:14px 0;font-size:14px;border-top:1px solid #eeece7}
+.money-rows{list-style:none;margin:0;padding:0}.money-rows li{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid #eeece7}
+.money-rows li>span:first-child{min-width:0;overflow-wrap:anywhere}
 .money-title{font-size:14px;font-weight:500}.money-amount{font-size:14px;white-space:nowrap;color:#1a1a19}
-.money-links{display:flex;flex-wrap:wrap;gap:4px 20px}.money-links a{display:inline-flex;align-items:center;gap:2px;min-height:44px;font-size:14px;font-weight:500;text-decoration:none}
-.account-card{padding:18px 20px 4px}.account-card .customer-name{margin-bottom:8px;padding-bottom:8px;border-bottom:0}
-.account-row{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px;padding:8px 0;border-top:1px solid #eeece7;font-size:14px}.account-row>span:last-child{overflow-wrap:anywhere;text-align:right}
-.account-link{text-decoration:none}.account-link>span{display:flex;flex-direction:column}.account-link svg{color:#55544f;flex-shrink:0}
+.history-pager{border-top:1px solid #eeece7;padding-top:12px}.history-pager .pager-label{text-align:left}
+.pager-buttons{display:flex;gap:8px}
 .sign-out{align-self:flex-start}
-@media(max-width:600px){.page-heading h1{font-size:24px}.page-heading p{font-size:14px}.stat{padding:12px}.stat strong{font-size:20px}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.connect-card>section,.paste-card,.money-card,.account-card,.balance-card{padding-left:16px;padding-right:16px}.advanced{padding:0 16px}}
+@media(max-width:600px){.page-heading h1{font-size:24px}.page-heading p{font-size:14px}.stat{padding:12px}.stat strong{font-size:20px}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.connect-card>section,.paste-card,.profile-card{padding-left:16px;padding-right:16px}.advanced{padding:0 16px}}
