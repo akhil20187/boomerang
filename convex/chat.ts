@@ -373,7 +373,7 @@ export function pickerRepeat(
 /** The one open follow-up after "Something else": no choices, typed answer. */
 export function escapeReply(question?: string) {
   const q = (question ?? "").trim();
-  if (/^what\b.*\b(ask|find out|know|discuss)\b/i.test(q)) return "Sure. Type what you’d like us to ask, in your own words.";
+  if (/^what\b.*\b(ask|find out|know|discuss|enquire|inquire|check)\b/i.test(q)) return "Sure. Type what you’d like us to ask, in your own words.";
   return "Sure. Type your answer in your own words.";
 }
 
@@ -587,7 +587,8 @@ async function runTool(ctx: ActionCtx, s: State, name: string, rawArgs: string):
       const businessName = str(args.business_name, 120);
       const radiusKm = args.wider && !businessName ? 20 : 10;
       const samePlaces = [brief.pincode, briefArea(brief.brief), s.chat.pincode, s.chat.area];
-      const repeat = pickerRepeat(s.latestPicker, s.chat.briefId, where, radiusKm, { businessName, samePlaces });
+      // An explicit "search the web" for a named business is a new lookup, even after a Google card for it.
+      const repeat = businessName && args.search_web === true ? "new" : pickerRepeat(s.latestPicker, s.chat.briefId, where, radiusKm, { businessName, samePlaces });
       if (repeat === "duplicate")
         return {
           result: {

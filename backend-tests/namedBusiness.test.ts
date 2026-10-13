@@ -8,7 +8,7 @@ import schema from "../convex/schema";
 import { api } from "../convex/_generated/api";
 import { nameMatches, countNoun, singularNoun, briefSearchPhrase } from "../convex/domain";
 import { isEscapeChoice, openAfterEscape } from "../convex/intake";
-import { normalizeIndianPhone, pageHasNumber, verifyCandidates, parseWebBusinessResponse, fetchableUrl } from "../convex/webBusiness";
+import { normalizeIndianPhone, pageHasNumber, verifyCandidates, parseWebBusinessResponse, fetchableUrl, loadPageText } from "../convex/webBusiness";
 import { pickerRepeat, pickerText, notFoundText, carryRequest, escapeReply, CHAT_SYSTEM_PROMPT } from "../convex/chat";
 import { lookUpFact } from "../convex/facts";
 const modules = import.meta.glob(["../convex/**/*.{ts,js}", "!../convex/**/*.d.ts"]);
@@ -76,6 +76,7 @@ describe("Something else", () => {
     expect(openAfterEscape(turns, { status: "question", question: "What exactly?", choices: ["Project", "Other"] }).choices).toEqual([]);
     expect(openAfterEscape([{ ...turns[0], answer: "Fees" }], { status: "question", question: "Q", choices: ["a", "b"] }).choices).toEqual(["a", "b"]);
     expect(escapeReply("What do you want to ask Ainapur Consultants and Engineers?")).toBe("Sure. Type what you’d like us to ask, in your own words.");
+    expect(escapeReply("What do you want to enquire about with Ainapur Consultants and Engineers?")).toBe("Sure. Type what you’d like us to ask, in your own words.");
     expect(escapeReply("Which area?")).toBe("Sure. Type your answer in your own words.");
   });
 });
@@ -95,13 +96,49 @@ describe("phone numbers and web results", () => {
     expect(pageHasNumber("Mobile +91 98765-43210", "+919876543210")).toBe(true);
     expect(pageHasNumber("Mobile +91 98765-43211", "+919876543210")).toBe(false);
   });
+  it("a number inside a longer run of digits does not count", () => {
+    expect(pageHasNumber("Ref 919876543210123", "+919876543210")).toBe(false);
+    expect(pageHasNumber("ID 19876543210", "+919876543210")).toBe(false);
+    expect(pageHasNumber("Call 919876543210.", "+919876543210")).toBe(true);
+    expect(pageHasNumber("Call 09876543210", "+919876543210")).toBe(true);
+  });
+  it("refuses IPv6 literals, IPv4 in any notation, non-default ports and trailing-dot hosts", () => {
+    for (const bad of ["http://[::1]/", "https://[2001:db8::1]/x", "https://example.com:8080/", "https://example.com:443x/", "https://example.com./", "http://0x7f.0.0.1/", "http://2130706433/", "http://169.254.169.254/latest", "http://metadata.google.internal/"]) expect(fetchableUrl(bad)).toBeNull();
+    expect(fetchableUrl("https://example.com:443/ok")?.href).toBe("https://example.com/ok"); // the default port is fine
+  });
+  it("follows redirects by hand: a hop to a private address is refused before it is requested; at most 3 hops", async () => {
+    const calls: string[] = [];
+    const routes: Record<string, Response | (() => Response)> = {
+      "https://public.example.com/a": () => new Response(null, { status: 302, headers: { location: "http://169.254.169.254/latest/meta-data" } }),
+      "https://public.example.com/b": () => new Response(null, { status: 301, headers: { location: "/c" } }),
+      "https://public.example.com/c": () => new Response("Call 040 2345 6789", { status: 200, headers: { "content-type": "text/html" } }),
+      "https://loop.example.com/1": () => new Response(null, { status: 302, headers: { location: "https://loop.example.com/2" } }),
+      "https://loop.example.com/2": () => new Response(null, { status: 302, headers: { location: "https://loop.example.com/3" } }),
+      "https://loop.example.com/3": () => new Response(null, { status: 302, headers: { location: "https://loop.example.com/4" } }),
+      "https://loop.example.com/4": () => new Response(null, { status: 302, headers: { location: "https://loop.example.com/5" } }),
+    };
+    vi.stubGlobal("fetch", vi.fn(async (url: string, init?: any) => {
+      calls.push(url);
+      expect(init?.redirect).toBe("manual");
+      const r = routes[url];
+      if (!r) throw new Error(`unexpected fetch ${url}`);
+      return typeof r === "function" ? r() : r;
+    }));
+    expect(await loadPageText(new URL("https://public.example.com/a"))).toBeNull();
+    expect(calls).toEqual(["https://public.example.com/a"]); // the metadata address was never requested
+    expect(await loadPageText(new URL("https://public.example.com/b"))).toContain("040 2345 6789");
+    calls.length = 0;
+    expect(await loadPageText(new URL("https://loop.example.com/1"))).toBeNull();
+    expect(calls).toHaveLength(4); // the first request plus 3 redirect hops, then it stops
+    expect(await loadPageText(new URL("http://127.0.0.1/"))).toBeNull();
+  });
   it("only public http(s) pages are fetched", () => {
     expect(fetchableUrl("https://ainapur.example.in/contact")?.hostname).toBe("ainapur.example.in");
     for (const bad of ["http://localhost/x", "http://127.0.0.1/", "file:///etc/passwd", "https://intranet/", "https://u:p@site.com/", "https://x.internal/"]) expect(fetchableUrl(bad)).toBeNull();
   });
   it("keeps a result only when the name matches and the number is printed on its source page", async () => {
     const pages: Record<string, string> = {
-      "https://ainapur.example.in/contact": "<p>Ainapur Consultants &amp; Engineers</p><a href=\"tel:+914023456789\">Call</a>",
+      "https://ainapur.example.in/contact?utm_source=openai": "<p>Ainapur Consultants &amp; Engineers</p><a href=\"tel:+914023456789\">Call</a>",
       "https://dir.example.com/a": "Ainapur Consultants. Phone: 98765 43210",
     };
     const out = await verifyCandidates(
@@ -112,18 +149,22 @@ describe("phone numbers and web results", () => {
         { name: "SG Analytics", phones: ["040 1111 2222"], sourceUrl: "https://sg.example.com" }, // wrong business
         { name: "Ainapur Consultants", phones: ["12345"], sourceUrl: "https://dir.example.com/a" }, // not a valid number
         { name: "Ainapur Consultants", phones: ["98765 43210"], sourceUrl: "https://blocked.example.com" }, // page unreadable
+        { name: "Ainapur Consultants", phones: ["040 2345 6789"], sourceUrl: "https://attacker.example.net/x" }, // model-written, not cited
       ],
+      ["https://ainapur.example.in/contact?utm_source=openai", "https://dir.example.com/a", "https://sg.example.com", "https://blocked.example.com/"],
       async (url) => pages[url.href] ?? null,
     );
     expect(out.contacts).toEqual([
-      { name: "Ainapur Consultants & Engineers", phone: "+914023456789", source: "assistant", sourceUrl: "https://ainapur.example.in/contact", context: "Number found on ainapur.example.in; it may be out of date." },
+      { name: "Ainapur Consultants & Engineers", phone: "+914023456789", source: "assistant", sourceUrl: "https://ainapur.example.in/contact?utm_source=openai", context: "Number found on ainapur.example.in; it may be out of date." },
     ]);
-    expect(out.dropped.map((d) => d.reason)).toEqual(["number not printed on the source page", "name does not match", "no valid Indian phone number", "source page could not be read to check the number"]);
+    expect(out.dropped.map((d) => d.reason)).toEqual(["number not printed on the source page", "name does not match", "no valid Indian phone number", "source page could not be read to check the number", "source not from the web search"]);
   });
   it("reads the model's JSON even inside prose, with cited URLs", () => {
     const parsed = parseWebBusinessResponse({ output: [{ type: "message", content: [{ type: "output_text", text: "Here:\n```json\n{\"results\":[{\"name\":\"A\",\"phones\":[\"9876543210\"],\"address\":\"\",\"source_url\":\"https://a.example.com\"}]}\n```", annotations: [{ type: "url_citation", url: "https://a.example.com" }] }] }] });
     expect(parsed.candidates).toEqual([{ name: "A", phones: ["9876543210"], address: undefined, sourceUrl: "https://a.example.com" }]);
     expect(parsed.cited).toEqual(["https://a.example.com"]);
+    const withSources = parseWebBusinessResponse({ output: [{ type: "web_search_call", action: { sources: [{ type: "url", url: "https://b.example.com/p" }] } }, { type: "message", content: [{ type: "output_text", text: "{\"results\":[]}" }] }] });
+    expect(withSources.cited).toEqual(["https://b.example.com/p"]);
     expect(parseWebBusinessResponse({ output_text: "nothing" }).candidates).toEqual([]);
   });
 });
