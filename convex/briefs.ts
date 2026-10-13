@@ -1,4 +1,5 @@
-import { action, query, internalQuery } from "./_generated/server";
+import { action, query, internalQuery, type ActionCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { internalMutation } from "./mutationSafety";
 import { v, ConvexError } from "convex/values";
 import { internal } from "./_generated/api";
@@ -11,6 +12,8 @@ import {
   MAX_QUESTIONS,
   parseIntakeOutput,
   forceReady,
+  scrubUnitNumbers,
+  openAfterEscape,
   type Turn,
   type IntakeOutput,
 } from "./intake";
@@ -152,10 +155,18 @@ export const prepare = action({
   returns: v.any(),
   handler: async (ctx, args): Promise<any> => {
     const userId = await ctx.runQuery(internal.users.resolve, { accessToken: args.accessToken });
+    return prepareBrief(ctx, userId, args);
+  },
+});
+
+export type PrepareArgs = { request?: string; briefId?: Id<"briefs">; answer?: string; pincode?: string; contacts?: Contact[] };
+/** Shared by the `prepare` action and the website chat engine (convex/chat.ts). The caller resolves the user. */
+export async function prepareBrief(ctx: ActionCtx, userId: Id<"users">, args: PrepareArgs): Promise<any> {
     let briefId = args.briefId;
     let request: string, pincode: string | undefined, turns: Turn[], contacts: Contact[] | undefined;
     if (!briefId) {
-      request = (args.request ?? "").trim();
+      // D159: a flat/house/door number is never stored or passed on, even if the customer types one.
+      request = scrubUnitNumbers((args.request ?? "").trim());
       if (request.length < 3 || request.length > 2000)
         throw new ConvexError("Describe what you want the call to find out.");
       pincode = args.pincode;
@@ -167,9 +178,11 @@ export const prepare = action({
     } else {
       if (args.contacts !== undefined || args.request !== undefined)
         throw new ConvexError('Start a new brief to change the request or business contacts.');
-      const answer = (args.answer ?? "").trim();
-      if (!answer || answer.length > 500)
+      const typed = (args.answer ?? "").trim();
+      if (!typed || typed.length > 500)
         throw new ConvexError("Give a short answer to the question.");
+      // D159: drop flat/house/door numbers before storing; an answer that was only a unit number becomes "Skip".
+      const answer = scrubUnitNumbers(typed) || "Skip";
       if (args.pincode !== undefined && !/^[1-9]\d{5}$/.test(args.pincode))
         throw new ConvexError("Enter a valid six-digit Indian pincode.");
       const stored = await ctx.runMutation(internal.briefs.answer, { briefId, userId, answer });
@@ -186,6 +199,7 @@ export const prepare = action({
     let out = await askModel(request, pincode, turns, finish, contacts);
     if (finish && (!out || out.status !== "ready")) out = forceReady(request, turns);
     if (!out) out = { status: "question", question: FALLBACK_QUESTION, choices: [] };
+    out = openAfterEscape(turns, out);
     if (out.status === "question") {
       turns.push({ question: out.question, choices: out.choices });
       await ctx.runMutation(internal.briefs.record, { briefId, expectedTurns, turns, status: "question" });
@@ -193,5 +207,4 @@ export const prepare = action({
     }
     await ctx.runMutation(internal.briefs.record, { briefId, expectedTurns, turns, status: "ready", summary: out.summary, brief: out.brief });
     return { status: "ready", briefId, summary: out.summary, brief: out.brief, asked: turns.length, maxQuestions: MAX_QUESTIONS };
-  },
-});
+}

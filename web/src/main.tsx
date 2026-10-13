@@ -7,6 +7,7 @@ import {ErrorBoundary} from './ErrorBoundary';
 import './style.css';
 import './account.css';
 import './tasks.css';
+import './shell.css';
 const url=import.meta.env.VITE_CONVEX_URL;
 const app=<ErrorBoundary><App connected={!!url}/></ErrorBoundary>;
 const widget=(window as Window & {__BOOMERANG_WIDGET__?:boolean}).__BOOMERANG_WIDGET__||location.pathname.includes('/widget')||new URLSearchParams(location.search).has('widget');

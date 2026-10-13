@@ -85,3 +85,7 @@ The post-call summary must separate confirmed facts, conditions, unanswered ques
 ## Not covered
 
 No change to shop selection, sign-in, credit or call-start rules. No new outbound call authorised. Service-provider discovery is not part of the live product; these examples are design input only.
+
+## Update 2026-10-12: home-visit location (D159)
+
+For home-visit services the intake asks the area or locality ("Gachibowli, near DLF") and, optionally, the apartment or building name ("Skip" allowed). The call states the area only; the building name is shared only if the business asks for more location detail. Never a house or flat number, street address or the customer's full name, and never "come to <pincode>". Products and in-store enquiries are unchanged. Implemented in `convex/intake.ts` (`location` on the brief, `locationLines`); see [the intake prompt](../../prompts/task-intake-prompt.md).

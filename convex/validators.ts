@@ -111,4 +111,12 @@ export const briefV = v.object({
     date: v.union(v.string(), v.null()),
     start_assumption: v.union(v.string(), v.null()),
   }),
+  // D159 (optional, older briefs have none): area said on the call; building name only if the business asks.
+  location: v.optional(
+    v.object({
+      home_visit: v.boolean(),
+      area: v.union(v.string(), v.null()),
+      building_if_asked: v.union(v.string(), v.null()),
+    }),
+  ),
 });

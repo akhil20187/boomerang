@@ -1,0 +1,36 @@
+/* Signed-in app shell (D153): laptop sidebar + phone top bar and drawer. Mockups: design/redesign-canvas/Desktop, Main, Tasks. */
+.app-shell{min-height:100vh}
+.app-brand{display:flex;align-items:center;gap:6px;font-size:17px;font-weight:700;letter-spacing:-.02em;line-height:1;text-decoration:none;min-height:44px}.app-brand svg{width:22px;height:22px;flex-shrink:0}
+.app-sidebar{display:flex;flex-direction:column;background:#fff;font-size:14px}
+.sidebar-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 8px 12px}
+.menu-button,.menu-close{width:44px;height:44px;padding:0;border:0;border-radius:8px;background:transparent;display:grid;place-items:center;color:#1a1a19}
+.new-request{display:flex;align-items:center;gap:8px;min-height:44px;margin:0 4px 6px;padding:0 12px;border:1px solid #dad7d0;border-radius:8px;font-size:15px;font-weight:500;text-decoration:none}.new-request:hover{border-color:#8f8c85}
+.sidebar-tasks{flex:1;overflow-y:auto;min-height:0}.sidebar-tasks ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.sidebar-label{font-size:12px;line-height:16px;font-weight:500;color:#55544f;padding:14px 12px 4px}
+.sidebar-task{display:flex;flex-direction:column;gap:3px;padding:9px 12px;border-radius:8px;text-decoration:none;min-height:44px}
+.sidebar-task:hover,.sidebar-links a:hover,.sidebar-all:hover{background:#f2f1ee}
+.sidebar-task[aria-current=page],.sidebar-links a[aria-current=page],.sidebar-all[aria-current=page],.new-request[aria-current=page]{background:#f2f1ee}
+.sidebar-task-label{font-size:14px;line-height:19px;overflow-wrap:anywhere}
+.sidebar-task-status{display:flex;align-items:center;gap:6px;font-size:12px;line-height:16px}
+.sidebar-note{font-size:12px;color:#55544f;padding:14px 12px}
+.sidebar-all{display:flex;align-items:center;min-height:44px;padding:0 12px;margin-top:4px;border-radius:8px;font-size:13px;color:#55544f;text-decoration:none}
+.sidebar-links{border-top:1px solid #dad7d0;margin-top:8px;padding-top:8px;display:flex;flex-direction:column;gap:2px}
+.sidebar-links a{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:0 12px;border-radius:8px;text-decoration:none}
+.sidebar-links a>svg{flex-shrink:0}.sidebar-links a:not(.sidebar-account){justify-content:flex-start}
+.sidebar-signout{display:flex;align-items:center;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#55544f;font-size:14px;text-align:left}.sidebar-signout:hover{background:#f2f1ee;color:#1a1a19}
+.sidebar-empty{font-size:14px;line-height:1.5;padding:6px 12px 0}
+.sidebar-link-text{display:flex;align-items:center;gap:10px}.sidebar-balance{font-size:13px;color:#55544f}
+.balance-pill{display:grid;place-items:center;min-width:44px;min-height:44px;text-decoration:none}.balance-pill>span{height:32px;padding:0 12px;border:1px solid #dad7d0;border-radius:999px;display:flex;align-items:center;font-size:13px;font-weight:500}
+@media(min-width:900px){
+ .app-shell{display:grid;grid-template-columns:270px minmax(0,1fr)}
+ .app-topbar,.menu-close,.menu-scrim{display:none}
+ .app-sidebar{position:sticky;top:0;height:100vh;padding:14px 8px;border-right:1px solid #dad7d0}
+ .app-main{width:100%}
+}
+@media(max-width:899px){
+ .app-topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 8px;background:#fff;border-bottom:1px solid #dad7d0}
+ .app-sidebar{position:fixed;z-index:30;top:0;left:0;bottom:0;width:min(318px,86vw);padding:8px 8px 12px;border-right:1px solid #dad7d0;transform:translateX(-100%);visibility:hidden;transition:transform .2s ease,visibility .2s}
+ .menu-open .app-sidebar{transform:none;visibility:visible;transition:transform .2s ease}
+ .menu-scrim{position:fixed;z-index:20;inset:0;background:rgba(26,26,25,.35)}
+}
+@media(max-width:600px){.app-main.workspace{padding-top:20px}}

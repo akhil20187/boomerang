@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Call log on a phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#1A1A19;background:#FFFFFF}
+a{color:#1A1A19}a:hover{color:#000}
+.f{font:inherit;font-size:13px;height:34px;padding:0 12px;border-radius:999px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.stat{display:flex;flex-direction:column;gap:2px}
+.rowbtn{font:inherit;background:none;border:0;padding:0;text-align:left;color:inherit;cursor:pointer;width:100%}
+.icon{width:34px;height:34px;border:1px solid #DAD7D0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#1A1A19;box-sizing:border-box;flex-shrink:0}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #FFFFFF; overflow: hidden">
+
+<header style="display: flex; align-items: center; gap: 4px; padding: 10px 12px; border-bottom: 1px solid #DAD7D0; flex-shrink: 0">
+<a href="Tasks.dc.html" aria-label="Back to menu" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1A1A19"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+<div style="font-size: 16px; font-weight: 600">Call log</div>
+</header>
+
+<div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column">
+
+<div style="padding: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; border-bottom: 1px solid #DAD7D0">
+<div class="stat"><span style="font-size: 12px; color: #55544F">Calls</span><span style="font-size: 20px; font-weight: 700">14</span><span style="font-size: 11px; color: #55544F">18 tries</span></div>
+<div class="stat"><span style="font-size: 12px; color: #55544F">Answered</span><span style="font-size: 20px; font-weight: 700">8</span><span style="font-size: 11px; color: #55544F">6 fully</span></div>
+<div class="stat"><span style="font-size: 12px; color: #55544F">Charged</span><span style="font-size: 20px; font-weight: 700">₹80</span><span style="font-size: 11px; color: #55544F">6 free</span></div>
+</div>
+
+<div role="group" aria-label="Filter calls" style="display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto; flex-shrink: 0">
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+<button class="f" aria-pressed="{{f.on}}" onClick="{{f.pick}}" style="background: {{f.bg}}; color: {{f.fg}}; border: 1px solid {{f.bd}}">{{f.label}}</button>
+</sc-for>
+</div>
+
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+<div style="font-size: 12px; color: #55544F; font-weight: 500; padding: 14px 16px 6px">{{g.day}}</div>
+<sc-for list="{{g.rows}}" as="r" hint-placeholder-count="3">
+<div style="padding: 12px 16px; border-top: 1px solid #DAD7D0; display: flex; flex-direction: column; gap: 8px">
+<button class="rowbtn" onClick="{{r.toggle}}" aria-expanded="{{r.open}}" style="display: flex; flex-direction: column; gap: 4px">
+<span style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline; width: 100%">
+<span style="font-size: 15px; font-weight: 500">{{r.biz}}</span>
+<span style="font-size: 13px; white-space: nowrap; display: flex; align-items: center; gap: 4px">{{r.charge}}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#55544F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform: {{r.chev}}"><path d="m6 9 6 6 6-6"></path></svg></span>
+</span>
+<span style="font-size: 12px; color: #55544F">{{r.task}}</span>
+<span style="display: flex; justify-content: space-between; gap: 12px; width: 100%">
+<span style="font-size: 13px; color: {{r.color}}">{{r.result}}</span>
+<span style="font-size: 12px; color: #55544F; white-space: nowrap">{{r.chargeNote}}</span>
+</span>
+<span style="font-size: 12px; color: #55544F">{{r.time}} · {{r.attempt}} · AI agent · {{r.len}}</span>
+</button>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 10px">
+<a href="#" style="font-size: 12px">{{r.phone}}</a>
+<span style="display: flex; gap: 8px">
+<a class="icon" href="#" aria-label="Call {{r.biz}} yourself"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></a>
+<a class="icon" href="#" aria-label="Directions to {{r.biz}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg></a>
+</span>
+</div>
+
+<sc-if value="{{r.open}}" hint-placeholder-val="{{ false }}">
+<dc-import name="CallDetail" call="{{r.detail}}" hint-size="100%,300px"></dc-import>
+</sc-if>
+</div>
+</sc-for>
+</sc-for>
+
+<p style="margin: 0; padding: 16px; border-top: 1px solid #DAD7D0; font-size: 12px; color: #55544F; line-height: 1.5">You pay ₹10 only when a business answers what you asked, even partly. Missed calls, retries and "prefers a personal call" are never charged.</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { filter: 'all', open: 0 }; }
+  renderVals() {
+    const G = '#17573A', A = '#7A4A00', N = '#55544F';
+    const ok = (q, a) => ({ mark: '✓', color: G, q, a }), part = (q, a) => ({ mark: '~', color: A, q, a }), open = (q) => ({ mark: '–', color: A, q, a: 'Unconfirmed' }), no = (q, a) => ({ mark: '✓', color: N, q, a });
+    const all = [
+      { day: 'Today', time: '4:04 pm', biz: 'Sri Sai Plumbing Works', task: 'Plumber near 500032', phone: '+91 00000 00001', attempt: 'Try 1', result: 'Answered your questions', color: G, len: '1:42', charge: '₹10', chargeNote: 'Charged', charged: true, hasRec: true,
+        answers: [ok('Can you come today?', '"Yes, at 4 pm."'), ok('Visit charge?', '"₹200 for the visit."'), part('Cost to fix the tap?', '"Usually ₹150 to ₹300, parts extra."')],
+        timeline: [['4:02 pm', 'AI agent called'], ['4:02 pm', 'Picked up'], ['4:04 pm', 'Call ended · 1 min 42 s']], address: 'Plot 12, Gachibowli Main Road, Hyderabad 500032' },
+      { day: 'Today', time: '4:03 pm', biz: 'Quick Fix Plumbers', task: 'Plumber near 500032', phone: '+91 00000 00002', attempt: 'Try 2', result: 'Answered 2 of 3 questions', color: A, len: '1:05', charge: '₹10', chargeNote: 'Charged', charged: true, hasRec: true,
+        answers: [ok('Can you come today?', '"Tomorrow morning, not today."'), ok('Visit charge?', '"₹150 visit."'), open('Cost to fix the tap?')],
+        timeline: [['3:58 pm', 'Try 1 · no answer'], ['4:03 pm', 'Try 2 · AI agent called'], ['4:04 pm', 'Call ended · 1 min 05 s']], address: 'Kothaguda X Roads, Kondapur, Hyderabad 500084' },
+      { day: 'Today', time: '3:58 pm', biz: 'Quick Fix Plumbers', task: 'Plumber near 500032', phone: '+91 00000 00002', attempt: 'Try 1', result: 'No answer · retried after 5 min', color: A, len: 'rang 0:40', charge: '₹0', chargeNote: 'Not charged', charged: false, hasRec: false,
+        timeline: [['3:58 pm', 'AI agent called'], ['3:59 pm', 'Rang 40 s, no answer'], ['4:03 pm', 'Retried · see try 2']], address: 'Kothaguda X Roads, Kondapur, Hyderabad 500084' },
+      { day: 'Today', time: '4:03 pm', biz: 'AquaCare Plumbing', task: 'Plumber near 500032', phone: '+91 00000 00003', attempt: 'Try 1', result: 'Prefers a personal call', color: A, len: '0:22', charge: '₹0', chargeNote: 'Not charged', charged: false, hasRec: true, needs: true,
+        note: 'They asked to speak to a person. Best to call them directly. No charge for this one.',
+        timeline: [['4:02 pm', 'AI agent called'], ['4:03 pm', 'Asked for a person · call ended']], address: 'Ayyappa Society, Madhapur, Hyderabad 500081' },
+      { day: '9 October', time: '11:20 am', biz: 'Balanagar Notary Office', task: 'Notary in Balanagar', phone: '+91 00000 00006', attempt: 'Try 1', result: 'Prefers a personal call', color: A, len: '0:31', charge: '₹0', chargeNote: 'Not charged', charged: false, hasRec: true, needs: true,
+        note: 'They asked to speak to a person. Best to call them directly. No charge for this one.',
+        timeline: [['11:19 am', 'AI agent called'], ['11:20 am', 'Asked for a person · call ended']], address: 'Balanagar Main Road, Hyderabad 500042' },
+      { day: '8 October', time: '6:12 pm', biz: 'Aptronix', task: 'iPhone 17 256GB near 500037', phone: '+91 00000 00007', attempt: 'Try 1', result: 'In stock · ₹75,900 after card offer', color: G, len: '2:10', charge: '₹10', chargeNote: 'Charged', charged: true, hasRec: true,
+        answers: [ok('Final price?', '₹75,900 with HDFC credit card'), ok('In stock?', '"Yes, black and blue in stock."'), part('Offers?', '"₹4,000 instant discount on HDFC credit card."')],
+        timeline: [['6:10 pm', 'AI agent called'], ['6:10 pm', 'Picked up'], ['6:12 pm', 'Call ended · 2 min 10 s']], address: 'Road No. 36, Jubilee Hills, Hyderabad 500033' },
+      { day: '8 October', time: '6:10 pm', biz: 'Croma, Banjara Hills', task: 'iPhone 17 256GB near 500037', phone: '+91 00000 00008', attempt: 'Try 1', result: 'No stock · expected Friday', color: N, len: '1:15', charge: '₹10', chargeNote: 'Charged (clear answer)', charged: true, hasRec: true,
+        answers: [no('In stock?', '"Not right now. Expected Friday."'), open('Final price?')],
+        timeline: [['6:09 pm', 'AI agent called'], ['6:10 pm', 'Call ended · 1 min 15 s']], address: 'Road No. 1, Banjara Hills, Hyderabad 500034' },
+      { day: '8 October', time: '6:09 pm', biz: 'Vijay Sales', task: 'iPhone 17 256GB near 500037', phone: '+91 00000 00009', attempt: 'Try 1', result: 'Call didn’t connect', color: N, len: 'no ring', charge: '₹0', chargeNote: 'Refunded ₹10', charged: false, hasRec: false,
+        note: 'The call didn’t go through on our side. The ₹10 we held was returned to your credit.',
+        timeline: [['6:09 pm', 'Call couldn’t start'], ['6:09 pm', '₹10 hold returned']], address: 'Ameerpet Main Road, Hyderabad 500016' }
+    ];
+    const words = { 'AI agent called': 'AI called on your behalf', 'Picked up': 'Shop answered · notes saved', 'Try 2 · AI agent called': 'AI called on your behalf', 'Try 1 · no answer': 'No answer · retry scheduled', 'Rang 40 s, no answer': 'No answer · retry scheduled', 'Asked for a person · call ended': 'Shop asked to speak to a person', 'Call couldn’t start': 'Call couldn’t start · ₹10 hold returned' };
+    const kind = t => /no answer|couldn/i.test(t) ? 'fail' : /person/i.test(t) ? 'warn' : /retried|returned/i.test(t) ? 'wait' : 'ok';
+    const product = { 'Aptronix': [['Price', '₹75,900'], ['Offers', '₹4,000 instant discount on HDFC credit card'], ['Note', 'Black and blue in stock.']],
+      'Croma, Banjara Hills': [['Price', 'Unconfirmed'], ['Offers', 'Unconfirmed'], ['Note', 'Not in stock right now. Expected Friday.']] };
+    const toDetail = (r, calledAt) => {
+      const tl = r.timeline.filter(([, what]) => what !== '₹10 hold returned');
+      const steps = [['Call requested', tl[0][0], 'ok']].concat(tl.map(([at, what]) => { const t = words[what] || what; return [t, at, kind(t)]; }));
+      const items = product[r.biz] || (r.answers || []).map(q => [q.mark + ' ' + q.q, q.a]);
+      return { steps, items, cols: product[r.biz] ? 'plain' : 'items', rec: r.hasRec, calledAt, address: r.address,
+        personal: r.result === 'Prefers a personal call', pending: r.note || 'Their answers remain unconfirmed.' };
+    };
+    const f = this.state.filter;
+    const rows = all.map((r, i) => ({ ...r, i })).filter(r => f === 'all' || (f === 'charged' && r.charged) || (f === 'free' && !r.charged) || (f === 'needs' && r.needs))
+      .map(r => {
+        const isOpen = this.state.open === r.i;
+        return { ...r, detail: toDetail(r, r.time), noRec: !r.hasRec, open: isOpen, chev: isOpen ? 'rotate(180deg)' : 'none',
+          answers: r.answers || [], hasAnswers: !!(r.answers && r.answers.length), hasNote: !!r.note,
+          timeline: r.timeline.map(([at, what]) => ({ at, what })),
+          toggle: () => this.setState({ open: isOpen ? -1 : r.i }) };
+      });
+    const groups = [];
+    rows.forEach(r => { let g = groups.find(x => x.day === r.day); if (!g) { g = { day: r.day, rows: [] }; groups.push(g); } g.rows.push(r); });
+    const filters = [['all', 'All calls'], ['charged', 'Charged'], ['free', 'Not charged'], ['needs', 'Needs you']].map(([id, label]) => {
+      const on = f === id;
+      return { label, on, bg: on ? '#1A1A19' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1A1A19', bd: on ? '#1A1A19' : '#DAD7D0', pick: () => this.setState({ filter: id }) };
+    });
+    const bars = [6,10,16,9,20,14,8,18,22,12,7,15,19,11,6,13,21,17,9,14,8,16,12,6,10,18,13,7,11,9].map(h => ({ h: h + 'px' }));
+    return { groups, filters, bars };
+  }
+}
+</script>
+</body>
+</html>

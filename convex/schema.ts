@@ -102,6 +102,8 @@ export default defineSchema({
     productInput: v.string(),
     product: productV,
     pincode: v.optional(v.string()),
+    /** Area text the customer gave instead of a pincode ("Ameerpet, Hyderabad"). */
+    area: v.optional(v.string()),
     cards: v.array(v.string()),
     comments: v.string(),
     radiusKm: v.optional(v.number()),
@@ -259,6 +261,54 @@ export default defineSchema({
     .index("by_shop", ["shopJobId"])
     .index("by_user", ["userId"])
     .index("by_task", ["taskId"]),
+  // Website chat (D158). New tables only; they start empty.
+  chats: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    lastTaskId: v.optional(v.id("tasks")),
+    /** Latest brief this chat is working on, and the pincode the customer gave. */
+    briefId: v.optional(v.id("briefs")),
+    pincode: v.optional(v.string()),
+    /** Area or locality the customer gave ("Ameerpet, Hyderabad"), used to search when there is no pincode. */
+    area: v.optional(v.string()),
+    /** Plural word for who we call: "shops", "plumbers", "businesses". */
+    noun: v.optional(v.string()),
+  }).index("by_user_updated", ["userId", "updatedAt"]),
+  chatMessages: defineTable({
+    chatId: v.id("chats"),
+    userId: v.id("users"),
+    role: v.union(v.literal("user"), v.literal("assistant")),
+    kind: v.union(
+      v.literal("text"),
+      v.literal("question"),
+      v.literal("brief"),
+      v.literal("picker"),
+      v.literal("calls"),
+      v.literal("test_call"),
+    ),
+    text: v.string(),
+    payload: v.optional(
+      v.object({
+        briefId: v.optional(v.id("briefs")),
+        question: v.optional(v.string()),
+        choices: v.optional(v.array(v.string())),
+        index: v.optional(v.number()),
+        total: v.optional(v.number()),
+        questions: v.optional(v.array(v.string())),
+        noun: v.optional(v.string()),
+        draftId: v.optional(v.id("drafts")),
+        taskId: v.optional(v.id("tasks")),
+        /** D163: the picker lists matches for this business the customer named. */
+        businessName: v.optional(v.string()),
+      }),
+    ),
+  })
+    .index("by_chat", ["chatId"])
+    .index("by_user", ["userId"]),
+  /** One row per chat turn that may call the model. Never deleted on failure, so the hourly limit cannot be reset. */
+  chatTurns: defineTable({ userId: v.id("users") }).index("by_user", ["userId"]),
   notifications: defineTable({
     attempts: v.optional(v.number()),
     leaseUntil: v.optional(v.number()),

@@ -1,4 +1,4 @@
-import {Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, ExternalLink, Navigation, Pause, Phone, Play, Plus, ShoppingBag} from 'lucide-react';
+import {ArrowUp, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, ExternalLink, Link2, List, Menu, Navigation, Pause, Phone, Play, Plus, ShoppingBag, User, X} from 'lucide-react';
 
 const icons = {
   phone: Phone,
@@ -13,6 +13,12 @@ const icons = {
   up: ChevronUp,
   left: ChevronLeft,
   right: ChevronRight,
+  menu: Menu,
+  close: X,
+  list: List,
+  link: Link2,
+  user: User,
+  send: ArrowUp,
 };
 
 export function Icon({name, size = 18, filled = false}: {name: keyof typeof icons; size?: number; filled?: boolean}) {

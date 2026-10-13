@@ -144,7 +144,11 @@ For choosing which shops we call.
 - ★ rating (count) · distance · hours. Unknown hours show as amber "Hours unknown".
   
 
-3. "Show 5 more shops" adds the next five to the same card. Ticked shops stay ticked.
+3. "Show 5 more shops" adds the next five to the same card. Ticked shops stay ticked. In the chat the word follows the request ("Show 5 more institutes"). At the end of the list: "No more <noun> within 10 km. <Noun> with fewer than 50 Google ratings are hidden." When fewer than 10 came up within 10 km, a "Search up to 20 km" button under that line runs the wider search itself (no chat message) and puts the result in the same card; ticks stay. The headline names what the customer gave: "5 institutes near Ameerpet" or "5 shops near 500016". One result reads "1 office", never "1 offices" (D163).
+   - Named business (D163): when the customer names one business, the card lists only Google listings whose name matches, headlined "Matches for “Ainapur Consultants and Engineers” near Miyapur", nearest first; no 50-ratings line and no "Search up to 20 km". If nothing matches, no card: Luna says "I couldn’t find <name> on Google or the web near <area>. If you have their phone number, send it and I’ll set up the call. Or I can look for other <noun> nearby."
+   - Numbers from the web (D164): "Web results for “<name>”". Each row shows the name, number and address, then "Found on <site> · number from a website, may be out of date" with the site linked. Only numbers printed on a page the web search cited are shown.
+   - Numbers the customer typed (D148): "2 businesses you sent". Rows show name and number, then "Provided by you".
+   - Ticking rows is still the approval (D149); Luna never starts calls.
   
 4. The main button.
   
@@ -245,6 +249,58 @@ Under it: elapsed time on the left, "Called 4:07 pm" on the right.
 | Loading | the waveform shows faded until the audio is ready |
 | Error | "Recording didn't load. Open it on the website." |
 | Done | stops at the end and resets to the start |
+### Signed-in website (D153)
+Spec: [signed-in redesign](docs/superpowers/specs/2026-10-12-signed-in-chat-redesign.md). Same colours, type and shapes as the cards above. Every signed-in page sits inside the app shell; `/demo/...` shows each page with sample data and no backend.
+
+**Chat page (`/app`)**
+- One column, about 760px wide. The composer stays visible at all times; cards (questions, shop picker, call card) appear inside the conversation.
+- Empty state: "What should we call about?", one line under it, three starter chips, and the real balance with "₹10 only when a shop answers".
+- The picker's price line and main button live inside the picker card. After "Call", the picker folds to one line and the call card follows.
+- The noun follows the request: "shops" for products, the service word ("plumbers") or "businesses" otherwise.
+- Home visits (D159): the question cards ask "Which area is it in?" and, optionally, "Apartment or building name? We share it only if a plumber asks for more detail." with a "Skip" choice. Never ask for a house or flat number, street address or full name. Brief questions use the area, never the pincode: "Can you come to Gachibowli today?", never "Can you come to 500032 today?". The brief box note reads "We share only what changes their answer: the area, never your flat number, street address or full name. No booking."
+
+**Sidebar / menu**
+- Laptop (≥900px): fixed 270px left sidebar. Phone: top bar (menu button, logo, balance pill → account) and a drawer.
+- Order: New request · Chats · Live now / Today / Needs you / Earlier · Call log · Use in ChatGPT or Claude · Profile and credit (with balance) · Sign out (grey, last).
+- A new account with no chats or tasks shows "Your requests" and "No requests yet. Your chats and calls will show here."
+- Each task row: label, then one status line in its DESIGN colour; live tasks carry the blue pulse.
+
+**Call log (`/calls`)**
+- One row per call try, newest first. Heading "Call log" and "Every call we made for you, every try, and what it cost."
+- Totals in four boxes: calls this month (tries), answered, charged in ₹ (not-charged count), credit left (link to account). No "Add credit".
+- Filters are pill buttons with `aria-pressed`: All calls · Charged · Not charged · Needs you. Selected = light grey fill and dark outline, never black fill.
+- Laptop: a table (When · Business with task and tap-to-call phone · Try N / AI agent · Result in its status colour · Length · Charge · Open). It scrolls sideways inside its own box. Opening shows the shared opened call in a full-width row with call and directions icons.
+- Phone: grouped by day ("Today", "9 Oct"), stacked cards; the phone number and the call/directions icons are always visible (D146).
+- An earlier unanswered try reads amber "No answer · tried again". Charge lines are grey: "Charged ₹10", "Not charged · reason", "Refunded ₹10", "Free" for a test call to yourself. Never green.
+- "Download CSV" exports the rows on screen in rupees, without recording links; text cells starting with = + - @ are escaped.
+- Empty: "No calls yet." + "Start a request". Simulated verification tasks never appear.
+- Pages of 10 rows (call tries), not "Load more". Controls under the list: "‹ Previous" · "Page N" · "Next ›". Add "of M" only once every call is loaded (a reliable total); until then the label reads "Page 2 · Showing 11–20". Disabled buttons are faded, never hidden; one page only → no controls.
+- The filter applies to every loaded call, then the result is paged; when a page is not full and older calls exist, the next batch loads by itself. Changing the filter returns to page 1.
+- Changing page closes any opened call, scrolls to the top of the list and moves focus there. Same on phone (stacked cards) and /demo/calls.
+
+**Use in ChatGPT or Claude (`/connect-assistant`)**
+- A two-option switch (ChatGPT / Claude) with real tab semantics; selected = light grey fill and dark outline.
+- 1. Copy this address (the MCP address, a Copy button that reads "Copied") → 2. three short steps for the chosen app → 3. "Check connection" ("Connected · ChatGPT · last refreshed …" or "Not connected yet").
+- Steps stay generic ("add a custom connector"); menu names change often, so name only what our SKILL.md names.
+- Then "Or paste this into any AI assistant: Set me up with Boomerang using …/SKILL.md", and a closed fold "Advanced: access keys" with the access-key controls.
+
+**Profile and credit (`/account`, signed in; the old `/credit` shows the same page)** (mockups `Wallet.dc.html` phone, `ProfileLaptop.dc.html` laptop)
+- One centred 640px column on every screen size, every fact shown once (owner: "No spacing, no alignments, cluttered view", 2026-10-13). First card: a round grey initial badge (first letter of the name, else the email; no photos), the name (or "Add your name") and the email. Only facts we already hold; no new profile fields.
+- Rows in that card share one grid (label 132px · value · action) so labels and values line up; on phones the label sits above the value. Name: value plus "Shops hear only your first name: “calling for Asha”." (the first word, exactly what calls say; no name → "Until you add one, shops hear “calling for our customer”.") and an underlined text "Edit". Edit opens an inline form: Name, "Shops hear only your first name. We never share your email, phone or address.", black "Save", "Cancel" (D159). Then Member since ("1 Oct 2026", India time) and "ChatGPT or Claude" → `/connect-assistant` with the connection status.
+- "Credit": balance large, "About N answers · ₹10 per shop that answers", the on-hold line when money is held, then one line split in three (Credits added · Charged · Refunded, all-time totals, thin dividers, no boxes) and "Totals since you joined. Paid top-ups aren't available yet." No payment or top-up buttons until payments are agreed (D140).
+- "Credits, charges and refunds": a compact switch beside the heading, All · Charges · Refunds · Credits (`aria-pressed`, selected = light grey fill; full width on phones). The server filters; "Not charged" rows appear only under All; holds never appear. Rows: title (shop, or "Welcome credit"), "Charge · Plumber in Gachibowli · today 4:04 pm", amount in text colour (−₹10, +₹10, ₹0), never green. Pages of 10 with the call log's controls and wording; changing the filter returns to page 1. Empty: "No charges yet.", "No refunds yet.", "No credits yet.".
+- Order: you → Credit → history → Sign out. Sign out opens the usual confirmation. Times read "4:04 pm" in lowercase everywhere.
+
+**Signed out, sign in and sign out** (mockups `SignIn.dc.html`, `JourneyPhone.dc.html`)
+- Every signed-out route (`/app`, `/account`, `/calls`, `/connect-assistant`, `/tasks`, `/status`, `/credit`, and `/connect` before the assistant consent) shows one page: a plain header (logo · "See a demo" → `/demo`, no other links) and a centred 420px column. The email link brings the customer back to the page they were on.
+- Sign in: "Sign in to Boomerang" · "We'll email you a link. No password." · Email · black "Email me a sign-in link" · "New here? You start with ₹100 credit, about 10 answers. You pay ₹10 only when a shop answers what you asked." · "Then just tell us what to call about" with three example requests (not buttons). A sending error stays under the button and keeps the typed email.
+- Check your email: the address in bold, "Open it on this device. It expires in 15 minutes." (the real link lifetime, `convex/auth.ts`), "Not there? Check spam, or wait a minute and send it again.", then underlined "Send it again" (waits 30 seconds after each email; reads "Sent again") and "Use a different email".
+- Expired or used link: "That link has expired" · "Sign-in links work once, for 15 minutes. We can send you a fresh one." · black "Send a new link" to the last address used in this browser (or an email field when none is known).
+- First visit of a new account (no chats, no tasks, credit to spend): the empty chat shows "You're in. Your ₹100 welcome credit is ready, about 10 answers." once, above "What should we call about?", instead of the usual credit line. The amount is the real balance.
+- Sign out (menu and Account page) always asks first: "Sign out of Boomerang?" · "Calls already running keep going. Their answers will be here when you sign in again, and we also email you the results." · black "Sign out" · "Stay signed in". Phone: bottom sheet; laptop: small centred dialog. Focus starts on "Stay signed in", stays inside, Escape or the backdrop closes it, and focus returns to where it was (the menu button on phones).
+- After signing out: the sign-in page with "You're signed out. Sign in again any time to see your chats and calls." shown once.
+- `/demo/signin` (add `?stage=sent`, `?stage=expired` or `?signed_out=1`) and `/demo/welcome` show these screens with no backend; the demo menu's Sign out opens the real dialog.
+
 ## 5. The first screen's words
 The shop picker card (D66). Numbers, product and pincode fill in from the search.
 
@@ -303,6 +359,8 @@ Copies of each screen's source are in [design/canvas/](./design/canvas/), taken 
 | Option 1 · New status card (fallback) | `Flow.dc.html` | Fallback if app review objects: the picker stays and a new call card appears below |
 
 **Mockups match this document** as of 5 October 2026. They use the phone's own font, "shops", the approved headline, a black main button, the "shops picked" line and "Prefers a personal call" instead of human rows. If they ever differ, this document wins.
+
+**Signed-in redesign mockups (reference):** [design/redesign-canvas/](design/redesign-canvas/) holds copies of the "Boomerang App Redesign" canvas (chat, sidebar, call log, connect, wallet, opened call). They are reference only: where they differ from section 4 "Signed-in website" (for example the Wallet's "Add credit" buttons or black selected filters), this document wins.
 
 Known gaps in the mockups:
 - All shop names, prices, ratings and answers are sample data.

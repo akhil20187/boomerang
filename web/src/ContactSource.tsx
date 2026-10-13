@@ -12,8 +12,7 @@ export function ContactSource({shop, row = false}: {shop: Shop; row?: boolean}) 
   let url: URL | undefined;
   try { if (source) { const candidate = new URL(source); if (['https:', 'http:'].includes(candidate.protocol)) url = candidate; } } catch {}
   return <p className={`contact-source${row ? ' contact-source-row' : ''}`}>
-    {shop.source === 'customer' ? 'Provided by you' : 'Researched contact'}
-    {url && <> · <a href={url.href} target="_blank" rel="noreferrer">{url.hostname.replace(/^www\./, '')}</a></>}
+    {shop.source === 'customer' ? 'Provided by you' : url ? <>Found on <a href={url.href} target="_blank" rel="noreferrer">{url.hostname.replace(/^www\./, '')}</a> · number from a website, may be out of date</> : 'Researched contact'}
   </p>;
 }
 

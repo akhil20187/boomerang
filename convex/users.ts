@@ -40,6 +40,7 @@ export const me = query({
       id: userId,
       email: user.email,
       name: user.name,
+      memberSince: user._creationTime,
       eligible:
         !!user.eligible || approved.includes(user.email?.toLowerCase() ?? ""),
       creditBalance: credit.balanceCents / 100,
