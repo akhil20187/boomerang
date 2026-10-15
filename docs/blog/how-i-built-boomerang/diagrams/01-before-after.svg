@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 960" width="1600" height="960">
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#55544F"/></marker>
+<style>
+text{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;fill:#1A1A19}
+.h{font-size:34px;font-weight:700;letter-spacing:-0.5px}
+.k{font-size:17px;font-weight:600;letter-spacing:1.6px;fill:#55544F}
+.t{font-size:24px;font-weight:600}
+.b{font-size:21px;fill:#55544F}
+.s{font-size:19px;fill:#55544F}
+.w{fill:#FFFFFF}
+.g{fill:#17573A;font-weight:600}
+.am{fill:#7A4A00;font-weight:600}
+.bl{fill:#2341B5;font-weight:600}
+.box{fill:#FFFFFF;stroke:#DAD7D0;stroke-width:2}
+.dark{fill:#1A1A19}
+.ln{stroke:#55544F;stroke-width:2.5;fill:none}
+.dash{stroke:#55544F;stroke-width:2.5;fill:none;stroke-dasharray:7 7}
+.chipg{fill:#E6F0EA}.chipa{fill:#FBEFD9}.chipb{fill:#E6EBFA}.chipn{fill:#F2F1EE}
+</style>
+</defs>
+
+<rect width="1600" height="960" fill="#FFFFFF"/>
+
+<!-- LEFT: before -->
+<rect x="30" y="30" width="755" height="900" rx="20" fill="#F7F6F3"/>
+<text x="70" y="88" class="k">BEFORE</text>
+<text x="70" y="132" class="h">Me, my phone, one shop at a time</text>
+
+<!-- me -->
+<circle cx="407" cy="520" r="62" class="dark"/>
+<text x="407" y="512" text-anchor="middle" class="t w">Me</text>
+<text x="407" y="540" text-anchor="middle" class="s" style="fill:#DAD7D0">+ phone</text>
+
+<!-- five shops -->
+<g>
+<line x1="407" y1="458" x2="407" y2="290" class="dash"/>
+<rect x="257" y="196" width="300" height="94" rx="12" class="box"/>
+<text x="407" y="234" text-anchor="middle" class="t">Shop 1</text>
+<text x="407" y="267" text-anchor="middle" class="b am">Didn't pick up</text>
+
+<line x1="350" y1="490" x2="230" y2="430" class="dash"/>
+<rect x="70" y="352" width="300" height="94" rx="12" class="box"/>
+<text x="220" y="390" text-anchor="middle" class="t">Shop 2</text>
+<text x="220" y="423" text-anchor="middle" class="b am">“Come to the store”</text>
+
+<line x1="464" y1="490" x2="590" y2="430" class="dash"/>
+<rect x="445" y="352" width="300" height="94" rx="12" class="box"/>
+<text x="595" y="390" text-anchor="middle" class="t">Shop 3</text>
+<text x="595" y="423" text-anchor="middle" class="b am">Put on hold</text>
+
+<line x1="360" y1="562" x2="240" y2="640" class="dash"/>
+<rect x="70" y="640" width="300" height="94" rx="12" class="box"/>
+<text x="220" y="678" text-anchor="middle" class="t">Shop 4</text>
+<text x="220" y="711" text-anchor="middle" class="b am">Not in stock</text>
+
+<line x1="454" y1="562" x2="575" y2="640" class="dash"/>
+<rect x="445" y="640" width="300" height="94" rx="12" class="box"/>
+<text x="595" y="678" text-anchor="middle" class="t">Shop 5</text>
+<text x="595" y="711" text-anchor="middle" class="b am">“Card offer? Not sure”</text>
+</g>
+<text x="70" y="818" class="t">Online: out of stock. Price rise: days away.</text>
+<text x="70" y="856" class="b">Every call repeats the same questions: stock, colour,</text>
+<text x="70" y="886" class="b">final price, card offers. Notes on paper.</text>
+
+<!-- RIGHT: after -->
+<rect x="815" y="30" width="755" height="900" rx="20" fill="#FFFFFF" stroke="#DAD7D0" stroke-width="2"/>
+<text x="855" y="88" class="k">AFTER</text>
+<text x="855" y="132" class="h">One message. The calls run for me.</text>
+
+<rect x="855" y="172" width="675" height="92" rx="14" fill="#F2F1EE"/>
+<text x="885" y="210" class="t">“iPhone 17 256GB lavender near 500037,</text>
+<text x="885" y="244" class="t">best price after card offers”</text>
+
+<line x1="1192" y1="264" x2="1192" y2="300" class="ln" marker-end="url(#a)"/>
+<rect x="855" y="304" width="675" height="80" rx="14" class="box"/>
+<text x="885" y="340" class="t">My AI assistant</text>
+<text x="885" y="368" class="s">ChatGPT, Claude, Codex or the Boomerang chat</text>
+
+<line x1="1192" y1="384" x2="1192" y2="420" class="ln" marker-end="url(#a)"/>
+<rect x="855" y="424" width="675" height="80" rx="14" class="dark"/>
+<text x="885" y="460" class="t w">Boomerang</text>
+<text x="885" y="488" class="s" style="fill:#DAD7D0">Finds nearby shops. AI calls the ones I pick, together.</text>
+
+<path d="M1000 504 L1000 560" class="ln" marker-end="url(#a)"/>
+<path d="M1192 504 L1192 560" class="ln" marker-end="url(#a)"/>
+<path d="M1384 504 L1384 560" class="ln" marker-end="url(#a)"/>
+
+<rect x="855" y="564" width="214" height="150" rx="12" class="box"/>
+<text x="875" y="604" class="t">Aptronix</text>
+<rect x="873" y="628" width="178" height="68" rx="8" class="chipg"/>
+<text x="887" y="656" class="s g">In stock</text>
+<text x="887" y="684" class="s g">₹77,900</text>
+
+<rect x="1085" y="564" width="214" height="150" rx="12" class="box"/>
+<text x="1105" y="604" class="t">Vijay Sales</text>
+<rect x="1103" y="628" width="178" height="68" rx="8" class="chipa"/>
+<text x="1117" y="656" class="s am">Prefers a</text>
+<text x="1117" y="684" class="s am">personal call</text>
+
+<rect x="1316" y="564" width="214" height="150" rx="12" class="box"/>
+<text x="1336" y="604" class="t">Croma</text>
+<rect x="1334" y="628" width="178" height="68" rx="8" class="chipb"/>
+<text x="1348" y="656" class="s bl">AI agent</text>
+<text x="1348" y="684" class="s bl">calling…</text>
+
+<text x="855" y="818" class="t">Answers come back as one card.</text>
+<text x="855" y="856" class="b">I choose where to buy. ₹10 only when a shop answers.</text>
+<text x="855" y="896" class="s">Shop names from a real listing; answers are sample data.</text>
+</svg>

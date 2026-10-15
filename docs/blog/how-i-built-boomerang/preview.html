@@ -1,0 +1,525 @@
+<title>How I Built Boomerang</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* Layout: one Substack-width reading column; a quiet draft bar on top; Boomerang's black, white and status greens. */
+:root{
+  --bg:#FFFFFF; --fg:#1A1A19; --muted:#55544F; --line:#DAD7D0; --soft:#F4F3F0;
+  --green:#17573A; --amber:#7A4A00; --amber-bg:#FBEFD9; --code-bg:#1A1A19; --code-fg:#F4F3F0;
+  --display:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#151514; --fg:#ECEBE7; --muted:#A9A79F; --line:#3A3936; --soft:#22221F;
+  --green:#7CC79E; --amber:#E8B36A; --amber-bg:#3A2D17; --code-bg:#0C0C0B; --code-fg:#ECEBE7; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#151514; --fg:#ECEBE7; --muted:#A9A79F; --line:#3A3936; --soft:#22221F;
+  --green:#7CC79E; --amber:#E8B36A; --amber-bg:#3A2D17; --code-bg:#0C0C0B; --code-fg:#ECEBE7; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:19px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.bar{max-width:728px;margin:0 auto;padding-block:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--line);font-family:var(--display);font-size:14px;color:var(--muted)}
+.bar strong{color:var(--fg)}
+.bar button{font:600 14px var(--display);background:var(--fg);color:var(--bg);border:0;border-radius:8px;padding:9px 14px;cursor:pointer}
+.bar button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+article{max-width:728px;margin:0 auto;padding-top:40px}
+article>*{min-width:0}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;letter-spacing:-0.02em;line-height:1.2}
+h1{font-size:clamp(30px,5vw,42px);font-weight:700;margin:0 0 12px}
+h1+h3{font-family:var(--body);font-weight:400;font-size:21px;color:var(--muted);letter-spacing:0;margin:0 0 32px}
+h2{font-size:28px;margin:48px 0 12px}
+h3{font-size:21px;margin:32px 0 8px}
+p,li{max-width:68ch}
+a{color:var(--fg);text-decoration-color:var(--green);text-underline-offset:3px}
+hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+figure{margin:28px 0}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+figure img.narrow{max-width:380px;margin:0 auto}
+figcaption{font-family:var(--display);font-size:14px;color:var(--muted);margin-top:8px;text-align:center}
+blockquote{margin:24px 0;padding:14px 18px;background:var(--amber-bg);border-radius:8px;color:var(--amber);font-family:var(--display);font-size:16px}
+blockquote p{margin:0}
+pre{background:var(--code-bg);color:var(--code-fg);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:15px;line-height:1.5}
+code{font-family:var(--mono);font-size:0.86em}
+p code,li code{background:var(--soft);padding:2px 5px;border-radius:4px}
+table{border-collapse:collapse;width:100%;font-family:var(--display);font-size:15px;font-variant-numeric:tabular-nums}
+.tw{overflow-x:auto}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+td:first-child{white-space:nowrap;font-weight:600}
+@media (max-width:480px){body{font-size:18px}h2{font-size:24px}}
+</style>
+
+<div class="bar">
+  <span><strong>Draft for The Tool Nerd</strong> · images are in the same folder as article.md</span>
+  <button type="button" id="copy-md">Copy Markdown</button>
+</div>
+<article>
+<h1>How I Built Boomerang: An AI That Calls Local Shops So You Don't Have To</h1>
+<h3>It started with an iPhone I couldn't find online. Here's how I built an AI calling agent for Indian shops with OpenAI, Sarvam and Vobiz, and how you can try it today.</h3>
+<p>Have you ever spent an evening calling shop after shop, asking the same four questions again and again?</p>
+<p>"Do you have it in stock?" "Which colour?" "What's the final price?" "Any card offer?"</p>
+<p>I did exactly that last month, hunting for an iPhone. That evening turned into <strong>Boomerang</strong>: you tell your AI assistant what you need, Boomerang's AI agent calls the nearby shops, and the answers come back to your chat. You never pick up the phone.</p>
+<p>Before I explain how I built it, here's what it looks like.</p>
+<figure><img alt="Boomerang homepage at askboomerang.online" src="img/05-live-homepage.png" /><figcaption>The homepage at <a target="_blank" rel="noopener" href="https://www.askboomerang.online">askboomerang.online</a>. Type a request and watch the shops around you light up.</figcaption></figure>
+<p>I built it as part of the <strong>GrowthX Build Sprint</strong>. In this article I'll cover:</p>
+<ol>
+<li>The problem: my iPhone hunt</li>
+<li>What Boomerang does</li>
+<li>The stack, and why I switched from OpenAI to Sarvam for the calls</li>
+<li>How you can test it yourself</li>
+</ol>
+<hr />
+<p>If you haven't read my previous articles, check out these:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.thetoolnerd.com/p/what-is-jev-how-i-used-it-to-build-toolnerd-library">What Is Jev? How I Used It to Build an AI Tool Finder</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.thetoolnerd.com/p/what-is-webmcp-why-businesses-are">What Is WebMCP? Why Businesses Are Making Their Websites Easier for AI to Use</a></li>
+</ul>
+<hr />
+<h2>The problem: the journey of finding my iPhone</h2>
+<p>iPhone prices in India were about to go up. I wanted to buy the iPhone 17 (256GB, lavender) before the new price kicked in.</p>
+<p>Online, it was gone. Amazon, Flipkart and the rest all showed no stock. I even asked AI to check for me, and it came back with the same answer: no inventory online.</p>
+<p>So I did what every Indian buyer does. I went offline.</p>
+<p>There are a lot of Apple resellers near me: Aptronix, Vijay Sales, Croma, Reliance Digital and a few more. I had to go through them one by one. Call the store. Wait. Explain the model, the storage and the colour. Ask if it is actually in stock at that branch. Ask for the final price. Ask about ICICI and HSBC card offers. Write it down. Hang up. Next shop.</p>
+<p>Some didn't pick up. Some said "Sir, come to the store, we'll give you the best price." Some put me on hold. Some didn't know their own card offers.</p>
+<blockquote>
+<p><strong>[Akhil: add one or two lines here on how the hunt ended. Where did you finally buy it, and how long did the calling take?]</strong></p>
+</blockquote>
+<p>The frustrating part is that AI could do everything else. It could research the product, compare prices online and even find the stores. It stopped at the phone call. The last step still needed a human to talk to a human.</p>
+<p>That was the gap I wanted to close.</p>
+<figure><img alt="Before and after: calling five shops yourself versus one message to Boomerang" src="img/01-before-after.png" /></figure>
+<hr />
+<h2>The solution: what Boomerang does</h2>
+<p><strong>Boomerang lets your AI assistant hand a phone call to an AI agent and get the answer back.</strong> Like a boomerang, the request goes out and comes back with the answer.</p>
+<p>You ask in plain language, for example "iPhone 17 256GB near Ameerpet, best price after card offers" or "Plumber in Gachibowli who can come today". Boomerang then:</p>
+<ol>
+<li><strong>Asks the questions a shop would ask you.</strong> For a plumber, that's "What needs fixing?" and your area. For an iPhone, the exact variant and which cards you hold. It turns this into a short brief for the call.</li>
+<li><strong>Finds nearby businesses on Google Maps</strong>, highest rated first, with distance and opening hours. You tick the ones you want called. That tick is your approval. The AI never calls anyone on its own.</li>
+<li><strong>Calls each shop with an AI voice agent.</strong> The agent speaks English, Hindi and Telugu and can switch languages mid-call, which is how most calls in Hyderabad actually go. Calls are enquiries only: no bookings, no payments, and it never shares your address.</li>
+<li><strong>Brings back shop-by-shop answers.</strong> Each question is marked answered or unconfirmed, with the shop's exact words and the call recording.</li>
+</ol>
+<figure><img alt="How a request flows through Boomerang" src="img/02-how-it-works.png" /></figure>
+<p>Here's the flow in the product. First, Boomerang asks only what it needs and shows you the questions it will put to each shop:</p>
+<figure><img alt="Boomerang asks a few questions, then shows the call brief and the nearby businesses" src="img/07-brief-questions.png" /><figcaption>The brief and the business picker. This screenshot is from the demo, with sample businesses.</figcaption></figure>
+<p>For my iPhone, the picker looks like this:</p>
+<figure><img alt="Shop picker for iPhone 17 lavender 256GB near 500037" class="narrow" src="img/08-iphone-shop-picker.png" /><figcaption>Shop names come from a real Google Maps search near 500037.</figcaption></figure>
+<p>Then you watch the calls happen live:</p>
+<figure><img alt="Calls in progress: one in stock, one calling, one prefers a personal call" class="narrow" src="img/09-calls-in-progress.png" /></figure>
+<p>And the result comes back with the price, the offer and the recording:</p>
+<figure><img alt="iPhone results with price, card offer and call recording" class="narrow" src="img/10-iphone-results.png" /><figcaption>Prices and answers in these cards are sample data from the demo.</figcaption></figure>
+<p>It isn't only for gadgets. The same flow works for services: plumbers, painters, tailors, notaries, coaching institutes, gift-hamper suppliers.</p>
+<figure><img alt="Plumber results: visit time, visit charge and rough cost, each with the plumber's own words" src="img/11-plumber-results.png" /><figcaption>Sample results from the demo. Each question shows the business's exact reply.</figcaption></figure>
+<h3>Three rules I built it around</h3>
+<ul>
+<li><strong>Unknown stays unknown.</strong> If a shop doesn't confirm stock, Boomerang says "unconfirmed". It never guesses, and a Google listing alone never counts as stock.</li>
+<li><strong>You pay only for answers.</strong> Every new account gets ₹100 of credit. A useful answer costs ₹10. If the shop doesn't pick up, asks for a personal call or can't answer, you aren't charged.</li>
+<li><strong>You stay in control.</strong> Boomerang only calls the businesses you select, and it never books or buys anything for you. You decide where to buy.</li>
+</ul>
+<hr />
+<h2>The stack</h2>
+<p>Here's what runs where.</p>
+<figure><img alt="Boomerang architecture: assistants, Convex backend, Railway call bridge, Sarvam voice agent, Vobiz number" src="img/03-architecture.png" /></figure>
+<p><strong>Where you ask.</strong> You can use Boomerang from two places:</p>
+<ul>
+<li><strong>ChatGPT, Claude, Codex or any agent that supports MCP.</strong> MCP (Model Context Protocol) is the standard way to plug a service into an AI assistant. Boomerang is one connector at <code>askboomerang.online/mcp</code>. Results show up as a card inside your chat.</li>
+<li><strong>The Boomerang web chat</strong> at <a target="_blank" rel="noopener" href="https://www.askboomerang.online">askboomerang.online</a>. I added this later because connecting an assistant is an extra step for most people. The chat assistant, Luna, runs on OpenAI's GPT-6 Luna model. The website is hosted on Vercel.</li>
+</ul>
+<p><strong>Convex</strong> is the backend and the single source of truth: the database, tasks, briefs, credit, scheduled retries and live status. Whether you ask from ChatGPT, Claude or the website, you see the same tasks. Inside it:</p>
+<ul>
+<li><strong>Google Places</strong> finds nearby businesses.</li>
+<li><strong>OpenAI</strong> reads each finished call transcript and pulls out the answers. It keeps an answer only if the shop actually said it.</li>
+<li><strong>Resend</strong> sends the sign-in and result emails.</li>
+</ul>
+<p><strong>A small Node.js call bridge on Railway</strong> sits between Convex and the phone network. It starts each call exactly once (so a shop never gets a double call), checks progress every 30 seconds, fetches the recording, and frees the line if a call runs past six minutes.</p>
+<p><strong>Sarvam</strong> is the voice agent that talks to the shop. <strong>Vobiz</strong> gives me the Indian phone number the shop sees.</p>
+<h3>Why Vobiz for the phone number</h3>
+<p>Calling Indian shops needs an Indian number: I wanted shops to see a local caller, not a strange international one. When I researched the usual global options, ordinary Twilio calls to India needed a non-Indian originating number. Vobiz is an Indian cloud telephony provider: I got a local number, an API to place calls, and live audio streaming. It worked from the first day, and it stayed when I changed the voice layer.</p>
+<h3>Starting with OpenAI Realtime</h3>
+<p>My first version used <strong>OpenAI's Realtime model</strong>, which does speech-to-speech in one step.</p>
+<p>I started in the browser with a page called "Be the shopkeeper". The agent called me, I played the shopkeeper, and it extracted the answers.</p>
+<figure><img alt="The first voice rehearsal in the browser with OpenAI Realtime" src="img/13-openai-voice-rehearsal.png" /><figcaption>Day two: a browser rehearsal before any real phone call.</figcaption></figure>
+<p>Then I connected it to a real phone. Vobiz placed the call and streamed the audio to my bridge server, and my bridge passed every audio packet to OpenAI and back. On 4 October the agent called my own phone and held a two-minute conversation. That felt like magic.</p>
+<p>The real-phone tests were less magical:</p>
+<ul>
+<li>It <strong>asked the same question twice</strong>.</li>
+<li>On one call it <strong>made up a product number</strong> I had never mentioned.</li>
+<li>It <strong>misheard replies that mixed Telugu and English</strong>, which is how many people around me actually talk.</li>
+<li>My server had to carry the live audio both ways, which is the hardest and most fragile part to run.</li>
+</ul>
+<h3>Switching to Sarvam</h3>
+<p>On 6 October I tried <strong>Sarvam</strong>, an Indian AI company whose voice agents are built for Indian languages. I tested it on calls to my own phone before switching anything.</p>
+<p>The difference was clear:</p>
+<ul>
+<li>It <strong>switched between English and Telugu</strong> in the middle of my test calls without losing track, and later handled Hindi with real shops.</li>
+<li>Sarvam connects directly to Vobiz, so I kept the same telephony account and just connected a new number.</li>
+<li>My bridge got much simpler. It now makes one API call to start a call and then checks the result. No live audio passes through my server.</li>
+</ul>
+<p>On 7 October I made Sarvam the primary caller. A day later came the real test: two gift-hamper suppliers in Hyderabad picked up an AI call about 60 corporate Diwali hampers. The calls lasted 75 and 94 seconds, mostly in Hindi, and both shops answered and gave useful information.</p>
+<figure><img alt="From OpenAI Realtime to Sarvam" src="img/04-openai-to-sarvam.png" /></figure>
+<p>I didn't drop OpenAI. It moved to the job it does best: reading the finished transcript and turning it into structured answers. Sarvam talks, OpenAI checks, and only what the shop actually said reaches you.</p>
+<h3>What the real calls taught me</h3>
+<p>Listening to real shop calls changed the product more than any planning did.</p>
+<ul>
+<li><strong>The questions matter more than the voice.</strong> The early agent bundled questions together ("Do you have it, and what's the price, and any offers?") and shops answered only part of it. Now Boomerang builds a brief first and the agent asks one question at a time.</li>
+<li><strong>Ask the shop's questions before you call.</strong> A plumber needs to know what's broken and roughly where you are. Getting that from the customer first makes the call useful.</li>
+<li><strong>Transcripts can disagree.</strong> In one call, Sarvam's transcript and an audio model heard different numbers for the same price. That's why an answer is only marked confirmed when the shop's words clearly support it.</li>
+</ul>
+<h3>Timeline</h3>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>What happened</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3 Oct</td>
+<td>Wrote down the idea and the iPhone use case</td>
+</tr>
+<tr>
+<td>4 Oct</td>
+<td>OpenAI voice rehearsal in the browser, then the first call to my own phone via Vobiz</td>
+</tr>
+<tr>
+<td>5 Oct</td>
+<td>Call bridge deployed on Railway; first ChatGPT connection</td>
+</tr>
+<tr>
+<td>6–7 Oct</td>
+<td>Tested Sarvam, then made it the primary caller; site went public</td>
+</tr>
+<tr>
+<td>8 Oct</td>
+<td>First real shops answered an AI call</td>
+</tr>
+<tr>
+<td>12 Oct</td>
+<td>Moved to production, new domain askboomerang.online, ChatGPT-style web chat</td>
+</tr>
+<tr>
+<td>13 Oct</td>
+<td>Luna can find a named business on the web when Google Maps doesn't have it</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>How you can test Boomerang</h2>
+<p>Boomerang works in India today, with prices in rupees.</p>
+<h3>1. See the demo (no sign-in)</h3>
+<p>Open <a target="_blank" rel="noopener" href="https://www.askboomerang.online/demo">askboomerang.online/demo</a>. It's the full product with sample shops, dummy numbers and sample answers. No calls are made and nothing is charged.</p>
+<figure><img alt="The Boomerang demo chat" src="img/06-live-demo-chat.png" /></figure>
+<h3>2. Sign in and make real calls</h3>
+<ol>
+<li>Go to <a target="_blank" rel="noopener" href="https://www.askboomerang.online">askboomerang.online</a> and click <strong>Get started</strong>.</li>
+<li>Enter your email. You'll get a sign-in link; there's no password.</li>
+<li>You start with <strong>₹100 of credit</strong>, enough for about 10 answers.</li>
+<li>Want to hear the agent first? Choose <strong>"Call me first, so I hear how it sounds"</strong>. It calls your own phone for free.</li>
+<li>Type a real request, such as <em>"iPhone 17 256GB near Ameerpet, best price after card offers"</em> or <em>"Plumber in Gachibowli who can come today"</em>.</li>
+<li>Answer the few questions, tick the shops to call, and press <strong>Call</strong>.</li>
+<li>Watch the status update live. Each shop's answer comes back with the recording.</li>
+</ol>
+<figure><img alt="Sign-in on phone: email link, ₹100 credit and example requests" class="narrow" src="img/12-live-signin-phone.png" /></figure>
+<h3>3. Use it from ChatGPT, Claude or Codex</h3>
+<p><strong>Easiest way, in any agent that can read a skill file:</strong> paste this into your agent:</p>
+<pre><code>Set up Boomerang using https://www.askboomerang.online/SKILL.md
+</code></pre>
+<p><strong>In the ChatGPT or Claude app:</strong> open settings, add a custom connector named Boomerang with this address, and sign in with the same email:</p>
+<pre><code>https://www.askboomerang.online/mcp
+</code></pre>
+<p><strong>In Claude Code:</strong></p>
+<pre><code class="language-sh">claude mcp add --scope user --transport http boomerang https://www.askboomerang.online/mcp
+</code></pre>
+<p>Then type <code>/mcp</code>, choose Boomerang and select Authenticate.</p>
+<p><strong>In Codex:</strong></p>
+<pre><code class="language-sh">codex mcp add boomerang --url https://www.askboomerang.online/mcp
+</code></pre>
+<p>Once it's connected, just ask your assistant: <em>"Use Boomerang to find who has the iPhone 17 256GB near 500037 and the best price after card offers."</em></p>
+<h3>Good to know</h3>
+<ul>
+<li>India only for now, and all prices are in rupees.</li>
+<li>Calls are enquiries only. Boomerang won't book, reserve or pay.</li>
+<li>A Google listing doesn't confirm stock. Only the shop's answer does.</li>
+<li>If a shop wants to speak to you personally, Boomerang tells you so and you aren't charged.</li>
+</ul>
+<hr />
+<h2>My verdict</h2>
+<p>AI assistants have become very good at research. They still stop at the phone call, and in India a lot of real information lives in that call: stock, final price, the card offer, whether the plumber can come today.</p>
+<p>Boomerang is my attempt to close that last step. The lessons I'd pass on to anyone building a voice agent:</p>
+<ol>
+<li><strong>Pick the voice model for your users' languages.</strong> OpenAI Realtime is impressive, but Sarvam handled the way my customers actually speak.</li>
+<li><strong>Keep telephony local.</strong> An Indian number from Vobiz got calls answered.</li>
+<li><strong>Let code own the rules.</strong> The AI talks and extracts. Code decides what counts as an answer, what gets charged and when to stop.</li>
+<li><strong>Never pretend.</strong> "Unconfirmed" is a perfectly good answer. A made-up "in stock" is not.</li>
+</ol>
+<p>Next, I want a human follow-up when the AI can't finish a call, and to take Boomerang beyond shops to getting an expert second opinion.</p>
+<p>Go ahead and try it out: <a target="_blank" rel="noopener" href="https://www.askboomerang.online">askboomerang.online</a>. And if you hate calling shops as much as I do, tell me what you'd want Boomerang to call about next.</p>
+<p><em>Thanks for reading The Tool Nerd! Subscribe for free to receive new posts and support my work.</em></p>
+</article>
+<script type="text/plain" id="md-src"># How I Built Boomerang: An AI That Calls Local Shops So You Don&#x27;t Have To
+
+### It started with an iPhone I couldn&#x27;t find online. Here&#x27;s how I built an AI calling agent for Indian shops with OpenAI, Sarvam and Vobiz, and how you can try it today.
+
+Have you ever spent an evening calling shop after shop, asking the same four questions again and again?
+
+&quot;Do you have it in stock?&quot; &quot;Which colour?&quot; &quot;What&#x27;s the final price?&quot; &quot;Any card offer?&quot;
+
+I did exactly that last month, hunting for an iPhone. That evening turned into **Boomerang**: you tell your AI assistant what you need, Boomerang&#x27;s AI agent calls the nearby shops, and the answers come back to your chat. You never pick up the phone.
+
+Before I explain how I built it, here&#x27;s what it looks like.
+
+![Boomerang homepage at askboomerang.online](img/05-live-homepage.png)
+*The homepage at [askboomerang.online](https://www.askboomerang.online). Type a request and watch the shops around you light up.*
+
+I built it as part of the **GrowthX Build Sprint**. In this article I&#x27;ll cover:
+
+1. The problem: my iPhone hunt
+2. What Boomerang does
+3. The stack, and why I switched from OpenAI to Sarvam for the calls
+4. How you can test it yourself
+
+---
+
+If you haven&#x27;t read my previous articles, check out these:
+
+- [What Is Jev? How I Used It to Build an AI Tool Finder](https://www.thetoolnerd.com/p/what-is-jev-how-i-used-it-to-build-toolnerd-library)
+- [What Is WebMCP? Why Businesses Are Making Their Websites Easier for AI to Use](https://www.thetoolnerd.com/p/what-is-webmcp-why-businesses-are)
+
+---
+
+## The problem: the journey of finding my iPhone
+
+iPhone prices in India were about to go up. I wanted to buy the iPhone 17 (256GB, lavender) before the new price kicked in.
+
+Online, it was gone. Amazon, Flipkart and the rest all showed no stock. I even asked AI to check for me, and it came back with the same answer: no inventory online.
+
+So I did what every Indian buyer does. I went offline.
+
+There are a lot of Apple resellers near me: Aptronix, Vijay Sales, Croma, Reliance Digital and a few more. I had to go through them one by one. Call the store. Wait. Explain the model, the storage and the colour. Ask if it is actually in stock at that branch. Ask for the final price. Ask about ICICI and HSBC card offers. Write it down. Hang up. Next shop.
+
+Some didn&#x27;t pick up. Some said &quot;Sir, come to the store, we&#x27;ll give you the best price.&quot; Some put me on hold. Some didn&#x27;t know their own card offers.
+
+&gt; **[Akhil: add one or two lines here on how the hunt ended. Where did you finally buy it, and how long did the calling take?]**
+
+The frustrating part is that AI could do everything else. It could research the product, compare prices online and even find the stores. It stopped at the phone call. The last step still needed a human to talk to a human.
+
+That was the gap I wanted to close.
+
+![Before and after: calling five shops yourself versus one message to Boomerang](img/01-before-after.png)
+
+---
+
+## The solution: what Boomerang does
+
+**Boomerang lets your AI assistant hand a phone call to an AI agent and get the answer back.** Like a boomerang, the request goes out and comes back with the answer.
+
+You ask in plain language, for example &quot;iPhone 17 256GB near Ameerpet, best price after card offers&quot; or &quot;Plumber in Gachibowli who can come today&quot;. Boomerang then:
+
+1. **Asks the questions a shop would ask you.** For a plumber, that&#x27;s &quot;What needs fixing?&quot; and your area. For an iPhone, the exact variant and which cards you hold. It turns this into a short brief for the call.
+2. **Finds nearby businesses on Google Maps**, highest rated first, with distance and opening hours. You tick the ones you want called. That tick is your approval. The AI never calls anyone on its own.
+3. **Calls each shop with an AI voice agent.** The agent speaks English, Hindi and Telugu and can switch languages mid-call, which is how most calls in Hyderabad actually go. Calls are enquiries only: no bookings, no payments, and it never shares your address.
+4. **Brings back shop-by-shop answers.** Each question is marked answered or unconfirmed, with the shop&#x27;s exact words and the call recording.
+
+![How a request flows through Boomerang](img/02-how-it-works.png)
+
+Here&#x27;s the flow in the product. First, Boomerang asks only what it needs and shows you the questions it will put to each shop:
+
+![Boomerang asks a few questions, then shows the call brief and the nearby businesses](img/07-brief-questions.png)
+*The brief and the business picker. This screenshot is from the demo, with sample businesses.*
+
+For my iPhone, the picker looks like this:
+
+![Shop picker for iPhone 17 lavender 256GB near 500037](img/08-iphone-shop-picker.png)
+*Shop names come from a real Google Maps search near 500037.*
+
+Then you watch the calls happen live:
+
+![Calls in progress: one in stock, one calling, one prefers a personal call](img/09-calls-in-progress.png)
+
+And the result comes back with the price, the offer and the recording:
+
+![iPhone results with price, card offer and call recording](img/10-iphone-results.png)
+*Prices and answers in these cards are sample data from the demo.*
+
+It isn&#x27;t only for gadgets. The same flow works for services: plumbers, painters, tailors, notaries, coaching institutes, gift-hamper suppliers.
+
+![Plumber results: visit time, visit charge and rough cost, each with the plumber&#x27;s own words](img/11-plumber-results.png)
+*Sample results from the demo. Each question shows the business&#x27;s exact reply.*
+
+### Three rules I built it around
+
+- **Unknown stays unknown.** If a shop doesn&#x27;t confirm stock, Boomerang says &quot;unconfirmed&quot;. It never guesses, and a Google listing alone never counts as stock.
+- **You pay only for answers.** Every new account gets ₹100 of credit. A useful answer costs ₹10. If the shop doesn&#x27;t pick up, asks for a personal call or can&#x27;t answer, you aren&#x27;t charged.
+- **You stay in control.** Boomerang only calls the businesses you select, and it never books or buys anything for you. You decide where to buy.
+
+---
+
+## The stack
+
+Here&#x27;s what runs where.
+
+![Boomerang architecture: assistants, Convex backend, Railway call bridge, Sarvam voice agent, Vobiz number](img/03-architecture.png)
+
+**Where you ask.** You can use Boomerang from two places:
+
+- **ChatGPT, Claude, Codex or any agent that supports MCP.** MCP (Model Context Protocol) is the standard way to plug a service into an AI assistant. Boomerang is one connector at `askboomerang.online/mcp`. Results show up as a card inside your chat.
+- **The Boomerang web chat** at [askboomerang.online](https://www.askboomerang.online). I added this later because connecting an assistant is an extra step for most people. The chat assistant, Luna, runs on OpenAI&#x27;s GPT-6 Luna model. The website is hosted on Vercel.
+
+**Convex** is the backend and the single source of truth: the database, tasks, briefs, credit, scheduled retries and live status. Whether you ask from ChatGPT, Claude or the website, you see the same tasks. Inside it:
+
+- **Google Places** finds nearby businesses.
+- **OpenAI** reads each finished call transcript and pulls out the answers. It keeps an answer only if the shop actually said it.
+- **Resend** sends the sign-in and result emails.
+
+**A small Node.js call bridge on Railway** sits between Convex and the phone network. It starts each call exactly once (so a shop never gets a double call), checks progress every 30 seconds, fetches the recording, and frees the line if a call runs past six minutes.
+
+**Sarvam** is the voice agent that talks to the shop. **Vobiz** gives me the Indian phone number the shop sees.
+
+### Why Vobiz for the phone number
+
+Calling Indian shops needs an Indian number: I wanted shops to see a local caller, not a strange international one. When I researched the usual global options, ordinary Twilio calls to India needed a non-Indian originating number. Vobiz is an Indian cloud telephony provider: I got a local number, an API to place calls, and live audio streaming. It worked from the first day, and it stayed when I changed the voice layer.
+
+### Starting with OpenAI Realtime
+
+My first version used **OpenAI&#x27;s Realtime model**, which does speech-to-speech in one step.
+
+I started in the browser with a page called &quot;Be the shopkeeper&quot;. The agent called me, I played the shopkeeper, and it extracted the answers.
+
+![The first voice rehearsal in the browser with OpenAI Realtime](img/13-openai-voice-rehearsal.png)
+*Day two: a browser rehearsal before any real phone call.*
+
+Then I connected it to a real phone. Vobiz placed the call and streamed the audio to my bridge server, and my bridge passed every audio packet to OpenAI and back. On 4 October the agent called my own phone and held a two-minute conversation. That felt like magic.
+
+The real-phone tests were less magical:
+
+- It **asked the same question twice**.
+- On one call it **made up a product number** I had never mentioned.
+- It **misheard replies that mixed Telugu and English**, which is how many people around me actually talk.
+- My server had to carry the live audio both ways, which is the hardest and most fragile part to run.
+
+### Switching to Sarvam
+
+On 6 October I tried **Sarvam**, an Indian AI company whose voice agents are built for Indian languages. I tested it on calls to my own phone before switching anything.
+
+The difference was clear:
+
+- It **switched between English and Telugu** in the middle of my test calls without losing track, and later handled Hindi with real shops.
+- Sarvam connects directly to Vobiz, so I kept the same telephony account and just connected a new number.
+- My bridge got much simpler. It now makes one API call to start a call and then checks the result. No live audio passes through my server.
+
+On 7 October I made Sarvam the primary caller. A day later came the real test: two gift-hamper suppliers in Hyderabad picked up an AI call about 60 corporate Diwali hampers. The calls lasted 75 and 94 seconds, mostly in Hindi, and both shops answered and gave useful information.
+
+![From OpenAI Realtime to Sarvam](img/04-openai-to-sarvam.png)
+
+I didn&#x27;t drop OpenAI. It moved to the job it does best: reading the finished transcript and turning it into structured answers. Sarvam talks, OpenAI checks, and only what the shop actually said reaches you.
+
+### What the real calls taught me
+
+Listening to real shop calls changed the product more than any planning did.
+
+- **The questions matter more than the voice.** The early agent bundled questions together (&quot;Do you have it, and what&#x27;s the price, and any offers?&quot;) and shops answered only part of it. Now Boomerang builds a brief first and the agent asks one question at a time.
+- **Ask the shop&#x27;s questions before you call.** A plumber needs to know what&#x27;s broken and roughly where you are. Getting that from the customer first makes the call useful.
+- **Transcripts can disagree.** In one call, Sarvam&#x27;s transcript and an audio model heard different numbers for the same price. That&#x27;s why an answer is only marked confirmed when the shop&#x27;s words clearly support it.
+
+### Timeline
+
+| Date | What happened |
+|---|---|
+| 3 Oct | Wrote down the idea and the iPhone use case |
+| 4 Oct | OpenAI voice rehearsal in the browser, then the first call to my own phone via Vobiz |
+| 5 Oct | Call bridge deployed on Railway; first ChatGPT connection |
+| 6–7 Oct | Tested Sarvam, then made it the primary caller; site went public |
+| 8 Oct | First real shops answered an AI call |
+| 12 Oct | Moved to production, new domain askboomerang.online, ChatGPT-style web chat |
+| 13 Oct | Luna can find a named business on the web when Google Maps doesn&#x27;t have it |
+
+---
+
+## How you can test Boomerang
+
+Boomerang works in India today, with prices in rupees.
+
+### 1. See the demo (no sign-in)
+
+Open [askboomerang.online/demo](https://www.askboomerang.online/demo). It&#x27;s the full product with sample shops, dummy numbers and sample answers. No calls are made and nothing is charged.
+
+![The Boomerang demo chat](img/06-live-demo-chat.png)
+
+### 2. Sign in and make real calls
+
+1. Go to [askboomerang.online](https://www.askboomerang.online) and click **Get started**.
+2. Enter your email. You&#x27;ll get a sign-in link; there&#x27;s no password.
+3. You start with **₹100 of credit**, enough for about 10 answers.
+4. Want to hear the agent first? Choose **&quot;Call me first, so I hear how it sounds&quot;**. It calls your own phone for free.
+5. Type a real request, such as *&quot;iPhone 17 256GB near Ameerpet, best price after card offers&quot;* or *&quot;Plumber in Gachibowli who can come today&quot;*.
+6. Answer the few questions, tick the shops to call, and press **Call**.
+7. Watch the status update live. Each shop&#x27;s answer comes back with the recording.
+
+![Sign-in on phone: email link, ₹100 credit and example requests](img/12-live-signin-phone.png)
+
+### 3. Use it from ChatGPT, Claude or Codex
+
+**Easiest way, in any agent that can read a skill file:** paste this into your agent:
+
+```
+Set up Boomerang using https://www.askboomerang.online/SKILL.md
+```
+
+**In the ChatGPT or Claude app:** open settings, add a custom connector named Boomerang with this address, and sign in with the same email:
+
+```
+https://www.askboomerang.online/mcp
+```
+
+**In Claude Code:**
+
+```sh
+claude mcp add --scope user --transport http boomerang https://www.askboomerang.online/mcp
+```
+
+Then type `/mcp`, choose Boomerang and select Authenticate.
+
+**In Codex:**
+
+```sh
+codex mcp add boomerang --url https://www.askboomerang.online/mcp
+```
+
+Once it&#x27;s connected, just ask your assistant: *&quot;Use Boomerang to find who has the iPhone 17 256GB near 500037 and the best price after card offers.&quot;*
+
+### Good to know
+
+- India only for now, and all prices are in rupees.
+- Calls are enquiries only. Boomerang won&#x27;t book, reserve or pay.
+- A Google listing doesn&#x27;t confirm stock. Only the shop&#x27;s answer does.
+- If a shop wants to speak to you personally, Boomerang tells you so and you aren&#x27;t charged.
+
+---
+
+## My verdict
+
+AI assistants have become very good at research. They still stop at the phone call, and in India a lot of real information lives in that call: stock, final price, the card offer, whether the plumber can come today.
+
+Boomerang is my attempt to close that last step. The lessons I&#x27;d pass on to anyone building a voice agent:
+
+1. **Pick the voice model for your users&#x27; languages.** OpenAI Realtime is impressive, but Sarvam handled the way my customers actually speak.
+2. **Keep telephony local.** An Indian number from Vobiz got calls answered.
+3. **Let code own the rules.** The AI talks and extracts. Code decides what counts as an answer, what gets charged and when to stop.
+4. **Never pretend.** &quot;Unconfirmed&quot; is a perfectly good answer. A made-up &quot;in stock&quot; is not.
+
+Next, I want a human follow-up when the AI can&#x27;t finish a call, and to take Boomerang beyond shops to getting an expert second opinion.
+
+Go ahead and try it out: [askboomerang.online](https://www.askboomerang.online). And if you hate calling shops as much as I do, tell me what you&#x27;d want Boomerang to call about next.
+
+*Thanks for reading The Tool Nerd! Subscribe for free to receive new posts and support my work.*
+</script>
+<script>
+document.querySelectorAll('article table').forEach(t=>{const w=document.createElement('div');w.className='tw';t.parentNode.insertBefore(w,t);w.appendChild(t)});
+const btn=document.getElementById('copy-md');
+btn.addEventListener('click',()=>{
+  const ta=document.createElement('textarea');ta.innerHTML=document.getElementById('md-src').textContent;const text=ta.value;
+  navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied'},()=>{btn.textContent='Copy blocked: use article.md'});
+  setTimeout(()=>{btn.textContent='Copy Markdown'},2500);
+});
+</script>

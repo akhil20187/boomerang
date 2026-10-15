@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1060" width="1600" height="1060">
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#55544F"/></marker>
+<style>
+text{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;fill:#1A1A19}
+.h{font-size:34px;font-weight:700;letter-spacing:-0.5px}
+.k{font-size:17px;font-weight:600;letter-spacing:1.6px;fill:#55544F}
+.t{font-size:24px;font-weight:600}
+.b{font-size:21px;fill:#55544F}
+.s{font-size:19px;fill:#55544F}
+.w{fill:#FFFFFF}
+.g{fill:#17573A;font-weight:600}
+.am{fill:#7A4A00;font-weight:600}
+.bl{fill:#2341B5;font-weight:600}
+.box{fill:#FFFFFF;stroke:#DAD7D0;stroke-width:2}
+.dark{fill:#1A1A19}
+.ln{stroke:#55544F;stroke-width:2.5;fill:none}
+.dash{stroke:#55544F;stroke-width:2.5;fill:none;stroke-dasharray:7 7}
+.chipg{fill:#E6F0EA}.chipa{fill:#FBEFD9}.chipb{fill:#E6EBFA}.chipn{fill:#F2F1EE}
+</style>
+</defs>
+
+<rect width="1600" height="1060" fill="#FFFFFF"/>
+<text x="40" y="70" class="k">THE VOICE SWITCH</text>
+<text x="40" y="116" class="h">OpenAI Realtime first, then Sarvam</text>
+
+<!-- V1 -->
+<rect x="40" y="150" width="1520" height="400" rx="18" fill="#F7F6F3"/>
+<text x="76" y="200" class="k">VERSION 1 · 4–6 OCTOBER</text>
+<text x="76" y="240" class="t">Vobiz + OpenAI Realtime, with my server in the middle</text>
+
+<rect x="76" y="280" width="300" height="110" rx="12" class="box"/>
+<text x="102" y="326" class="t">Shop's phone</text>
+<line x1="376" y1="335" x2="420" y2="335" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+<rect x="424" y="280" width="300" height="110" rx="12" class="box"/>
+<text x="450" y="326" class="t">Vobiz number</text>
+<text x="450" y="358" class="s">call + audio stream</text>
+<line x1="724" y1="335" x2="768" y2="335" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+<rect x="772" y="280" width="370" height="110" rx="12" class="box" style="stroke:#7A4A00"/>
+<text x="798" y="326" class="t">My bridge on Railway</text>
+<text x="798" y="358" class="s">carries every audio packet</text>
+<line x1="1142" y1="335" x2="1186" y2="335" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+<rect x="1190" y="280" width="334" height="110" rx="12" class="box"/>
+<text x="1216" y="326" class="t">OpenAI Realtime</text>
+<text x="1216" y="358" class="s">speech-to-speech model</text>
+
+<text x="76" y="440" class="t">What I saw on test calls</text>
+<rect x="76" y="460" width="430" height="58" rx="10" class="chipa"/>
+<text x="98" y="497" class="b am">Asked the same question twice</text>
+<rect x="522" y="460" width="430" height="58" rx="10" class="chipa"/>
+<text x="544" y="497" class="b am">Made up a product number</text>
+<rect x="968" y="460" width="556" height="58" rx="10" class="chipa"/>
+<text x="990" y="497" class="b am">Misheard mixed Telugu–English replies</text>
+
+<!-- V2 -->
+<rect x="40" y="590" width="1520" height="430" rx="18" fill="#FFFFFF" stroke="#1A1A19" stroke-width="2"/>
+<text x="76" y="640" class="k">VERSION 2 · FROM 7 OCTOBER</text>
+<text x="76" y="680" class="t">Sarvam's hosted voice agent dials through the same Vobiz account</text>
+
+<rect x="76" y="720" width="370" height="110" rx="12" class="box"/>
+<text x="102" y="766" class="t">My bridge on Railway</text>
+<text x="102" y="798" class="s">starts the call, then checks</text>
+<line x1="446" y1="775" x2="490" y2="775" class="ln" marker-end="url(#a)"/>
+<rect x="494" y="720" width="334" height="110" rx="12" class="dark"/>
+<text x="520" y="766" class="t w">Sarvam agent</text>
+<text x="520" y="798" class="s" style="fill:#DAD7D0">speaks and listens</text>
+<line x1="828" y1="775" x2="872" y2="775" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+<rect x="876" y="720" width="300" height="110" rx="12" class="box"/>
+<text x="902" y="766" class="t">Vobiz number</text>
+<text x="902" y="798" class="s">same account</text>
+<line x1="1176" y1="775" x2="1220" y2="775" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+<rect x="1224" y="720" width="300" height="110" rx="12" class="box"/>
+<text x="1250" y="766" class="t">Shop's phone</text>
+
+<text x="76" y="880" class="t">What changed</text>
+<rect x="76" y="900" width="470" height="58" rx="10" class="chipg"/>
+<text x="98" y="937" class="b g">Switches English, Hindi, Telugu</text>
+<rect x="562" y="900" width="440" height="58" rx="10" class="chipg"/>
+<text x="584" y="937" class="b g">Real shops answered, in Hindi</text>
+<rect x="1018" y="900" width="506" height="58" rx="10" class="chipg"/>
+<text x="1040" y="937" class="b g">No live audio through my server</text>
+<text x="76" y="996" class="s">OpenAI stays in the stack: it reads the finished transcript and keeps only answers the shop actually said.</text>
+</svg>

@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1080" width="1600" height="1080">
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#55544F"/></marker>
+<style>
+text{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;fill:#1A1A19}
+.h{font-size:34px;font-weight:700;letter-spacing:-0.5px}
+.k{font-size:17px;font-weight:600;letter-spacing:1.6px;fill:#55544F}
+.t{font-size:24px;font-weight:600}
+.b{font-size:21px;fill:#55544F}
+.s{font-size:19px;fill:#55544F}
+.w{fill:#FFFFFF}
+.g{fill:#17573A;font-weight:600}
+.am{fill:#7A4A00;font-weight:600}
+.bl{fill:#2341B5;font-weight:600}
+.box{fill:#FFFFFF;stroke:#DAD7D0;stroke-width:2}
+.dark{fill:#1A1A19}
+.ln{stroke:#55544F;stroke-width:2.5;fill:none}
+.dash{stroke:#55544F;stroke-width:2.5;fill:none;stroke-dasharray:7 7}
+.chipg{fill:#E6F0EA}.chipa{fill:#FBEFD9}.chipb{fill:#E6EBFA}.chipn{fill:#F2F1EE}
+</style>
+</defs>
+
+<rect width="1600" height="1080" fill="#FFFFFF"/>
+<text x="40" y="70" class="k">THE STACK</text>
+<text x="40" y="116" class="h">What runs where</text>
+
+<!-- Row A -->
+<text x="40" y="176" class="k">WHERE YOU ASK</text>
+<rect x="40" y="194" width="730" height="110" rx="14" class="box"/>
+<text x="70" y="238" class="t">ChatGPT · Claude · Codex · other agents</text>
+<text x="70" y="274" class="s">Connect once: askboomerang.online/mcp (MCP connector)</text>
+<rect x="830" y="194" width="730" height="110" rx="14" class="box"/>
+<text x="860" y="238" class="t">Boomerang web chat · Vercel</text>
+<text x="860" y="274" class="s">Chat assistant “Luna” runs on OpenAI; email sign-in</text>
+
+<line x1="405" y1="304" x2="405" y2="356" class="ln" marker-end="url(#a)"/>
+<line x1="1195" y1="304" x2="1195" y2="356" class="ln" marker-end="url(#a)"/>
+
+<!-- Row B: Convex -->
+<rect x="40" y="360" width="1520" height="210" rx="16" class="dark"/>
+<text x="70" y="406" class="t w">Convex backend: the single source of truth</text>
+<text x="70" y="438" class="s" style="fill:#DAD7D0">Database, tasks, retries, live status. ChatGPT, Claude and the website all see the same tasks.</text>
+<g>
+<rect x="70" y="466" width="276" height="74" rx="10" fill="#2D2D2B"/>
+<text x="92" y="498" class="s w" style="font-weight:600">Briefs &amp; tasks</text>
+<text x="92" y="524" class="s" style="fill:#DAD7D0">questions per call</text>
+<rect x="364" y="466" width="276" height="74" rx="10" fill="#2D2D2B"/>
+<text x="386" y="498" class="s w" style="font-weight:600">Shop search</text>
+<text x="386" y="524" class="s" style="fill:#DAD7D0">Google Places</text>
+<rect x="658" y="466" width="276" height="74" rx="10" fill="#2D2D2B"/>
+<text x="680" y="498" class="s w" style="font-weight:600">Answer checking</text>
+<text x="680" y="524" class="s" style="fill:#DAD7D0">OpenAI reads transcript</text>
+<rect x="952" y="466" width="276" height="74" rx="10" fill="#2D2D2B"/>
+<text x="974" y="498" class="s w" style="font-weight:600">Credit</text>
+<text x="974" y="524" class="s" style="fill:#DAD7D0">₹100 free · ₹10/answer</text>
+<rect x="1246" y="466" width="284" height="74" rx="10" fill="#2D2D2B"/>
+<text x="1268" y="498" class="s w" style="font-weight:600">Emails</text>
+<text x="1268" y="524" class="s" style="fill:#DAD7D0">Resend</text>
+</g>
+
+<!-- down to bridge, and return -->
+<line x1="560" y1="570" x2="560" y2="626" class="ln" marker-end="url(#a)"/>
+<text x="580" y="606" class="s">start call</text>
+<line x1="1040" y1="626" x2="1040" y2="574" class="ln" marker-end="url(#a)"/>
+<text x="1060" y="606" class="s">answers, transcript, recording</text>
+
+<!-- Row C: bridge -->
+<rect x="40" y="630" width="1520" height="110" rx="14" class="box"/>
+<text x="70" y="674" class="t">Call bridge · Node.js on Railway</text>
+<text x="70" y="710" class="s">Starts each call once (no duplicate dials), checks every 30 seconds, fetches the recording, frees the line after 6 minutes</text>
+
+<line x1="300" y1="740" x2="300" y2="796" class="ln" marker-end="url(#a)"/>
+
+<!-- Row D: telephony -->
+<text x="40" y="790" class="k" style="opacity:0">.</text>
+<rect x="40" y="800" width="470" height="150" rx="14" class="box" style="stroke:#1A1A19"/>
+<text x="70" y="846" class="t">Sarvam voice agent</text>
+<text x="70" y="882" class="s">Listens and speaks; switches</text>
+<text x="70" y="908" class="s">English, Hindi, Telugu mid-call</text>
+
+<line x1="510" y1="875" x2="561" y2="875" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+<rect x="565" y="800" width="470" height="150" rx="14" class="box"/>
+<text x="595" y="846" class="t">Vobiz phone number</text>
+<text x="595" y="882" class="s">Indian cloud telephony;</text>
+<text x="595" y="908" class="s">the number the shop sees</text>
+
+<line x1="1035" y1="875" x2="1086" y2="875" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+<rect x="1090" y="800" width="470" height="150" rx="14" fill="#F2F1EE"/>
+<text x="1120" y="846" class="t">The shop's phone</text>
+<text x="1120" y="882" class="s">An ordinary call. No app,</text>
+<text x="1120" y="908" class="s">nothing to install.</text>
+
+<text x="40" y="1012" class="s">Website on Vercel · backend on Convex · call bridge on Railway · voice by Sarvam · numbers by Vobiz</text>
+</svg>
