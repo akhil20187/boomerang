@@ -59,9 +59,9 @@ text{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;fill:#1A1A1
 <text x="595" y="678" text-anchor="middle" class="t">Shop 5</text>
 <text x="595" y="711" text-anchor="middle" class="b am">“Card offer? Not sure”</text>
 </g>
-<text x="70" y="818" class="t">Online: out of stock. Price rise: days away.</text>
+<text x="70" y="818" class="t">Launch day: prices going up. Online: out of stock.</text>
 <text x="70" y="856" class="b">Every call repeats the same questions: stock, colour,</text>
-<text x="70" y="886" class="b">final price, card offers. Notes on paper.</text>
+<text x="70" y="886" class="b">final price, card offers. Notes on paper. 2–4 hours.</text>
 
 <!-- RIGHT: after -->
 <rect x="815" y="30" width="755" height="900" rx="20" fill="#FFFFFF" stroke="#DAD7D0" stroke-width="2"/>

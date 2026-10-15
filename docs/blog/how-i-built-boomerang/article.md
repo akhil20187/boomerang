@@ -2,11 +2,11 @@
 
 ### It started with an iPhone I couldn't find online. Here's how I built an AI calling agent for Indian shops with OpenAI, Sarvam and Vobiz, and how you can try it today.
 
-Have you ever spent an evening calling shop after shop, asking the same four questions again and again?
+Have you ever spent a whole morning calling shop after shop, asking the same four questions again and again?
 
 "Do you have it in stock?" "Which colour?" "What's the final price?" "Any card offer?"
 
-I did exactly that last month, hunting for an iPhone. That evening turned into **Boomerang**: you tell your AI assistant what you need, Boomerang's AI agent calls the nearby shops, and the answers come back to your chat. You never pick up the phone.
+I did exactly that last month, hunting for an iPhone. That morning turned into **Boomerang**: you tell your AI assistant what you need, Boomerang's AI agent calls the nearby shops, and the answers come back to your chat. You never pick up the phone.
 
 Before I explain how I built it, here's what it looks like.
 
@@ -31,7 +31,7 @@ If you haven't read my previous articles, check out these:
 
 ## The problem: the journey of finding my iPhone
 
-iPhone prices in India were about to go up. I wanted to buy the iPhone 17 (256GB, lavender) before the new price kicked in.
+It was the day Apple launched the iPhone 18 Pro, and with the launch came higher prices. I wanted the iPhone 17 (256GB, lavender), and I wanted it before the new prices reached the shops. So early that morning, I started hunting.
 
 Online, it was gone. Amazon, Flipkart and the rest all showed no stock. I even asked AI to check for me, and it came back with the same answer: no inventory online.
 
@@ -41,8 +41,9 @@ There are a lot of Apple resellers near me: Aptronix, Vijay Sales, Croma, Relian
 
 Some didn't pick up. Some said "Sir, come to the store, we'll give you the best price." Some put me on hold. Some didn't know their own card offers.
 
-> **[Akhil: add one or two lines here on how the hunt ended. Where did you finally buy it, and how long did the calling take?]**
+I spent somewhere between two and four hours just figuring out where to go and where to buy. In the end I drove to Croma and bought the phone there.
 
+I got my iPhone. I also lost a morning to a job that was mostly asking the same questions on repeat.
 The frustrating part is that AI could do everything else. It could research the product, compare prices online and even find the stores. It stopped at the phone call. The last step still needed a human to talk to a human.
 
 That was the gap I wanted to close.
