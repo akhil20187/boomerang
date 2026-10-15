@@ -13,7 +13,7 @@ Before I explain how I built it, here's what it looks like.
 ![Boomerang homepage at askboomerang.online](img/05-live-homepage.png)
 *The homepage at [askboomerang.online](https://www.askboomerang.online). Type a request and watch the shops around you light up.*
 
-I built it as part of the **GrowthX Build Sprint**. In this article I'll cover:
+I built it as part of the **[GrowthX](https://growthx.club) Build Sprint**. In this article I'll cover:
 
 1. The problem: my iPhone hunt
 2. What Boomerang does
@@ -44,6 +44,7 @@ Some didn't pick up. Some said "Sir, come to the store, we'll give you the best 
 I spent somewhere between two and four hours just figuring out where to go and where to buy. In the end I drove to Croma and bought the phone there.
 
 I got my iPhone. I also lost a morning to a job that was mostly asking the same questions on repeat.
+
 The frustrating part is that AI could do everything else. It could research the product, compare prices online and even find the stores. It stopped at the phone call. The last step still needed a human to talk to a human.
 
 That was the gap I wanted to close.
@@ -59,7 +60,7 @@ That was the gap I wanted to close.
 You ask in plain language, for example "iPhone 17 256GB near Ameerpet, best price after card offers" or "Plumber in Gachibowli who can come today". Boomerang then:
 
 1. **Asks the questions a shop would ask you.** For a plumber, that's "What needs fixing?" and your area. For an iPhone, the exact variant and which cards you hold. It turns this into a short brief for the call.
-2. **Finds nearby businesses on Google Maps**, highest rated first, with distance and opening hours. You tick the ones you want called. That tick is your approval. The AI never calls anyone on its own.
+2. **Finds nearby businesses on [Google Maps](https://www.google.com/maps)**, highest rated first, with distance and opening hours. You tick the ones you want called. That tick is your approval. The AI never calls anyone on its own.
 3. **Calls each shop with an AI voice agent.** The agent speaks English, Hindi and Telugu and can switch languages mid-call, which is how most calls in Hyderabad actually go. Calls are enquiries only: no bookings, no payments, and it never shares your address.
 4. **Brings back shop-by-shop answers.** Each question is marked answered or unconfirmed, with the shop's exact words and the call recording.
 
@@ -105,26 +106,26 @@ Here's what runs where.
 
 **Where you ask.** You can use Boomerang from two places:
 
-- **ChatGPT, Claude, Codex or any agent that supports MCP.** MCP (Model Context Protocol) is the standard way to plug a service into an AI assistant. Boomerang is one connector at `askboomerang.online/mcp`. Results show up as a card inside your chat.
-- **The Boomerang web chat** at [askboomerang.online](https://www.askboomerang.online). I added this later because connecting an assistant is an extra step for most people. The chat assistant, Luna, runs on OpenAI's GPT-6 Luna model. The website is hosted on Vercel.
+- **[ChatGPT](https://chatgpt.com), [Claude](https://claude.ai), [Codex](https://openai.com/codex/) or any agent that supports MCP.** [MCP (Model Context Protocol)](https://modelcontextprotocol.io) is the standard way to plug a service into an AI assistant. Boomerang is one connector at `askboomerang.online/mcp`. Results show up as a card inside your chat.
+- **The Boomerang web chat** at [askboomerang.online](https://www.askboomerang.online). I added this later because connecting an assistant is an extra step for most people. The chat assistant, Luna, runs on [OpenAI](https://openai.com)'s GPT-6 Luna model. The website is hosted on [Vercel](https://vercel.com).
 
-**Convex** is the backend and the single source of truth: the database, tasks, briefs, credit, scheduled retries and live status. Whether you ask from ChatGPT, Claude or the website, you see the same tasks. Inside it:
+**[Convex](https://www.convex.dev)** is the backend and the single source of truth: the database, tasks, briefs, credit, scheduled retries and live status. Whether you ask from ChatGPT, Claude or the website, you see the same tasks. Inside it:
 
-- **Google Places** finds nearby businesses.
+- **[Google Places](https://developers.google.com/maps/documentation/places/web-service/overview)** finds nearby businesses.
 - **OpenAI** reads each finished call transcript and pulls out the answers. It keeps an answer only if the shop actually said it.
-- **Resend** sends the sign-in and result emails.
+- **[Resend](https://resend.com)** sends the sign-in and result emails.
 
-**A small Node.js call bridge on Railway** sits between Convex and the phone network. It starts each call exactly once (so a shop never gets a double call), checks progress every 30 seconds, fetches the recording, and frees the line if a call runs past six minutes.
+**A small [Node.js](https://nodejs.org) call bridge on [Railway](https://railway.com)** sits between Convex and the phone network. It starts each call exactly once (so a shop never gets a double call), checks progress every 30 seconds, fetches the recording, and frees the line if a call runs past six minutes.
 
-**Sarvam** is the voice agent that talks to the shop. **Vobiz** gives me the Indian phone number the shop sees.
+**[Sarvam](https://www.sarvam.ai)** is the voice agent that talks to the shop. **[Vobiz](https://www.vobiz.ai)** gives me the Indian phone number the shop sees.
 
 ### Why Vobiz for the phone number
 
-Calling Indian shops needs an Indian number: I wanted shops to see a local caller, not a strange international one. When I researched the usual global options, ordinary Twilio calls to India needed a non-Indian originating number. Vobiz is an Indian cloud telephony provider: I got a local number, an API to place calls, and live audio streaming. It worked from the first day, and it stayed when I changed the voice layer.
+Calling Indian shops needs an Indian number: I wanted shops to see a local caller, not a strange international one. When I researched the usual global options, ordinary [Twilio](https://www.twilio.com) calls to India needed a non-Indian originating number. Vobiz is an Indian cloud telephony provider: I got a local number, an API to place calls, and live audio streaming. It worked from the first day, and it stayed when I changed the voice layer.
 
 ### Starting with OpenAI Realtime
 
-My first version used **OpenAI's Realtime model**, which does speech-to-speech in one step.
+My first version used **[OpenAI's Realtime model](https://platform.openai.com/docs/guides/realtime)**, which does speech-to-speech in one step.
 
 I started in the browser with a page called "Be the shopkeeper". The agent called me, I played the shopkeeper, and it extracted the answers.
 
@@ -214,7 +215,7 @@ Set up Boomerang using https://www.askboomerang.online/SKILL.md
 https://www.askboomerang.online/mcp
 ```
 
-**In Claude Code:**
+**In [Claude Code](https://www.anthropic.com/claude-code):**
 
 ```sh
 claude mcp add --scope user --transport http boomerang https://www.askboomerang.online/mcp
@@ -222,7 +223,7 @@ claude mcp add --scope user --transport http boomerang https://www.askboomerang.
 
 Then type `/mcp`, choose Boomerang and select Authenticate.
 
-**In Codex:**
+**In [Codex](https://openai.com/codex/):**
 
 ```sh
 codex mcp add boomerang --url https://www.askboomerang.online/mcp
