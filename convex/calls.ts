@@ -330,17 +330,22 @@ export const receive = internalMutation({
         status: "request_unknown",
         dispatchState: "uncertain",
       });
-      if (j.latestAttemptId === a._id && !terminalStates.has(j.state))
+      if (j.latestAttemptId === a._id && !terminalStates.has(j.state)) {
         await ctx.db.patch(j._id, { state: "reconciling" });
-      if (j.latestAttemptId === a._id && !terminalStates.has(j.state))
         await scheduleReconciliation(ctx, a, 60000);
+      }
+      const current = await ctx.db.get(a._id);
       await ctx.db.insert("taskEvents", {
         taskId: a.taskId,
         shopJobId: j._id,
         attemptId: a._id,
         eventId: args.eventId,
         type: "reconciliation_required",
-        text: "Call status unconfirmed · checking provider",
+        text: current?.manualReconciliationAt !== undefined
+          ? "Call status unconfirmed · needs manual review"
+          : j.latestAttemptId !== a._id || terminalStates.has(j.state)
+            ? "Earlier call status remains unconfirmed"
+            : "Call status unconfirmed · checking provider",
         timestamp: Date.now(),
       });
       return { duplicate: false };

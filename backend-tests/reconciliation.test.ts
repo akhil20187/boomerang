@@ -126,6 +126,7 @@ describe('bounded call reconciliation', () => {
     await t.mutation(internal.calls.receive,{attemptId:s.attemptId,taskId:s.taskId,shopJobId:s.shopJobId,eventId:'unknown-again',status:'reconciliation_required'});
     await t.action(internal.calls.checkAbandoned,{attemptId:s.attemptId});
     expect(request).toHaveBeenCalledTimes(12);
+    expect((await t.run(ctx=>ctx.db.query('taskEvents').collect())).find(e=>e.eventId==='unknown-again')?.text).toBe('Call status unconfirmed · needs manual review');
     const callback = {attemptId:s.attemptId,taskId:s.taskId,shopJobId:s.shopJobId,eventId:'late-completion',status:'completed',answer:{stock:'available',notes:'Confirmed',currency:'INR'}};
     await t.mutation(internal.calls.receive,callback);
     await t.mutation(internal.calls.receive,callback);
@@ -179,6 +180,28 @@ describe('bounded call reconciliation', () => {
     await t.action(internal.calls.checkAbandoned,{attemptId:s.attemptId});
     expect((await t.run(ctx=>ctx.db.get(s.shopJobId)))?.state).toBe('answered');
     expect((await t.run(ctx=>ctx.db.get(s.attemptId)))?.reconciliationNextAt).toBeUndefined();
+  });
+  it.each(['unknown','completed'])('preserves a newer job when an in-flight check returns %s', async outcome => {
+    const {t,s}=await fixture();
+    let newer: any;
+    vi.stubGlobal('fetch',vi.fn(async()=>{
+      newer = await t.run(async ctx=>{
+        const id=await ctx.db.insert('callAttempts',{taskId:s.taskId,shopJobId:s.shopJobId,number:2,executor:'AI',status:'calling',dispatchState:'accepted',startedAt:Date.now()});
+        await ctx.db.patch(s.shopJobId,{latestAttemptId:id,attemptCount:2,state:'calling',billingState:'reserved'});
+        return id;
+      });
+      return outcome==='completed'
+        ? Response.json({status:'completed',result:{answer:{stock:'available',currency:'INR'}}})
+        : new Response('',{status:500});
+    }));
+    await t.action(internal.calls.checkAbandoned,{attemptId:s.attemptId});
+    expect(await t.run(ctx=>ctx.db.get(s.shopJobId))).toMatchObject({latestAttemptId:newer,state:'calling',billingState:'reserved',attemptCount:2});
+    expect((await t.run(ctx=>ctx.db.get(s.taskId)))?.status).toBe('running');
+    if(outcome==='completed')expect((await t.run(ctx=>ctx.db.get(s.attemptId)))?.answer?.stock).toBe('available');
+    vi.setSystemTime(Date.now()+5*60000);
+    await t.action(internal.calls.checkAbandoned,{attemptId:s.attemptId});
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect((await t.run(ctx=>ctx.db.query('creditEntries').collect())).filter(e=>e.type==='charge'||e.type==='release')).toHaveLength(0);
   });
   it.each([404,500])('retains unknown outcomes on bridge HTTP %s', async status => {
     const {t,s,request}=await fixture();
