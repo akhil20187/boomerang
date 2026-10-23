@@ -185,6 +185,7 @@ export const get = query({
           timeline: events
             .filter((e) => e.shopJobId === j._id)
             .map((e) => ({ text: e.text, time: e.timestamp })),
+          manualReconciliationRequired: attempt?.manualReconciliationAt !== undefined,
           durationSeconds: attempt?.durationSeconds,
           recordingUrl: null,
           recordingAvailable: !!attempt?.recordingId,

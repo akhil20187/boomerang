@@ -3,18 +3,42 @@ import { internalAction, internalQuery } from "./_generated/server";
 import { internalMutation } from "./mutationSafety";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
+import type { MutationCtx } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
 import { nextOutcome, briefItems, isChargeable, objectiveComplete, type ItemResult } from "./domain";
 import { terminalStates } from "./validators";
 import { settle } from "./credits";
 const transcriptV = v.array(
   v.object({ speaker: v.string(), text: v.string() }),
 );
+// A stopped reconciliation is unresolved, never permission to redial or release credit.
+const MAX_RECONCILIATION_CHECKS = 12;
+const MAX_RECONCILIATION_AGE_MS = 60 * 60000;
+async function scheduleReconciliation(ctx: MutationCtx, a: Doc<"callAttempts">, delay: number) {
+  if (a.manualReconciliationAt || a.endedAt || a.dispatchState === "rejected") return;
+  const now = Date.now();
+  if ((a.reconciliationChecks ?? 0) >= MAX_RECONCILIATION_CHECKS || now - a.startedAt >= MAX_RECONCILIATION_AGE_MS) {
+    await ctx.db.patch(a._id, { manualReconciliationAt: now, reconciliationNextAt: undefined });
+    await ctx.db.patch(a.shopJobId, { state: "reconciling" });
+    await ctx.db.insert("taskEvents", {
+      taskId: a.taskId, shopJobId: a.shopJobId, attemptId: a._id,
+      eventId: `${a._id}:manual-reconciliation`, type: "manual_reconciliation_required",
+      text: "Automatic status checks stopped. Manual provider review required; call outcome and billing remain unresolved. Do not redial.",
+      timestamp: now,
+    });
+    return;
+  }
+  if (a.reconciliationNextAt !== undefined) return;
+  const nextAt = Math.min(now + delay, a.startedAt + MAX_RECONCILIATION_AGE_MS);
+  await ctx.db.patch(a._id, { reconciliationNextAt: nextAt });
+  await ctx.scheduler.runAt(nextAt, internal.calls.checkAbandoned, { attemptId: a._id });
+}
 export const prepare = internalMutation({
   args: { shopJobId: v.id("shopJobs") },
   returns: v.any(),
   handler: async (ctx, args) => {
     const job = await ctx.db.get(args.shopJobId);
-    if (!job || terminalStates.has(job.state) || job.state === "calling")
+    if (!job || terminalStates.has(job.state) || ["calling", "reconciling"].includes(job.state))
       return null;
     if (
       job.state === "retry_scheduled" &&
@@ -173,13 +197,12 @@ export const dispatchResult = internalMutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const a = await ctx.db.get(args.attemptId);
-    if (!a || a.endedAt) return null;
+    if (!a || a.endedAt || a.dispatchState === "rejected") return null;
     const j = await ctx.db.get(a.shopJobId);
-    if (!j || j.latestAttemptId !== a._id) return null;
-    if (args.state === "uncertain" && a.dispatchState === "uncertain") {
-      await ctx.scheduler.runAfter(5 * 60000, internal.calls.checkAbandoned, {
-        attemptId: a._id,
-      });
+    if (!j || j.latestAttemptId !== a._id || terminalStates.has(j.state)) return null;
+    if (a.manualReconciliationAt) return null;
+    if (args.state === a.dispatchState) {
+      await scheduleReconciliation(ctx, a, args.state === "accepted" ? 12 * 60000 : 5 * 60000);
       return null;
     }
     await ctx.db.patch(a._id, {
@@ -189,7 +212,7 @@ export const dispatchResult = internalMutation({
     if (args.state !== "accepted") {
       await ctx.db.patch(j._id, {
         state: args.state === "uncertain" ? "reconciling" : "technical_error",
-        billingState: "released",
+        ...(args.state === "rejected" ? { billingState: "released" as const } : {}),
       });
       await ctx.db.insert("taskEvents", {
         taskId: a.taskId,
@@ -201,19 +224,14 @@ export const dispatchResult = internalMutation({
         timestamp: Date.now(),
       });
       if (args.state === "uncertain")
-        await ctx.scheduler.runAfter(60000, internal.calls.checkAbandoned, {
-          attemptId: a._id,
-        });
+        await scheduleReconciliation(ctx, a, 60000);
       else {
+        await ctx.db.patch(a._id, { reconciliationNextAt: undefined });
         await settle(ctx, j._id, false);
         await finishIfReady(ctx, a.taskId);
       }
     } else
-      await ctx.scheduler.runAfter(
-        12 * 60 * 1000,
-        internal.calls.checkAbandoned,
-        { attemptId: a._id },
-      );
+      await scheduleReconciliation(ctx, a, 12 * 60000);
     return null;
   },
 });
@@ -312,18 +330,22 @@ export const receive = internalMutation({
         status: "request_unknown",
         dispatchState: "uncertain",
       });
-      if (j.latestAttemptId === a._id)
+      if (j.latestAttemptId === a._id && !terminalStates.has(j.state)) {
         await ctx.db.patch(j._id, { state: "reconciling" });
-      await ctx.scheduler.runAfter(60000, internal.calls.checkAbandoned, {
-        attemptId: a._id,
-      });
+        await scheduleReconciliation(ctx, a, 60000);
+      }
+      const current = await ctx.db.get(a._id);
       await ctx.db.insert("taskEvents", {
         taskId: a.taskId,
         shopJobId: j._id,
         attemptId: a._id,
         eventId: args.eventId,
         type: "reconciliation_required",
-        text: "Call status unconfirmed · checking provider",
+        text: current?.manualReconciliationAt !== undefined
+          ? "Call status unconfirmed · needs manual review"
+          : j.latestAttemptId !== a._id || terminalStates.has(j.state)
+            ? "Earlier call status remains unconfirmed"
+            : "Call status unconfirmed · checking provider",
         timestamp: Date.now(),
       });
       return { duplicate: false };
@@ -411,6 +433,8 @@ export const receive = internalMutation({
     await ctx.db.patch(a._id, {
       status: outcome,
       endedAt: Date.now(),
+      manualReconciliationAt: undefined,
+      reconciliationNextAt: undefined,
       answer,
       ...(args.providerCallId ? { providerCallId: args.providerCallId } : {}),
       ...(args.providerRequestId
@@ -481,11 +505,32 @@ export const attemptContext = internalQuery({
   returns: v.any(),
   handler: async (ctx, args) => ctx.db.get(args.attemptId),
 });
+// Atomically claim a due check. Old/duplicate scheduled jobs cannot fan out retries.
+export const claimReconciliation = internalMutation({
+  args: { attemptId: v.id("callAttempts") },
+  returns: v.any(),
+  handler: async (ctx, args) => {
+    const a = await ctx.db.get(args.attemptId);
+    if (!a || a.endedAt || a.dispatchState === "rejected" || a.manualReconciliationAt) return null;
+    const j = await ctx.db.get(a.shopJobId);
+    if (!j || j.latestAttemptId !== a._id || terminalStates.has(j.state)) return null;
+    if (a.reconciliationNextAt !== undefined && a.reconciliationNextAt > Date.now()) return null;
+    if ((a.reconciliationChecks ?? 0) >= MAX_RECONCILIATION_CHECKS || Date.now() - a.startedAt >= MAX_RECONCILIATION_AGE_MS) {
+      await scheduleReconciliation(ctx, a, 0);
+      return null;
+    }
+    const nextAt = Math.min(Date.now() + 5 * 60000, a.startedAt + MAX_RECONCILIATION_AGE_MS);
+    await ctx.db.patch(a._id, { reconciliationChecks: (a.reconciliationChecks ?? 0) + 1, reconciliationNextAt: nextAt });
+    // Schedule before I/O so an interrupted action cannot lose the reconciliation chain.
+    await ctx.scheduler.runAt(nextAt, internal.calls.checkAbandoned, args);
+    return a;
+  },
+});
 export const checkAbandoned = internalAction({
   args: { attemptId: v.id("callAttempts") },
   returns: v.null(),
   handler: async (ctx, args): Promise<null> => {
-    const attempt = await ctx.runQuery(internal.calls.attemptContext, args);
+    const attempt = await ctx.runMutation(internal.calls.claimReconciliation, args);
     if (!attempt || attempt.endedAt) return null;
     const bridge = process.env.CALL_BRIDGE_URL,
       secret = process.env.CALL_BRIDGE_SECRET;
