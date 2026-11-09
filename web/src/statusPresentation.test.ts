@@ -107,3 +107,8 @@ test('task page back link: the chat, else the Call log',()=>{
  assert.deepEqual(taskBackLink('c1'),{href:'/app?chat=c1',text:'Back to chat'});
  assert.deepEqual(taskBackLink(null),{href:'/calls',text:'Back to Call log'});
 });
+test('manual reconciliation is visibly unresolved after automatic checks stop',()=>{
+ const unresolved={...shop,state:'reconciling',manualReconciliationRequired:true};
+ assert.deepEqual(shopStatus(unresolved),['Call status unconfirmed · needs review','amber']);
+ assert.deepEqual(taskPageStatus(unresolved),['Call status unconfirmed · needs review','amber']);
+});
